@@ -1,10 +1,27 @@
-#nes online 
+# nes online 
 
 try it on http://nes.juanix.cn:8080
 
-js/jsnes is from https://github.com/bfirsh/jsnes
+js/jsnes https://github.com/bfirsh/jsnes
 
-/*
+# 版本变动
+## v1.0
+成功运行（能运行就不错了对不对）
+按下按键时  
+本机做出响应
+指令传到服务器再传到其他客户端进行相应的响应  
+
+效果感人...
+
+## v1.1
+按下按键时  
+本机不作出响应
+指令传到服务器再传到全部客户端进行相应的响应 
+
+效果依旧感人...
+
+
+# License
 JSNES, based on Jamie Sanders' vNES
 Copyright (C) 2010 Ben Firshman
 
@@ -20,4 +37,3 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/

@@ -91,11 +91,11 @@ func (c *connection) keyboard(m map[string]string) {
 	if _, ok := h.pair1[c.roomName]; ok {
 		if c == h.pair1[c.roomName] {
 			m["from"] = "1"
-			m["to"] = "2"
+			// m["to"] = "2"
 		} else if _, ok := h.pair2[c.roomName]; ok {
 			if c == h.pair2[c.roomName] {
 				m["from"] = "2"
-				m["to"] = "1"
+				// m["to"] = "1"
 			}
 		}
 	}

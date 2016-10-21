@@ -152,7 +152,7 @@ if (typeof jQuery !== 'undefined') {
                         self.nes.keyboard.keyUp1(evt); 
                     }).
                     bind('keypress', function(evt) {
-                        self.nes.keyboard.keyPress1(evt);
+                        self.nes.keyboard.keyPress(evt);
                     });
             
                 /*

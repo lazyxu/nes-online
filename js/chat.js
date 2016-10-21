@@ -75,26 +75,26 @@ function loadButtonSet2(jsonData){
     // appendLog($("<div/>").text(jsonData.KEY_RIGHT));
 
     if (jsonData.from == "1") {
-        nes.keyboard.updateKEY_A(jsonData.KEY_A);
-        nes.keyboard.updateKEY_B(jsonData.KEY_B);
-        nes.keyboard.updateKEY_SELECT(jsonData.KEY_SELECT);
-        nes.keyboard.updateKEY_START(jsonData.KEY_START);
-        nes.keyboard.updateKEY_UP(jsonData.KEY_UP);
-        nes.keyboard.updateKEY_DOWN(jsonData.KEY_DOWN);
-        nes.keyboard.updateKEY_LEFT(jsonData.KEY_LEFT);
-        nes.keyboard.updateKEY_RIGHT(jsonData.KEY_RIGHT);
+        nes.keyboard.updateKEY_A(Number(jsonData.KEY_A));
+        nes.keyboard.updateKEY_B(Number(jsonData.KEY_B));
+        nes.keyboard.updateKEY_SELECT(Number(jsonData.KEY_SELECT));
+        nes.keyboard.updateKEY_START(Number(jsonData.KEY_START));
+        nes.keyboard.updateKEY_UP(Number(jsonData.KEY_UP));
+        nes.keyboard.updateKEY_DOWN(Number(jsonData.KEY_DOWN));
+        nes.keyboard.updateKEY_LEFT(Number(jsonData.KEY_LEFT));
+        nes.keyboard.updateKEY_RIGHT(Number(jsonData.KEY_RIGHT));
         appendLog($("<div/>").text("玩家"+jsonData.from+"按键设置加载完毕"));
         appendLog($("<div/>").text("你可以开始游戏了"));
 
     } else if (jsonData.from == "2") {
-        nes.keyboard.updateKEY_A2(jsonData.KEY_A);
-        nes.keyboard.updateKEY_B2(jsonData.KEY_B);
-        nes.keyboard.updateKEY_SELECT2(jsonData.KEY_SELECT);
-        nes.keyboard.updateKEY_START2(jsonData.KEY_START);
-        nes.keyboard.updateKEY_UP2(jsonData.KEY_UP);
-        nes.keyboard.updateKEY_DOWN2(jsonData.KEY_DOWN);
-        nes.keyboard.updateKEY_LEFT2(jsonData.KEY_LEFT);
-        nes.keyboard.updateKEY_RIGHT2(jsonData.KEY_RIGHT);
+        nes.keyboard.updateKEY_A2(Number(jsonData.KEY_A));
+        nes.keyboard.updateKEY_B2(Number(jsonData.KEY_B));
+        nes.keyboard.updateKEY_SELECT2(Number(jsonData.KEY_SELECT));
+        nes.keyboard.updateKEY_START2(Number(jsonData.KEY_START));
+        nes.keyboard.updateKEY_UP2(Number(jsonData.KEY_UP));
+        nes.keyboard.updateKEY_DOWN2(Number(jsonData.KEY_DOWN));
+        nes.keyboard.updateKEY_LEFT2(Number(jsonData.KEY_LEFT));
+        nes.keyboard.updateKEY_RIGHT2(Number(jsonData.KEY_RIGHT));
         appendLog($("<div/>").text("玩家"+jsonData.from+"按键设置加载完毕"));
         appendLog($("<div/>").text("你可以开始游戏了"));
     } else {
@@ -157,7 +157,7 @@ function keyboard2(jsonData) {
     // appendLog($("<div/>").text(nes.keyboard.key2Setting.KEY_LEFT));
     // appendLog($("<div/>").text(nes.keyboard.key2Setting.KEY_RIGHT));
     if (jsonData.from == "1") {
-        switch (jsonData.keyCode) {
+        switch (Number(jsonData.keyCode)) {
             case nes.keyboard.key1Setting.KEY_A: nes.keyboard.state1[nes.keyboard.keys.KEY_A] = Number(jsonData.value); break;     // Num-7
             case nes.keyboard.key1Setting.KEY_B: nes.keyboard.state1[nes.keyboard.keys.KEY_B] = Number(jsonData.value); break;     // Num-9
             case nes.keyboard.key1Setting.KEY_SELECT: nes.keyboard.state1[nes.keyboard.keys.KEY_SELECT] = Number(jsonData.value); break; // Num-3
@@ -168,7 +168,7 @@ function keyboard2(jsonData) {
             case nes.keyboard.key1Setting.KEY_RIGHT: nes.keyboard.state1[nes.keyboard.keys.KEY_RIGHT] = Number(jsonData.value); break; // Num-6
         }
     } else if (jsonData.from == "2") {
-        switch (jsonData.keyCode) {
+        switch (Number(jsonData.keyCode)) {
             case nes.keyboard.key2Setting.KEY_A: nes.keyboard.state2[nes.keyboard.keys.KEY_A] = Number(jsonData.value); break;     // Num-7
             case nes.keyboard.key2Setting.KEY_B: nes.keyboard.state2[nes.keyboard.keys.KEY_B] = Number(jsonData.value); break;     // Num-9
             case nes.keyboard.key2Setting.KEY_SELECT: nes.keyboard.state2[nes.keyboard.keys.KEY_SELECT] = Number(jsonData.value); break; // Num-3
@@ -207,22 +207,22 @@ function bindNetwork(jsonData) {
     $("#canvas").
         bind('keydown', function(evt) {
             // alert(evt.keyCode)
-            if (jsonData.to=="1") {
-                self.nes.keyboard.keyDown1(evt);
-            } else if (jsonData.to=="2") {
-                self.nes.keyboard.keyDown2(evt);
-            }
+            // if (jsonData.to=="1") {
+            //     self.nes.keyboard.keyDown1(evt);
+            // } else if (jsonData.to=="2") {
+            //     self.nes.keyboard.keyDown2(evt);
+            // }
             // appendLog($("<div/>").text(evt.keyCode));
             // alert(keyCode)
             conn.send(JSON.stringify({"opt": "keyboard", "keyCode": evt.keyCode.toString(), "value": "65"}));
         }).
         bind('keyup', function(evt) {
             // alert(evt.keyCode)
-            if (jsonData.to=="1") {
-                self.nes.keyboard.keyUp1(evt);
-            } else if (jsonData.to=="2") {
-                self.nes.keyboard.keyUp2(evt);
-            }
+            // if (jsonData.to=="1") {
+            //     self.nes.keyboard.keyUp1(evt);
+            // } else if (jsonData.to=="2") {
+            //     self.nes.keyboard.keyUp2(evt);
+            // }
             
             // alert(evt.keyCode)
             // appendLog($("<div/>").text(evt.keyCode));
@@ -308,7 +308,7 @@ if (window["WebSocket"]) {
                 }
                 break;
             case "keyboard":
-                // appendLog($("<div/>").text("keyboard fromip:"+jsonData.ip+"from:"+jsonData.from+" to:"+jsonData.to));
+                appendLog($("<div/>").text("keyboard fromip:"+jsonData.ip+"from:"+jsonData.from+" to:"+jsonData.to));
                 keyboard2(jsonData);
                 break;
             default: 
