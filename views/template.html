@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>NES Online</title>
+    <link href="css/bootstrap/bootstrap.css" rel="stylesheet">
+    <script src="js/jquery-3.1.1.min.js"></script>
+    <script src="js/bootstrap/bootstrap.js"></script>
+    <script src="js/react/react.js"></script>
+    <script src="js/react/react-dom.js"></script>
+    <script src="js/react/browser.min.js"></script>
+
+    <!--chatBoard required-->
+    <link href="css/chatBoard.css" rel="stylesheet">
+
+    <!--nes required-->
+    <script src="/js/dynamicaudio-min.js" type="text/javascript" charset="utf-8"></script>
+    <script src="/js/jsnes/nes.js" type="text/javascript" charset="utf-8"></script>
+    <script src="/js/jsnes/utils.js" type="text/javascript" charset="utf-8"></script>
+    <script src="/js/jsnes/cpu.js" type="text/javascript" charset="utf-8"></script>
+    <script src="/js/jsnes/keyboard.js" type="text/javascript" charset="utf-8"></script>
+    <script src="/js/jsnes/mappers.js" type="text/javascript" charset="utf-8"></script>
+    <script src="/js/jsnes/papu.js" type="text/javascript" charset="utf-8"></script>
+    <script src="/js/jsnes/ppu.js" type="text/javascript" charset="utf-8"></script>
+    <script src="/js/jsnes/rom.js" type="text/javascript" charset="utf-8"></script>
+    <script src="/js/jsnes/ui.js" type="text/javascript" charset="utf-8"></script>
+</head>
+
+<body>
+    <script type="text/babel" src="js/chatBoard.js"></script>
+    <div id="host" style="display: none">{{.Host1}}</div>
+    <div id="Chat" class="dragclass">
+	    <div id="ChatHead">
+	              <span style="float: left">大厅</span>
+	              <a href="#" onclick="ChatHidden();">-</a>
+	              <a href="#" onclick="ChatShow();">+</a>
+	              <a href="#" onclick="ChatClose();">x</a>
+	          </div>
+		<div id="ChatBody">
+            <div id="ChatContent">
+            </div>
+            <div id="ChatBtn">
+            <form id="form" style="display: inline">
+                <input type="text" id="msg" class="ChatSendMsg" placeholder="随便说点什么..." />
+            </form>
+            <button id="leavePair" class="leavePair" onclick="leavePair();" disabled>离开房间</button>
+            <button id="ready" class="ready" onclick="readyPair();" disabled>准备</button>
+            </div>
+        </div>
+    </div>
+    <div id="Board" class="dragclass">
+        <div id="BoardHead">
+            <span style="float: left"><span id="ip"></span></span>
+            <a href="#" onclick="BoardHidden();">-</a>
+            <a href="#" onclick="BoardShow();">+</a>
+            <a href="#" onclick="BoardClose();">x</a>
+        </div>
+        <div id="BoardBody">
+            <div id="BoardBtn">
+            <ul class="tabs">
+                    <li>
+                        <a href="#" id="roomsTitle" class="active" onclick="$('#rooms').hide();$('#users').show();$('#roomsTitle').addClass('active');$('#usersTitle').removeClass('active');">在线玩家</a>
+                    </li>
+                    <li>
+                        <a href="#" id="usersTitle" onclick="$('#users').hide();$('#rooms').show();$('#usersTitle').addClass('active');$('#roomsTitle').removeClass('active');">双人房</a>
+                    </li>
+                </ul>
+            </div>
+            <div id="BoardContent">
+		        <div id="users">
+		        </div>
+		        <div id="rooms" hidden>
+		        </div>
+            </div>
+        </div>
+    </div>
+	<script src="js/chat.js"></script>
+    <div id="emulator" align="center"></div>
+    <!-- 按钮触发模态框 -->
+    <div align="center">
+        <!--<a href="/chatroom" target="blank">进入聊天室</a><br>-->
+        <button class="btn btn-primary btn-lg" id="choose-rom" data-toggle="modal" data-target="#myModal">选择游戏</button>
+        <br><br>
+        <!--<form id="form">
+            <input type="text" id="msg" size="32" placeholder="随便说点什么..." />
+        </form>-->
+    </div>
+    <!-- 模态框（Modal） -->
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog" style="width: 100%">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title" id="myModalLabel">nes游戏列表</h4>
+                </div>
+                <div class="modal-body" align="center">
+                    <div class="container-fluid">
+                        <div class="row-fluid">
+                            <div class="span12">
+                                <div id="romlist" align="center">
+                                    {{.Romlist}}
+                                    <!--<span id="rom-2" onclick="loadRom('/roms/Battle City (J).nes')">坦克大战</span>-->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                    <button type="button" class="btn btn-primary" data-dismiss="modal">确定</button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal -->
+    </div>
+    <br>
+    <div align="center" id="1-keyboard">
+        <div style="border-radius:22px;width:347px;height:150px;background:url(/images/controller.jpg);">
+            <input id="KEY_LEFT" style="border-color: #262729; background: #000000; color: #ffffff; float: left; width: 24px; height: 24px; border-radius: 5px; margin-top: 78px; margin-left: 27px; text-align: center;" value="65" type="text">
+            <input id="KEY_UP" style="border-color: #262729; background: #000000; color: #ffffff; float: left; width: 24px; height: 24px; border-radius: 5px; margin-top: 55px; margin-left: -1px; text-align: center;" value="87" type="text">
+            <input id="KEY_DOWN" style="border-color: #262729; background: #000000; color: #ffffff; float: left; width: 24px; height: 24px; border-radius: 5px; margin-top: 99px; margin-left: -24px; text-align: center;" value="83" type="text">
+            <input id="KEY_RIGHT" style="border-color: #262729; background: #000000; color: #ffffff; float: left; width: 24px; height: 24px; border-radius: 5px; margin-top: 78px; margin-left: -2px; text-align: center;" value="68" type="text">
+            <input id="KEY_SELECT" style="border-color: #262729; background: #000000; color: #ffffff; float: left; width: 40px; margin-top: 97px; margin-left: 24px; height: 18px; border-radius: 31px; text-align: center;" value="86" type="text">
+            <input id="KEY_START" style="border-color: #262729; background: #000000; color: #ffffff; float: left; width: 40px; margin-top: 97px; margin-left: 4px; height: 18px; border-radius: 20px; text-align: center;" value="66" type="text">
+            <input id="KEY_A" style="border-color: #262729; background: #000000; color: #ffffff; float: left; border-radius: 25px; margin-top: -55px; margin-left: 285px; width: 33px; height: 33px; text-align: center;" value="75" type="text">
+            <input id="KEY_B" style="border-color: #262729; background: #000000; color: #ffffff; float: left; width: 33px; height: 33px; border-radius: 25px; margin-top: -24px; margin-left: 253px; text-align: center;" value="74" type="text">
+        <br>
+	</div>
+	<div align="center" id="2-keyboard" style="display: none">
+        <div style="border-radius:22px;width:347px;height:150px;background:url(/images/controller.jpg);">
+            <input id="KEY_LEFT2" style="border-color: #262729; background: #000000; color: #ffffff; float: left; width: 24px; height: 24px; border-radius: 5px; margin-top: 78px; margin-left: 27px; text-align: center;" value="65" type="text">
+            <input id="KEY_UP2" style="border-color: #262729; background: #000000; color: #ffffff; float: left; width: 24px; height: 24px; border-radius: 5px; margin-top: 55px; margin-left: -1px; text-align: center;" value="87" type="text">
+            <input id="KEY_DOWN2" style="border-color: #262729; background: #000000; color: #ffffff; float: left; width: 24px; height: 24px; border-radius: 5px; margin-top: 99px; margin-left: -24px; text-align: center;" value="83" type="text">
+            <input id="KEY_RIGHT2" style="border-color: #262729; background: #000000; color: #ffffff; float: left; width: 24px; height: 24px; border-radius: 5px; margin-top: 78px; margin-left: -2px; text-align: center;" value="68" type="text">
+            <input id="KEY_SELECT2" style="border-color: #262729; background: #000000; color: #ffffff; float: left; width: 40px; margin-top: 97px; margin-left: 24px; height: 18px; border-radius: 31px; text-align: center;" value="86" type="text">
+            <input id="KEY_START2" style="border-color: #262729; background: #000000; color: #ffffff; float: left; width: 40px; margin-top: 97px; margin-left: 4px; height: 18px; border-radius: 20px; text-align: center;" value="66" type="text">
+            <input id="KEY_A2" style="border-color: #262729; background: #000000; color: #ffffff; float: left; border-radius: 25px; margin-top: -55px; margin-left: 285px; width: 33px; height: 33px; text-align: center;" value="75" type="text">
+            <input id="KEY_B2" style="border-color: #262729; background: #000000; color: #ffffff; float: left; width: 33px; height: 33px; border-radius: 25px; margin-top: -24px; margin-left: 253px; text-align: center;" value="74" type="text">
+        </div>
+    </div>
+    <script type="text/javascript" charset="utf-8">
+        var nes;
+        $(function() {
+            nes = new JSNES({
+                'ui': $('#emulator').JSNESUI({
+                    "Homebrew": [
+						['Battle City (J).nes', 'roms/Battle City (J).nes'],
+						['1942 (JU).nes', 'roms/1942 (JU).nes'],
+                    ]
+                })
+            });
+        });
+		
+        function loadRom(url, set) {
+            $.ajax({
+                url: url,
+                xhr: function() {
+                    var xhr = $.ajaxSettings.xhr();
+                    if (typeof xhr.overrideMimeType !== 'undefined') {
+                        // Download as binary
+                        xhr.overrideMimeType('text/plain; charset=x-user-defined');
+                    }
+                    return xhr;
+                },
+                complete: function(xhr, status) {
+                    var i, data;
+                    if (JSNES.Utils.isIE()) {
+                        var charCodes = JSNESBinaryToArray(
+                                xhr.responseBody
+                        ).toArray();
+                        data = String.fromCharCode.apply(
+                                undefined,
+                                charCodes
+                        );
+                    }
+                    else {
+                        data = xhr.responseText;
+                    }
+                    var ret = nes.loadRom(data);
+                    nes.start();
+                    if(set) {
+                        $("#nes-pause").attr("disabled", false);
+                        $("#nes-restart").attr("disabled", false);
+                    }
+                    if (nes.isRunning) {
+                        $("#nes-pause").val("pause");
+                    }
+                    else {
+                        $("#nes-pause").val("resume");
+                    }
+                    if (nes.opts.emulateSound) {
+                        $("#nes-sound").val("disable sound");
+                    }
+                    else {
+                        $("#nes-sound").val("enable sound");
+                    }
+                }
+            });
+        }
+    </script>
+    <script src="/js/keyset.js" type="text/javascript" charset="utf-8"></script>
+</body>
+</html>
