@@ -2,7 +2,8 @@
 
 try it on http://nes.juanix.cn:8080
 
-jsnes包来自https://github.com/bfirsh/jsnes
+js/jsnes is from https://github.com/bfirsh/jsnes
+
 /*
 JSNES, based on Jamie Sanders' vNES
 Copyright (C) 2010 Ben Firshman
