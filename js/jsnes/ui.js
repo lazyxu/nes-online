@@ -209,7 +209,6 @@ if (typeof jQuery !== 'undefined') {
                             prevBuffer[i] = pixel;
                         }
                     }
-
                     this.canvasContext.putImageData(this.canvasImageData, 0, 0);
                 }
             };

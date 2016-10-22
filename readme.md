@@ -20,6 +20,15 @@ js/jsnes https://github.com/bfirsh/jsnes
 
 效果依旧感人...
 
+## v1.2
+首先客户端与服务器进行时间同步
+
+按下按键时  
+本机不作出响应
+指令传到服务器，记录客户端时间t
+再传到全部客户端约定在t的基础上等待一定的时间（比如最大的ping，或者固定为100ms）进行相应的响应 
+
+然而...不知道为什么还是很容易画面不同步...gg
 
 # License
 JSNES, based on Jamie Sanders' vNES

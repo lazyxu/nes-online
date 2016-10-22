@@ -19,6 +19,8 @@ type hub struct {
 	pair1          map[string]*connection
 	pair2          map[string]*connection
 	pairReady      map[string]bool
+	pairStart      map[string]bool
+	maxPingPair    map[string]int64
 	buttonSetPair1 map[string]string
 	buttonSetPair2 map[string]string
 	gamePathPair   map[string]string
@@ -42,6 +44,8 @@ var h = hub{
 	pair1:          make(map[string]*connection),
 	pair2:          make(map[string]*connection),
 	pairReady:      make(map[string]bool),
+	pairStart:      make(map[string]bool),
+	maxPingPair:    make(map[string]int64),
 	buttonSetPair1: make(map[string]string),
 	buttonSetPair2: make(map[string]string),
 	gamePathPair:   make(map[string]string),
@@ -72,7 +76,7 @@ func (h *hub) run() {
 			}
 			log.Println("send msg success")
 		case m := <-h.msgPair:
-			log.Println(m["opt"] + " " + m["ip"] + " " + m["data"] + " " + m["roomName"] + " " + m["empty"])
+			log.Println(m["opt"] + " " + m["ip"] + " " + m["data"] + " " + m["roomName"] + " " + m["empty"] + m["time"])
 			if _, ok := m["roomName"]; ok {
 				pair1 := h.pair1[m["roomName"]]
 				pair2 := h.pair2[m["roomName"]]

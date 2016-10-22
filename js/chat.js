@@ -4,6 +4,11 @@ var ChatContent = $("#ChatContent");
 var users = $("#users");
 var rooms = $("#rooms");
 var ip;
+var maxPing=100;
+var noPair = 0;
+var time1;
+var dtime;
+var start;
 function appendLog(msg) {
     var d = ChatContent[0]
     var doScroll = d.scrollTop == d.scrollHeight - d.clientHeight;
@@ -45,6 +50,7 @@ function createPair(url, romName) {
     conn.send(JSON.stringify({"opt": "createPair", "data": romName, "url": url}));
     $("#leavePair").attr("disabled", false);
     $("#ready").attr("disabled", false);
+    noPair = "1";
 }
 function leavePair() {
     $("#1-keyboard").show();
@@ -55,6 +61,7 @@ function leavePair() {
     conn.send(JSON.stringify({"opt": "leavePair"}));
     $("#leavePair").attr("disabled", true);
     $("#ready").attr("disabled", true);
+    noPair = "0";
 }
 
 function joinPair(roomName){
@@ -62,6 +69,7 @@ function joinPair(roomName){
         return false;
     }
     conn.send(JSON.stringify({"opt": "joinPair", "roomName": roomName}));
+    noPair = "2";
 }
 
 function loadButtonSet2(jsonData){
@@ -84,8 +92,6 @@ function loadButtonSet2(jsonData){
         nes.keyboard.updateKEY_LEFT(Number(jsonData.KEY_LEFT));
         nes.keyboard.updateKEY_RIGHT(Number(jsonData.KEY_RIGHT));
         appendLog($("<div/>").text("玩家"+jsonData.from+"按键设置加载完毕"));
-        appendLog($("<div/>").text("你可以开始游戏了"));
-
     } else if (jsonData.from == "2") {
         nes.keyboard.updateKEY_A2(Number(jsonData.KEY_A));
         nes.keyboard.updateKEY_B2(Number(jsonData.KEY_B));
@@ -95,8 +101,6 @@ function loadButtonSet2(jsonData){
         nes.keyboard.updateKEY_DOWN2(Number(jsonData.KEY_DOWN));
         nes.keyboard.updateKEY_LEFT2(Number(jsonData.KEY_LEFT));
         nes.keyboard.updateKEY_RIGHT2(Number(jsonData.KEY_RIGHT));
-        appendLog($("<div/>").text("玩家"+jsonData.from+"按键设置加载完毕"));
-        appendLog($("<div/>").text("你可以开始游戏了"));
     } else {
         appendLog($("<div/>").text("error"));
     }
@@ -146,6 +150,7 @@ function readyPair(){
 }
 
 function keyboard2(jsonData) {
+    appendLog($("<div/>").text("keyboard 本地时间: "+getTime()+" 本地服务器时间: "+trueTime()+" 服务器时间: "+jsonData.time));
     // appendLog($("<div/>").text(jsonData.keyCode+": "+value));
 
     // appendLog($("<div/>").text(nes.keyboard.key2Setting.KEY_A.to));
@@ -181,6 +186,22 @@ function keyboard2(jsonData) {
     }
 }
 
+function keyboard(jsonData) {
+    if (trueTime() > Number(jsonData.time)) {
+        keyboard2(jsonData);
+    } else {
+        var delay = Number(jsonData.time) - trueTime();
+        appendLog($("<div/>").text("wait: "+delay+" 本地时间: "+getTime()+" 本地服务器时间: "+trueTime()+" 服务器时间: "+jsonData.time));
+        setTimeout(keyboard2, delay, jsonData);
+    }
+}
+function unbindButton() {
+    $("#canvas").
+        unbind('keydown').
+        unbind('keyup').
+        unbind('keypress');
+}
+
 function bindLocal() {
     $("#canvas").
         unbind('keydown').
@@ -192,7 +213,6 @@ function bindLocal() {
         }).
         bind('keyup', function(evt) {
             self.nes.keyboard.keyUp(evt);
-            conn.send(JSON.stringify({"opt": "keyboard", "keyCode": evt.keyCode.toString(), "value": "64"}));
         }).
         bind('keypress', function(evt) {
             self.nes.keyboard.keyPress(evt);
@@ -200,10 +220,7 @@ function bindLocal() {
 }
 
 function bindNetwork(jsonData) {
-    $("#canvas").
-        unbind('keydown').
-        unbind('keyup').
-        unbind('keypress');
+    unbindButton();
     $("#canvas").
         bind('keydown', function(evt) {
             // alert(evt.keyCode)
@@ -245,10 +262,26 @@ $("#form").submit(function() {
     return false
 });
 
+function getTime() {
+    var myDate = new Date();
+    return myDate.getTime();
+}
+
+function trueTime() {
+    var myDate = new Date();
+    return myDate.getTime()+dtime;
+}
+
+function startGame() {
+    nes.reloadRom();
+    self.nes.start();
+    appendLog($("<div/>").text("你可以开始游戏了"));
+}
+
 if (window["WebSocket"]) {
     conn = new WebSocket("ws://"+$('#host')[0].innerHTML+"/ws");
     conn.onclose = function(evt) {
-        appendLog($("<div><b>Connection closed.</b></div>"))
+        appendLog($("<div><b>Connection closed.</b></div>"));
     }
     conn.onmessage = function(evt) {
         var jsonData=JSON.parse(evt.data);
@@ -274,11 +307,15 @@ if (window["WebSocket"]) {
                     appendLog($("<div/>").text(jsonData.data+'离开了平台，回家吃饭了'));
                 }
                 break; 
+            case "readyPair":
+                appendLog($("<div/>").text("玩家"+jsonData.no+" "+jsonData.ip+"已经准备好了"));
+                break; 
             case "createPair":
                 appendRoom($("<div id="+jsonData.roomName+" onclick=\"joinPair('"+jsonData.roomName+"')\"/>").text(jsonData.ip+' - ' + jsonData.data));
                 appendLog($("<div/>").text(jsonData.ip+"创建了游戏"+jsonData.data));
                 break; 
             case "leavePair":
+                start = 0;
                 if (jsonData.empty=="true") {
                     if (document.getElementById(jsonData.roomName)) {
                         removeDiv(jsonData.roomName);
@@ -289,27 +326,58 @@ if (window["WebSocket"]) {
                 appendLog($("<div/>").text(jsonData.ip+"离开了双人房"+jsonData.roomName));
                 break; 
             case "joinPair":
-                $("#1-keyboard").hide();
-                $("#2-keyboard").show();
-                $("#leavePair").attr("disabled", false);
-                $("#ready").attr("disabled", false);
-                loadRom(jsonData.url, true)
-                appendLog($("<div/>").text("加载游戏"+jsonData.url));
+                if (noPair == "2") {
+                    $("#1-keyboard").hide();
+                    $("#2-keyboard").show();
+                    $("#leavePair").attr("disabled", false);
+                    $("#ready").attr("disabled", false);
+                    loadRom(jsonData.url, true);
+                    appendLog($("<div/>").text("加载游戏"+jsonData.url));
+                }
                 appendLog($("<div/>").text(jsonData.ip+"来到了双人房"+jsonData.roomName));
                 break; 
             case "buttonSetPair":
-                // appendLog($("<div/>").text("buttonSetPair fromip:"+jsonData.ip+"from:"+jsonData.from+" to:"+jsonData.to));
-                if (jsonData.from!=jsonData.to) {
-                    loadRom(jsonData.url, false)
-                    disableButtons(true);
-                    appendLog($("<div/>").text("正在加载玩家"+jsonData.from+"按键设置..."));
-                    loadButtonSet2(jsonData);
-                    bindNetwork(jsonData);
+                disableButtons(true);
+                loadRom(jsonData.url, false);
+                appendLog($("<div/>").text("正在加载玩家"+jsonData.from+"按键设置..."));
+                loadButtonSet2(jsonData);
+                unbindButton(jsonData);
+                conn.send(JSON.stringify({"opt": "checkTime1"}));
+                break;
+            case "checkTime1":
+                // appendLog($("<div/>").text("正在与服务器校对时间..."));
+                // $('#time').text(jsonData.s1);
+                time1 = getTime();
+                // $('#localTime').text(time1);
+                conn.send(JSON.stringify({"opt": "checkTime2", "from": jsonData.from, "to":jsonData.to, "s1":jsonData.s1}));
+                break;
+            case "checkTime2":
+                dtime = Number(jsonData.time) - time1;
+                appendLog($("<div/>").text("相对时间: "+dtime));
+                appendLog($("<div/>").text("时间校对完毕"));
+                bindNetwork(jsonData);
+                appendLog($("<div/>").text("服务器时间: "+jsonData.time));
+                appendLog($("<div/>").text("本地时间: "+time1));
+                time2 = getTime();
+                $('#ping').text(jsonData.ping);
+                $('#time').text(time2 + dtime);
+                $('#localTime').text();
+                if (start==0) {
+                    conn.send(JSON.stringify({"opt": "checkTimeOK"}));
+                }
+                break;
+            case "startPair":
+                start = 1;
+                appendLog($("<div/>").text("同步游戏中..."));
+                i=0;
+                if (trueTime() > Number(jsonData.time)) {
+                    startGame();
+                } else {
+                    setTimeout(startGame(), Number(jsonData.time) - trueTime());
                 }
                 break;
             case "keyboard":
-                appendLog($("<div/>").text("keyboard fromip:"+jsonData.ip+"from:"+jsonData.from+" to:"+jsonData.to));
-                keyboard2(jsonData);
+                keyboard(jsonData);
                 break;
             default: 
                 // appendLog($("<div/>").text(jsonData.data));
