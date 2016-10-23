@@ -78,6 +78,7 @@ JSNES.prototype = {
             if (!this.isRunning) {
                 this.isRunning = true;
                 
+                // this.frame();
                 this.frameInterval = setInterval(function() {
                     self.frame();
                 }, this.frameTime);
@@ -152,6 +153,7 @@ JSNES.prototype = {
         }
         this.fpsFrameCount++;
         this.frameCount++;
+        // requestAnimationFrame(this.frame());
     },
     
     printFps: function() {

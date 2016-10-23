@@ -40,6 +40,11 @@ js/jsnes https://github.com/bfirsh/jsnes
 但是本机测试并没有...
 实测这游戏fps不同游戏运行速度不同，可能是这个原因？？？
 
+## v1.2.2
+fps并不能很好的固定下来，setInterval也是有误差的
+canvas.toDataURL()保存为图片的方法也不行
+好像没找到什么好的解决办法，暂时不搞了...
+
 # License
 JSNES, based on Jamie Sanders' vNES
 Copyright (C) 2010 Ben Firshman

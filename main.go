@@ -14,9 +14,6 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
-
-	"labix.org/v2/mgo"
-	"labix.org/v2/mgo/bson"
 )
 
 var romlist string
@@ -35,16 +32,6 @@ func renderHTML(w http.ResponseWriter, file string, data interface{}) {
 	t.Execute(w, data)
 }
 
-// Game LALAL
-type Game struct {
-	ID       bson.ObjectId `bson:"_id"`
-	Path     string        `bson:"path"`
-	Name     string        `bson:"name"`
-	Tags     []string      `bson:"tags"`
-	Play     int           `bson:"play"`
-	Favorite int           `bson:"favorite"`
-}
-
 func hashFile(path string) (string, error) {
 	data, err := ioutil.ReadFile(path)
 	if err != nil {
@@ -52,47 +39,6 @@ func hashFile(path string) (string, error) {
 	}
 	// "http://www.michaelfogleman.com/static/nes/" + hash + ".png"
 	return fmt.Sprintf("%x", md5.Sum(data)), nil
-}
-
-func update(w http.ResponseWriter, r *http.Request) {
-	mongoDBDialInfo := &mgo.DialInfo{
-		Addrs:    []string{"115.159.151.237:27017"},
-		Username: "nes",
-		Password: "nes1123",
-		Database: "nes",
-		Source:   "nes"}
-
-	session, err := mgo.DialWithInfo(mongoDBDialInfo) //连接数据库
-	if err != nil {
-		panic(err)
-	}
-	defer session.Close()
-	session.SetMode(mgo.Monotonic, true)
-
-	db := session.DB("nes")     //数据库名称
-	collection := db.C("games") //如果该集合已经存在的话，则直接返回
-
-	dirPath := "roms/"
-	dir, err := ioutil.ReadDir(dirPath)
-	checkErr(err)
-	suffix := strings.ToUpper(".nes") //忽略后缀匹配的大小写
-	fmt.Println("start")
-	for _, fi := range dir {
-		if strings.HasSuffix(strings.ToUpper(fi.Name()), suffix) { //匹配文件
-			name := fi.Name()
-			path := dirPath + fi.Name()
-			err = collection.Insert(&Game{
-				ID:       bson.NewObjectId(),
-				Path:     path,
-				Name:     name,
-				Tags:     nil,
-				Play:     0,
-				Favorite: 0})
-			if err != nil {
-				panic(err)
-			}
-		}
-	}
 }
 
 func index(w http.ResponseWriter, r *http.Request) {
@@ -103,36 +49,6 @@ func index(w http.ResponseWriter, r *http.Request) {
 
 func test(w http.ResponseWriter, r *http.Request) {
 	renderHTML(w, "test.html", nil)
-}
-
-func getRomList() {
-	mongoDBDialInfo := &mgo.DialInfo{
-		Addrs:    []string{"115.159.151.237:27017"},
-		Username: "nes",
-		Password: "nes1123",
-		Database: "nes",
-		Source:   "nes"}
-
-	session, err := mgo.DialWithInfo(mongoDBDialInfo) //连接数据库
-	if err != nil {
-		panic(err)
-	}
-	defer session.Close()
-	session.SetMode(mgo.Monotonic, true)
-
-	db := session.DB("nes")     //数据库名称
-	collection := db.C("games") //如果该集合已经存在的话，则直接返回
-
-	//*****集合中元素数目********
-	var games []Game
-	collection.Find(nil).All(&games)
-	if err != nil {
-		panic(err)
-	}
-	romlist = ""
-	for index, game := range games {
-		romlist += "<button id='rom-" + strconv.Itoa(index) + "' data-dismiss=\"modal\" onclick=\"loadRom('" + game.Path + "');createPair('" + game.Name + "');\">" + game.Name + "</button>"
-	}
 }
 
 var (

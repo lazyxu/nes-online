@@ -74,7 +74,6 @@
             </div>
         </div>
     </div>
-	<script src="js/chat.js"></script>
     <div style="float: left">
         time: <span id="time">0</span><br>
         localTime: <span id="localTime">0</span>
@@ -84,6 +83,7 @@
         frameCount: <span id="frameCount">0</span>
         <!--<button onclick="conn.send(JSON.stringify({'opt': 'checkTime1a'}));">重新计算延迟</button>-->
     </div>
+    <script src="js/chat.js"></script>
     <div id="emulator" align="center"></div>
     <script type="text/javascript" charset="utf-8">
         var nes;
@@ -97,7 +97,6 @@
                 })
             });
         });
-		
         function loadRom(url, set) {
             $.ajax({
                 url: url,

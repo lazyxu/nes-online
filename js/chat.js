@@ -267,7 +267,13 @@ function bindNetwork(jsonData) {
             self.nes.keyboard.keyPress(evt);
         });
 }
-
+// var timeTest = 0;
+// function step() {
+//     $('#time').text(timeTest);
+//     timeTest++;
+//     requestAnimationFrame(step);
+// }
+// step();
 $("#form").submit(function() {
     if (!conn) {
         return false;
