@@ -30,6 +30,16 @@ js/jsnes https://github.com/bfirsh/jsnes
 
 然而...不知道为什么还是很容易画面不同步...gg
 
+## v1.2.1
+讲道理时间控制应该没错啊
+虽然应该多次测取平均值
+但是大概应该没错的啊
+
+听说settimeout这个函数很不准，换成了setInterval
+本来以为会因为发消息太频繁有按键消息丢了，还想每隔50ms发一次
+但是本机测试并没有...
+实测这游戏fps不同游戏运行速度不同，可能是这个原因？？？
+
 # License
 JSNES, based on Jamie Sanders' vNES
 Copyright (C) 2010 Ben Firshman

@@ -56,6 +56,7 @@ JSNES.VERSION = "<%= version %>";
 
 JSNES.prototype = {
     isRunning: false,
+    frameCount: 0,
     fpsFrameCount: 0,
     romData: null,
     
@@ -150,6 +151,7 @@ JSNES.prototype = {
             }
         }
         this.fpsFrameCount++;
+        this.frameCount++;
     },
     
     printFps: function() {
@@ -160,6 +162,7 @@ JSNES.prototype = {
                 this.fpsFrameCount / ((now - this.lastFpsTime) / 1000)
             ).toFixed(2)+' FPS';
         }
+        // $('#frameCount').text(this.frameCount);
         this.ui.updateStatus(s);
         this.fpsFrameCount = 0;
         this.lastFpsTime = now;

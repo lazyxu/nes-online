@@ -8,7 +8,12 @@ var maxPing=100;
 var noPair = 0;
 var time1;
 var dtime;
-var start;
+var start = 0;
+var keyboardinfo=[];
+var keyboardn = 0;
+var localkeyboardtime = 0;
+var receivedkeyboardtime = 0;
+
 function appendLog(msg) {
     var d = ChatContent[0]
     var doScroll = d.scrollTop == d.scrollHeight - d.clientHeight;
@@ -17,6 +22,7 @@ function appendLog(msg) {
         d.scrollTop = d.scrollHeight - d.clientHeight;
     }
 }
+
 function appendUser(msg) {
     var d = users[0]
     var doScroll = d.scrollTop == d.scrollHeight - d.clientHeight;
@@ -149,8 +155,10 @@ function readyPair(){
     disableButtons(true);
 }
 
-function keyboard2(jsonData) {
-    appendLog($("<div/>").text("keyboard 本地时间: "+getTime()+" 本地服务器时间: "+trueTime()+" 服务器时间: "+jsonData.time));
+function keyboard2(jsonData, keyboardn) {
+    appendLog($("<div/>").text("in 本地时间: "+getTime()+" 本地服务器时间: "+trueTime()+" 服务器时间: "+jsonData.time));
+    receivedkeyboardtime ++;
+    appendLog($("<div/>").text("localkeyboardtime: "+localkeyboardtime+" receivedkeyboardtime: "+receivedkeyboardtime));
     // appendLog($("<div/>").text(jsonData.keyCode+": "+value));
 
     // appendLog($("<div/>").text(nes.keyboard.key2Setting.KEY_A.to));
@@ -184,15 +192,21 @@ function keyboard2(jsonData) {
             case nes.keyboard.key2Setting.KEY_RIGHT: nes.keyboard.state2[nes.keyboard.keys.KEY_RIGHT] = Number(jsonData.value); break; // Num-6
         }
     }
+    appendLog($("<div/>").text("out 本地时间: "+getTime()+" 本地服务器时间: "+trueTime()+" 服务器时间: "+jsonData.time));
+    clearInterval(keyboardinfo[keyboardn]);
 }
 
 function keyboard(jsonData) {
-    if (trueTime() > Number(jsonData.time)) {
+    if (trueTime() > Number(jsonData.time)-10) {
+        var delay = trueTime() - Number(jsonData.time) ;
+        appendLog($("<div/>").text("start: "+delay+" 本地时间: "+getTime()+" 本地服务器时间: "+trueTime()+" 服务器时间: "+jsonData.time));
         keyboard2(jsonData);
     } else {
         var delay = Number(jsonData.time) - trueTime();
         appendLog($("<div/>").text("wait: "+delay+" 本地时间: "+getTime()+" 本地服务器时间: "+trueTime()+" 服务器时间: "+jsonData.time));
-        setTimeout(keyboard2, delay, jsonData);
+        // setTimeout(keyboard2, delay, jsonData);
+        keyboardinfo[keyboardn] = setInterval(keyboard2, delay-2, jsonData, keyboardn);
+        keyboardn++;
     }
 }
 function unbindButton() {
@@ -231,6 +245,8 @@ function bindNetwork(jsonData) {
             // }
             // appendLog($("<div/>").text(evt.keyCode));
             // alert(keyCode)
+            appendLog($("<div/>").text("down: 本地时间: "+getTime()+" 本地服务器时间: "+trueTime()));
+            localkeyboardtime++;
             conn.send(JSON.stringify({"opt": "keyboard", "keyCode": evt.keyCode.toString(), "value": "65"}));
         }).
         bind('keyup', function(evt) {
@@ -243,6 +259,8 @@ function bindNetwork(jsonData) {
             
             // alert(evt.keyCode)
             // appendLog($("<div/>").text(evt.keyCode));
+            appendLog($("<div/>").text("up: 本地时间: "+getTime()+" 本地服务器时间: "+trueTime()));
+            localkeyboardtime++;
             conn.send(JSON.stringify({"opt": "keyboard", "keyCode": evt.keyCode.toString(), "value": "64"}));
         }).
         bind('keypress', function(evt) {
@@ -272,10 +290,25 @@ function trueTime() {
     return myDate.getTime()+dtime;
 }
 
-function startGame() {
+function startGame(keyboardn) {
     nes.reloadRom();
     self.nes.start();
     appendLog($("<div/>").text("你可以开始游戏了"));
+    clearInterval(keyboardinfo[keyboardn]);
+}
+
+function startPair(jsonData) {
+    if (trueTime() > Number(jsonData.time)-10) {
+        var delay = trueTime() - Number(jsonData.time) ;
+        appendLog($("<div/>").text("start: "+delay+" 本地时间: "+getTime()+" 本地服务器时间: "+trueTime()+" 服务器时间: "+jsonData.time));
+        startGame();
+    } else {
+        var delay = Number(jsonData.time) - trueTime();
+        appendLog($("<div/>").text("wait: "+delay+" 本地时间: "+getTime()+" 本地服务器时间: "+trueTime()+" 服务器时间: "+jsonData.time));
+        // setTimeout(keyboard2, delay, jsonData);
+        keyboardinfo[keyboardn] = setInterval(startGame, delay-2, keyboardn);
+        keyboardn++;
+    }
 }
 
 if (window["WebSocket"]) {
@@ -342,6 +375,7 @@ if (window["WebSocket"]) {
                 appendLog($("<div/>").text("正在加载玩家"+jsonData.from+"按键设置..."));
                 loadButtonSet2(jsonData);
                 unbindButton(jsonData);
+                start==0
                 conn.send(JSON.stringify({"opt": "checkTime1"}));
                 break;
             case "checkTime1":
@@ -356,13 +390,15 @@ if (window["WebSocket"]) {
                 appendLog($("<div/>").text("相对时间: "+dtime));
                 appendLog($("<div/>").text("时间校对完毕"));
                 bindNetwork(jsonData);
+                appendLog($("<div/>").text("本地时间: "+(Number(jsonData.time) + time1)/2));
+                // appendLog($("<div/>").text("本地服务器时间: "+trueTime()));
                 appendLog($("<div/>").text("服务器时间: "+jsonData.time));
-                appendLog($("<div/>").text("本地时间: "+time1));
                 time2 = getTime();
                 $('#ping').text(jsonData.ping);
                 $('#time').text(time2 + dtime);
                 $('#localTime').text();
                 if (start==0) {
+                    appendLog($("<div/>").text("checkTimeOK"));
                     conn.send(JSON.stringify({"opt": "checkTimeOK"}));
                 }
                 break;
@@ -370,11 +406,7 @@ if (window["WebSocket"]) {
                 start = 1;
                 appendLog($("<div/>").text("同步游戏中..."));
                 i=0;
-                if (trueTime() > Number(jsonData.time)) {
-                    startGame();
-                } else {
-                    setTimeout(startGame(), Number(jsonData.time) - trueTime());
-                }
+                startPair(jsonData);
                 break;
             case "keyboard":
                 keyboard(jsonData);
