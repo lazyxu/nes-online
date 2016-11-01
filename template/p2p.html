@@ -10,6 +10,11 @@
     <script src="js/react/react-dom.js"></script>
     <script src="js/react/browser.min.js"></script>
 
+    <!--不允许缓存-->
+    <META HTTP-EQUIV="Pragma" CONTENT="no-cache"> 
+    <META HTTP-EQUIV="Cache-Control" CONTENT="no-cache"> 
+    <META HTTP-EQUIV="Expires" CONTENT="0"> 
+
     <!--chatBoard required-->
     <link href="css/chatBoard.css" rel="stylesheet">
 
@@ -28,6 +33,10 @@
 
 <body>
     <script type="text/babel" src="js/chatBoard.js"></script>
+    <!--<script type="text/babel" src="js/webRTC.js"></script>-->
+    <div align="center">
+        <video style="display: none" id="video" width="256" height="240" autoplay="autoplay"></video>
+    </div>
     <div id="host" style="display: none">{{.Host1}}</div>
     <div id="Chat" class="dragclass">
 	    <div id="ChatHead">
@@ -74,16 +83,7 @@
             </div>
         </div>
     </div>
-    <div style="float: left">
-        time: <span id="time">0</span><br>
-        localTime: <span id="localTime">0</span>
-    </div>
-    <div align=center>
-        ping: <span id="ping">0</span> ms<br>
-        frameCount: <span id="frameCount">0</span>
-        <!--<button onclick="conn.send(JSON.stringify({'opt': 'checkTime1a'}));">重新计算延迟</button>-->
-    </div>
-    <script src="js/chat.js"></script>
+    <script src="js/chat_p2p.js"></script>
     <div id="emulator" align="center"></div>
     <script type="text/javascript" charset="utf-8">
         var nes;

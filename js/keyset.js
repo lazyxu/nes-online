@@ -39,7 +39,7 @@ $("#KEY_RIGHT").bind("keyup", function (e) {
     $("#KEY_SELECT").focus();
 });
 
-<!--player 2-->
+// <!--player 2-->
 $('#KEY_A2').bind("keyup", function (e) {
     $("#KEY_A2").val(e.keyCode);
     nes.keyboard.updateKEY_A2(e.keyCode);

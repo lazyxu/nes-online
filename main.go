@@ -47,6 +47,24 @@ func index(w http.ResponseWriter, r *http.Request) {
 	renderHTML(w, "index.html", args)
 }
 
+func alone(w http.ResponseWriter, r *http.Request) {
+	println(r.URL)
+	args := map[string]string{"Host1": r.Host, "Host2": r.Host}
+	renderHTML(w, "alone.html", args)
+}
+
+func p2p(w http.ResponseWriter, r *http.Request) {
+	println(r.URL)
+	args := map[string]string{"Host1": r.Host, "Host2": r.Host}
+	renderHTML(w, "p2p.html", args)
+}
+
+func cs(w http.ResponseWriter, r *http.Request) {
+	println(r.URL)
+	args := map[string]string{"Host1": r.Host, "Host2": r.Host}
+	renderHTML(w, "cs.html", args)
+}
+
 func test(w http.ResponseWriter, r *http.Request) {
 	renderHTML(w, "test.html", nil)
 }
@@ -70,11 +88,10 @@ func chatroom(w http.ResponseWriter, r *http.Request) {
 	homeTempl.Execute(w, r.Host)
 }
 
-func updateIndexHtml() {
-	data, _ := ioutil.ReadFile("views/template.html")
+func updateRomlistInHTML(src string, des string) {
+	data, _ := ioutil.ReadFile(src)
 	newData := strings.Replace(string(data), "{{.Romlist}}", romlist, -1)
-	fileName := "views/index.html"
-	dstFile, err := os.Create(fileName)
+	dstFile, err := os.Create(des)
 	if err != nil {
 		fmt.Println(err.Error())
 		return
@@ -83,6 +100,7 @@ func updateIndexHtml() {
 	dstFile.WriteString(newData)
 }
 
+// ListDir xxx
 func ListDir(dirPth string, suffix string) (files []string, err error) {
 	files = make([]string, 0, 10)
 	dir, err := ioutil.ReadDir(dirPth)
@@ -114,11 +132,15 @@ func main() {
 	http.Handle("/roms/", http.StripPrefix("/roms/", http.FileServer(http.Dir("roms"))))
 	http.Handle("/images/", http.StripPrefix("/images/", http.FileServer(http.Dir("images"))))
 	http.Handle("/views/", http.StripPrefix("/views/", http.FileServer(http.Dir("views"))))
+	http.Handle("/template/", http.StripPrefix("/template/", http.FileServer(http.Dir("template"))))
+
 	fmt.Println("getRomList")
 	ListDir("roms/", ".nes")
-	// getRomList()
-	fmt.Println("updateIndexHtml")
-	updateIndexHtml()
+	fmt.Println("updateRomlistInHTML")
+	updateRomlistInHTML("template/cs.html", "views/cs.html")
+	updateRomlistInHTML("template/p2p.html", "views/p2p.html")
+	updateRomlistInHTML("template/alone.html", "views/alone.html")
+	updateRomlistInHTML("template/index.html", "views/index.html")
 
 	fmt.Println("start")
 	flag.Parse()
@@ -127,7 +149,10 @@ func main() {
 	go h.run()
 
 	// 路由设置
-	http.HandleFunc("/", index)
+	http.HandleFunc("/", p2p)
+	http.HandleFunc("/alone", alone)
+	http.HandleFunc("/cs", cs)
+	http.HandleFunc("/p2p", p2p)
 	http.HandleFunc("/test", test)
 	http.HandleFunc("/chatroom", chatroom)
 	http.HandleFunc("/ws", wsHandler)

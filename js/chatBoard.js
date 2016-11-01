@@ -7,13 +7,13 @@ function gs2(d,a){
   } 
   return curVal;
 }
-function ChatHidden(){$("#ChatBody").display = "none";}
-function ChatShow(){$("#ChatBody").display = "";}
-function ChatClose(){$("#Chat").display = "none";}
+function ChatHidden(){$("#ChatBody").css({display: "none"});}
+function ChatShow(){$("#ChatBody").css({display: ""});}
+function ChatClose(){$("#Chat").css({display: "none"});}
 
-function BoardHidden(){$("#BoardBody").display = "none";}
-function BoardShow(){$("#BoardBody").display = "";}
-function BoardClose(){$("#Board").display = "none";}
+function BoardHidden(){$("#BoardBody").css({display: "none"});}
+function BoardShow(){$("#BoardBody").css({display: ""});}
+function BoardClose(){$("#Board").css({display: "none"});}
 
 if  (document.getElementById){
   (

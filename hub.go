@@ -7,7 +7,7 @@ type hub struct {
 	connections map[*connection]bool
 
 	// msg from connection
-	msg chan map[string]string
+	msg chan map[string]interface{}
 
 	// register from connection
 	register chan *connection
@@ -21,11 +21,11 @@ type hub struct {
 	pairReady      map[string]bool
 	pairStart      map[string]bool
 	maxPingPair    map[string]int64
-	buttonSetPair1 map[string]string
-	buttonSetPair2 map[string]string
+	buttonSetPair1 map[string]interface{}
+	buttonSetPair2 map[string]interface{}
 	gamePathPair   map[string]string
 	// msgPair from connection
-	msgPair chan map[string]string
+	msgPair chan map[string]interface{}
 	// pair number
 	numPair int
 
@@ -37,7 +37,7 @@ type hub struct {
 
 var h = hub{
 	connections: make(map[*connection]bool),
-	msg:         make(chan map[string]string),
+	msg:         make(chan map[string]interface{}),
 	register:    make(chan *connection),
 	unregister:  make(chan *connection),
 
@@ -46,10 +46,10 @@ var h = hub{
 	pairReady:      make(map[string]bool),
 	pairStart:      make(map[string]bool),
 	maxPingPair:    make(map[string]int64),
-	buttonSetPair1: make(map[string]string),
-	buttonSetPair2: make(map[string]string),
+	buttonSetPair1: make(map[string]interface{}),
+	buttonSetPair2: make(map[string]interface{}),
 	gamePathPair:   make(map[string]string),
-	msgPair:        make(chan map[string]string),
+	msgPair:        make(chan map[string]interface{}),
 }
 
 func (h *hub) run() {
@@ -65,7 +65,7 @@ func (h *hub) run() {
 				close(c.send)
 			}
 		case m := <-h.msg:
-			log.Println(m["opt"] + " " + m["ip"] + " " + m["data"] + " " + m["roomName"])
+			// log.Println(m["opt"] + " " + m["ip"] + " " + m["data"] + " " + m["roomName"])
 			for c := range h.connections {
 				select {
 				case c.send <- m:
@@ -75,57 +75,6 @@ func (h *hub) run() {
 				}
 			}
 			log.Println("send msg success")
-		case m := <-h.msgPair:
-			log.Println(m["opt"] + " " + m["ip"] + " " + m["data"] + " " + m["roomName"] + " " + m["empty"] + m["time"])
-			if _, ok := m["roomName"]; ok {
-				pair1 := h.pair1[m["roomName"]]
-				pair2 := h.pair2[m["roomName"]]
-				log.Println(pair1)
-				log.Println(pair2)
-				if _, okto := m["to"]; okto {
-					if m["to"] == "1" {
-						if _, ok1 := h.pair1[m["roomName"]]; ok1 {
-							select {
-							case pair1.send <- m:
-								log.Println(m["opt"] + " from:" + m["from"] + " to:" + m["to"])
-							default:
-								delete(h.pair1, pair1.roomName)
-								close(pair1.send)
-							}
-						}
-					} else if m["to"] == "2" {
-						if _, ok2 := h.pair2[m["roomName"]]; ok2 {
-							select {
-							case pair2.send <- m:
-								log.Println(m["opt"] + " from:" + m["from"] + " to:" + m["to"])
-							default:
-								delete(h.pair2, pair2.roomName)
-								close(pair2.send)
-							}
-						}
-					}
-				} else {
-					if _, ok1 := h.pair1[m["roomName"]]; ok1 {
-						select {
-						case pair1.send <- m:
-							log.Println(m["opt"] + " from:" + m["from"] + " to:" + m["to"])
-						default:
-							delete(h.pair1, pair1.roomName)
-							close(pair1.send)
-						}
-					}
-					if _, ok2 := h.pair2[m["roomName"]]; ok2 {
-						select {
-						case pair2.send <- m:
-							log.Println(m["opt"] + " from:" + m["from"] + " to:" + m["to"])
-						default:
-							delete(h.pair2, pair2.roomName)
-							close(pair2.send)
-						}
-					}
-				}
-				log.Println("send msgPair success")
-			}
 		}
 	}
 }

@@ -15,19 +15,20 @@ type connection struct {
 	no       string
 	ping     int64
 	// 发送信息的缓冲 channel
-	send chan map[string]string
+	send chan map[string]interface{}
 }
 
 // 客户端到服务器
 func (c *connection) reader(ip string) {
-	message := make(map[string]string)
 	for {
+		message := make(map[string]interface{})
 		err := c.ws.ReadJSON(&message)
 		if err != nil {
 			println("ReadJSON err")
 			println(err)
 			break
 		}
+		log.Println(message["opt"])
 		message["ip"] = ip
 		switch message["opt"] {
 		case "msg":
@@ -40,19 +41,15 @@ func (c *connection) reader(ip string) {
 			c.readyPair(message)
 		case "leavePair":
 			c.leavePair("")
-		case "checkTime1":
-			c.checkTime1(message, false)
-		case "checkTime1a":
-			c.checkTime1(message, true)
-		case "checkTime2":
-			c.checkTime2(message)
-		case "checkTimeOK":
-			c.checkTimeOK()
+		case "__ice_candidate":
+			c.iceCandidate(message)
+		case "__offer":
+			c.offer(message)
+		case "__answer":
+			c.answer(message)
 		case "keyboard":
-			log.Println("to:" + message["to"])
 			c.keyboard(message)
 		default:
-			log.Println(message["opt"])
 			h.msg <- message
 		}
 	}
@@ -83,20 +80,20 @@ func wsHandler(w http.ResponseWriter, r *http.Request) {
 		println(err)
 		return
 	}
-	c := &connection{send: make(chan map[string]string, 256), ws: ws}
+	c := &connection{send: make(chan map[string]interface{}, 256), ws: ws}
 	h.register <- c
 
 	c.ip = ip
-	h.msg <- map[string]string{
+	h.msg <- map[string]interface{}{
 		"opt":  "in",
 		"data": ip,
 	}
-	c.ws.WriteJSON(map[string]string{
+	c.ws.WriteJSON(map[string]interface{}{
 		"opt":  "ip",
 		"data": ip,
 	})
 	defer func() {
-		h.msg <- map[string]string{
+		h.msg <- map[string]interface{}{
 			"opt":  "out",
 			"data": ip,
 		}
