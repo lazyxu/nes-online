@@ -138,18 +138,18 @@ function readyPair(){
     disableButtons(true);
 }
 
-function keyboard(jsonData) {
-    switch (Number(jsonData.keyCode)) {
-        case nes.keyboard.key2Setting.KEY_A: nes.keyboard.state2[nes.keyboard.keys.KEY_A] = Number(jsonData.value); break;     // Num-7
-        case nes.keyboard.key2Setting.KEY_B: nes.keyboard.state2[nes.keyboard.keys.KEY_B] = Number(jsonData.value); break;     // Num-9
-        case nes.keyboard.key2Setting.KEY_SELECT: nes.keyboard.state2[nes.keyboard.keys.KEY_SELECT] = Number(jsonData.value); break; // Num-3
-        case nes.keyboard.key2Setting.KEY_START: nes.keyboard.state2[nes.keyboard.keys.KEY_START] = Number(jsonData.value); break;  // Num-1
-        case nes.keyboard.key2Setting.KEY_UP: nes.keyboard.state2[nes.keyboard.keys.KEY_UP] = Number(jsonData.value); break;    // Num-8
-        case nes.keyboard.key2Setting.KEY_DOWN: nes.keyboard.state2[nes.keyboard.keys.KEY_DOWN] = Number(jsonData.value); break;   // Num-2
-        case nes.keyboard.key2Setting.KEY_LEFT: nes.keyboard.state2[nes.keyboard.keys.KEY_LEFT] = Number(jsonData.value); break;  // Num-4
-        case nes.keyboard.key2Setting.KEY_RIGHT: nes.keyboard.state2[nes.keyboard.keys.KEY_RIGHT] = Number(jsonData.value); break; // Num-6
-    }
-}
+// function keyboard(jsonData) {
+//     switch (Number(jsonData.keyCode)) {
+//         case nes.keyboard.key2Setting.KEY_A: nes.keyboard.state2[nes.keyboard.keys.KEY_A] = Number(jsonData.value); break;     // Num-7
+//         case nes.keyboard.key2Setting.KEY_B: nes.keyboard.state2[nes.keyboard.keys.KEY_B] = Number(jsonData.value); break;     // Num-9
+//         case nes.keyboard.key2Setting.KEY_SELECT: nes.keyboard.state2[nes.keyboard.keys.KEY_SELECT] = Number(jsonData.value); break; // Num-3
+//         case nes.keyboard.key2Setting.KEY_START: nes.keyboard.state2[nes.keyboard.keys.KEY_START] = Number(jsonData.value); break;  // Num-1
+//         case nes.keyboard.key2Setting.KEY_UP: nes.keyboard.state2[nes.keyboard.keys.KEY_UP] = Number(jsonData.value); break;    // Num-8
+//         case nes.keyboard.key2Setting.KEY_DOWN: nes.keyboard.state2[nes.keyboard.keys.KEY_DOWN] = Number(jsonData.value); break;   // Num-2
+//         case nes.keyboard.key2Setting.KEY_LEFT: nes.keyboard.state2[nes.keyboard.keys.KEY_LEFT] = Number(jsonData.value); break;  // Num-4
+//         case nes.keyboard.key2Setting.KEY_RIGHT: nes.keyboard.state2[nes.keyboard.keys.KEY_RIGHT] = Number(jsonData.value); break; // Num-6
+//     }
+// }
 
 function unbindButton() {
     $("#canvas").
@@ -187,10 +187,12 @@ function bindNetwork() {
         appendLog($("<div/>").text("你是可怜的玩家2啊"));
         $(document).
             bind('keydown', function(evt) {
-                conn.send(JSON.stringify({"opt": "keyboard", "keyCode": evt.keyCode.toString(), "value": "65"}));
+                // conn.send(JSON.stringify({"opt": "keyboard", "keyCode": evt.keyCode.toString(), "value": "65"}));
+                dataChannel.send(JSON.stringify({"keyCode": evt.keyCode, "value": 65}));
             }).
             bind('keyup', function(evt) {
-                conn.send(JSON.stringify({"opt": "keyboard", "keyCode": evt.keyCode.toString(), "value": "64"}));
+                // conn.send(JSON.stringify({"opt": "keyboard", "keyCode": evt.keyCode.toString(), "value": "64"}));
+                dataChannel.send(JSON.stringify({"keyCode": evt.keyCode, "value": 64}));
             });
     }
 }
@@ -215,6 +217,7 @@ function startGame() {
 
 var PeerConnection, pc;
 var videoElement = document.getElementById("video");
+var dataChannel, receiveChannel;
 function prepare() {
     PeerConnection = (window.PeerConnection ||
     window.webkitPeerConnection00 ||
@@ -229,6 +232,43 @@ function prepare() {
             "candidate": event.candidate
         }));
     };
+    var dataChannelOptions = {
+        ordered:false,
+        maxRetransmitTime: 3000
+    }
+    dataChannel = pc.createDataChannel("button", dataChannelOptions);
+    dataChannel.onopen = function(event) {
+        appendLog($("<div/>").text("dataChannel start"));
+    }
+    dataChannel.onmessage = function(event) {
+        appendLog($("<div/>").text("dataChannel message"));
+    }
+    dataChannel.onclose = function(event) {
+        appendLog($("<div/>").text("dataChannel closed"));
+    }
+    pc.ondatachannel = function(event) {
+        receiveChannel = event.channel;
+        receiveChannel.onopen = function(event) {
+            appendLog($("<div/>").text("receiveChannel start"));
+        }
+        receiveChannel.onmessage = function(event) {
+            // appendLog($("<div/>").text(event.data.opt));
+            var jsonData=JSON.parse(event.data);
+            switch (jsonData.keyCode) {
+                case nes.keyboard.key2Setting.KEY_A: nes.keyboard.state2[nes.keyboard.keys.KEY_A] = jsonData.value; break;     // Num-7
+                case nes.keyboard.key2Setting.KEY_B: nes.keyboard.state2[nes.keyboard.keys.KEY_B] = jsonData.value; break;     // Num-9
+                case nes.keyboard.key2Setting.KEY_SELECT: nes.keyboard.state2[nes.keyboard.keys.KEY_SELECT] = jsonData.value; break; // Num-3
+                case nes.keyboard.key2Setting.KEY_START: nes.keyboard.state2[nes.keyboard.keys.KEY_START] = jsonData.value; break;  // Num-1
+                case nes.keyboard.key2Setting.KEY_UP: nes.keyboard.state2[nes.keyboard.keys.KEY_UP] = jsonData.value; break;    // Num-8
+                case nes.keyboard.key2Setting.KEY_DOWN: nes.keyboard.state2[nes.keyboard.keys.KEY_DOWN] = jsonData.value; break;   // Num-2
+                case nes.keyboard.key2Setting.KEY_LEFT: nes.keyboard.state2[nes.keyboard.keys.KEY_LEFT] = jsonData.value; break;  // Num-4
+                case nes.keyboard.key2Setting.KEY_RIGHT: nes.keyboard.state2[nes.keyboard.keys.KEY_RIGHT] = jsonData.value; break; // Num-6
+            }
+        }
+        receiveChannel.onclose = function(event) {
+            appendLog($("<div/>").text("receiveChannel closed"));
+        }
+    }
     //如果检测到媒体流连接到本地，将其绑定到一个video标签上输出
     pc.onaddstream = function(event){
         $("#emulator").css({display: "none"});
@@ -338,9 +378,9 @@ if (window["WebSocket"]) {
                     video();
                 }
                 break;
-            case "keyboard":
-                keyboard(jsonData);
-                break;
+            // case "keyboard":
+            //     keyboard(jsonData);
+            //     break;
             case "__ice_candidate":
                 appendLog($("<div/>").text("__ice_candidate"));
                 var mid = new RTCIceCandidate(jsonData.candidate);
@@ -349,7 +389,7 @@ if (window["WebSocket"]) {
             case "__offer":
                 appendLog($("<div/>").text("__offer"));
                 var mid = new RTCSessionDescription(jsonData.sdp);
-                prepare();
+                // prepare();
                 pc.setRemoteDescription(mid);
                 video();
                 break;

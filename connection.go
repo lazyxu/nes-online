@@ -47,8 +47,8 @@ func (c *connection) reader(ip string) {
 			c.offer(message)
 		case "__answer":
 			c.answer(message)
-		case "keyboard":
-			c.keyboard(message)
+		// case "keyboard":
+		// 	c.keyboard(message)
 		default:
 			h.msg <- message
 		}

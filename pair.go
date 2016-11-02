@@ -119,14 +119,14 @@ func (c *connection) answer(m map[string]interface{}) {
 	pair1.send <- m
 }
 
-func (c *connection) keyboard(m map[string]interface{}) {
-	// log.Println(m["keyCode"] + ": " + m["value"] + " " + m["time"] + " " + m["to"])
-	m["from"] = c.no
-	m["roomName"] = c.roomName
-	// log.Println(m["keyCode"] + ": " + m["value"] + " " + m["time"] + " " + m["to"])
-	pair1 := h.pair1[c.roomName]
-	pair1.send <- m
-}
+// func (c *connection) keyboard(m map[string]interface{}) {
+// 	// log.Println(m["keyCode"] + ": " + m["value"] + " " + m["time"] + " " + m["to"])
+// 	m["from"] = c.no
+// 	m["roomName"] = c.roomName
+// 	// log.Println(m["keyCode"] + ": " + m["value"] + " " + m["time"] + " " + m["to"])
+// 	pair1 := h.pair1[c.roomName]
+// 	pair1.send <- m
+// }
 
 func (c *connection) leavePair(roomName string) {
 	m := make(map[string]interface{})
