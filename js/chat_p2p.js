@@ -263,7 +263,7 @@ var audioContext = new AudioContext();
             appendLog($("<div/>").text("receiveChannel start"));
         }
         receiveChannel.onmessage = function(event) {
-            // appendLog($("<div/>").text("ondatachannel"));
+            // appendLog($("<div/>").text("onmessage"));
             if (noPair=="1") {
                 var jsonData=JSON.parse(event.data);
                 switch (jsonData.keyCode) {
@@ -297,14 +297,14 @@ var audioContext = new AudioContext();
 }
 var videoStream;
 function video() {
-    getUserMedia = (navigator.getUserMedia ||
-            navigator.webkitGetUserMedia ||
-            navigator.mozGetUserMedia ||
-            navigator.msGetUserMedia);
-    getUserMedia.call(navigator, { 
-            "audio": true,
-            "video": false
-        } , function(stream) {
+    // getUserMedia = (navigator.getUserMedia ||
+    //         navigator.webkitGetUserMedia ||
+    //         navigator.mozGetUserMedia ||
+    //         navigator.msGetUserMedia);
+    // getUserMedia.call(navigator, { 
+    //         "audio": true,
+    //         "video": false
+    //     } , function(stream) {
             videoStream = document.querySelector("canvas").captureStream();
             // var AudioTracks = stream.getAudioTracks();
             // stream.addTrack(AudioTracks[0]);
@@ -320,10 +320,10 @@ function video() {
                     "sdp": pc.localDescription
                 }));
             });
-        }, function(err) {
-            console.log("The following error occurred: " + err.name);
-        }
-    );
+    //     }, function(err) {
+    //         console.log("The following error occurred: " + err.name);
+    //     }
+    // );
 }
 
 if (window["WebSocket"]) {
