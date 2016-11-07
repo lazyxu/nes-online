@@ -133,11 +133,7 @@ if (typeof jQuery !== 'undefined') {
                 },
             
                 writeAudio: function(samples) {
-                    // appendLog($("<div/>").text(noPair));
-                    // appendLog($("<div/>").text(network));
                     if ( noPair=="1" && network ) {
-                        // appendLog($("<div/>").text("samples"));
-                        // console.log(this.local_output.stream);
                         dataChannel.send(samples);
                     }
                     return this.dynamicaudio.writeInt(samples);

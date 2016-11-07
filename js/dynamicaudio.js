@@ -21,7 +21,6 @@ DynamicAudio.prototype = {
     audioContext: null,
     flashWrapper: null,
     flashElement: null,
-    // local_output: null,
 
     init: function(opts) {
         var self = this;
@@ -120,28 +119,8 @@ DynamicAudio.prototype = {
         // Create sound source and play samples from buffer
         var source = this.audioContext.createBufferSource();
         source.buffer = buffer;
-        // console.log(buffer);
-        // this.local_output = this.audioContext.createMediaStreamDestination();
-        // source.connect(this.local_output); // Output to sound card
-        // if ( noPair=="2" && network ) {
-        //     appendLog($("<div/>").text("pc.addStream(this.local_output.stream)"));
-        //     console.log(this.local_output.stream);
-        //     pc.addStream(this.local_output.stream);
-        // }
         source.connect(this.audioContext.destination); // Output to sound card
-        // this.local_output.connect(this.audioContext.destination);
-        // console.log(this.audioContext.destination);
-        // document.getElementById("audio").src = URL.createObjectURL(this.local_output.stream);
-        // document.getElementById("audio").play();
-        // this.peerSource = temp.stream.clone();
-        // // var AudioTracks = this.peerSource.getAudioTracks();
-        // // if (videoStream) {
-        // //     videoStream.addTrack(AudioTracks[0]);
-        // // }
         source.start();
-        // if( network == true && noPair=="1" ){
-        //     dataChannel.send(samples);
-        // }
     },
 
     /**

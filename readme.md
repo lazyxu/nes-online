@@ -7,14 +7,15 @@ http://nes.juanix.cn:8080
 编译 go build -o main *.go  
   
 # 版本变动
-## v1.3.2  
-完善了聊天界面的放大和缩小功能
+## v1.3.2.1  
+完善了聊天界面的放大和缩小功能  
+删除多余的测试文件和测试输出  
 声音方案：  
-1.用webRTC的createDataChannel来传递buffer，再转化成声音输出，网络差的时候卡顿比较明显  
+1.用webRTC的dataChannel来传递buffer，再转化成声音输出，网络差的时候卡顿比较明显  
 2.用webRTC的getUserMedia来传输，需要https，带耳机时无法传输游戏声音  
 
 ## v1.3.1  
-用webRTC的createDataChannel来p2p传递按键信息  
+用webRTC的dataChannel来p2p传递按键信息  
 
 ## v1.3 局域网版本  
 消息结构变为send chan map[string]interface{}  

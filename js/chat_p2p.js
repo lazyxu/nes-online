@@ -263,7 +263,7 @@ var audioContext = new AudioContext();
             appendLog($("<div/>").text("receiveChannel start"));
         }
         receiveChannel.onmessage = function(event) {
-            appendLog($("<div/>").text("onmessage"));
+            // appendLog($("<div/>").text("ondatachannel"));
             if (noPair=="1") {
                 var jsonData=JSON.parse(event.data);
                 switch (jsonData.keyCode) {
@@ -277,30 +277,7 @@ var audioContext = new AudioContext();
                     case nes.keyboard.key2Setting.KEY_RIGHT: nes.keyboard.state2[nes.keyboard.keys.KEY_RIGHT] = jsonData.value; break; // Num-6
                 }
             } else if (noPair=="2") {
-                // appendLog($("<div/>").text("nes.ui.dynamicaudio.writeInt(event.data)"));
-                // var buffer = this.audioContext.createBuffer(2, 17000, audioContext.sampleRate);
-                // console.log(event.data);
-                // buffer = event.data;
-                // console.log(buffer);
                 nes.ui.dynamicaudio.writeInt(event.data.split(","));
-                // var buffer = audioContext.createBuffer(2, samples.length, audioContext.sampleRate);
-                // var channelLeft = buffer.getChannelData(0);
-                // var channelRight = buffer.getChannelData(1);
-                // var j = 0;
-                // for (var i = 0; i < samples.length; i += 2) {
-                //     channelLeft[j] = (samples[i]) / 32768;
-                //     channelRight[j] = (samples[i+1]) / 32768;
-                //     j++;
-                // }
-                // Create sound source and play samples from buffer
-                // var source = audioContext.createBufferSource();
-                // source.buffer = event.data;
-                // // this.local_output = this.audioContext.createMediaStreamDestination();
-                // source.connect(audioContext.destination);
-                // // var source = nes.ui.dynamicaudio.audioContext.createBufferSource();
-                // // source.buffer = event.data;
-                // // source.connect(nes.ui.dynamicaudio.audioContext.destination);
-                // source.start();
             }
         }
         receiveChannel.onclose = function(event) {
@@ -309,17 +286,13 @@ var audioContext = new AudioContext();
     }
     //如果检测到媒体流连接到本地，将其绑定到一个video标签上输出
     pc.onaddstream = function(event){
-        appendLog($("<div/>").text("pc.onaddstream"));
+        // appendLog($("<div/>").text("pc.onaddstream"));
         $("#emulator").css({display: "none"});
         $("#video").css({display: ""});
         nes.rom=null;
         nes.stop();
         nes.start();
-        // document.getElementById("audio").src = URL.createObjectURL(event.stream);
-        // document.getElementById("audio").play();
         videoElement.src = URL.createObjectURL(event.stream);
-        // console.log(event);
-        // videoElement.play();
     };
 }
 var videoStream;
@@ -329,63 +302,28 @@ function video() {
             navigator.mozGetUserMedia ||
             navigator.msGetUserMedia);
     getUserMedia.call(navigator, { 
-                "audio": true,
-                "video": false
-            } , function(stream) {
-                videoStream = document.querySelector("canvas").captureStream();
-                // var AudioTracks = stream.getAudioTracks();
-                // stream.addTrack(AudioTracks[0]);
-                // stream.addTrack(videoStream.getTrackById(0));
-                // console.log(videoStream);
-                // appendLog($("<div/>").text("pc.addStream(videoStream)"));
-                pc.addStream(videoStream);
-                pc.createOffer().then(function(offer) {
-                    return pc.setLocalDescription(offer);
-                }).then(function() {
-                    conn.send(JSON.stringify({
-                        "opt": "__offer",
-                        "sdp": pc.localDescription
-                    }));
-                });
-            }, function(err) {
-                console.log("The following error occurred: " + err.name);
-            }
-        );
-    // } else {
-    //     console.log("getUserMedia not supported");
-    // }
-    // 如果是发送方则发送一个offer信令，否则发送一个answer信令
-    // var context = new Context();
-    // var videoSource = context.createMediaStreamSource(videoStream);
-    // var audioSource = context.createMediaStreamSource(peerSource);
-    // var analyser = context.createAnalyser();
-    // var mixedOutput = context.createMediaStreamDestination();
-    // audioSource.connect(analyser);
-    // analyser.connect(mixedOutput);
-    // videoSource.connect(mixedOutput);
-
-
-
-    // var audioContext = nes.ui.dynamicaudio.audioContext;
-    // console.log(audioContext);
-    // var streamDestination = audioContext.createMediaStreamDestination();
-    // console.log(streamDestination);
-    // nes.ui.dynamicaudio.source.connect(streamDestination);
-
-    // var audioStream = nes.ui.dynamicaudio.peerSource;
-    // console.log(audioStream);
-    // var audioTracks = audioStream.getAudioTracks();
-    // console.log(audioTracks[0]);
-    // var videoTracks = videoStream.getVideoTracks();
-    // console.log(videoTracks[0]);
-    // audioStream.addTrack(videoTracks[0]);
-
-    // 绑定本地媒体流到video标签用于输出
-    // videoElement.src = URL.createObjectURL(stream);
-    // videoElement.play();
-    // 向PeerConnection中加入需要发送的流
-
-
+            "audio": true,
+            "video": false
+        } , function(stream) {
+            videoStream = document.querySelector("canvas").captureStream();
+            // var AudioTracks = stream.getAudioTracks();
+            // stream.addTrack(AudioTracks[0]);
+            // stream.addTrack(videoStream.getTrackById(0));
+            // console.log(videoStream);
+            // appendLog($("<div/>").text("pc.addStream(videoStream)"));
+            pc.addStream(videoStream);
+            pc.createOffer().then(function(offer) {
+                return pc.setLocalDescription(offer);
+            }).then(function() {
+                conn.send(JSON.stringify({
+                    "opt": "__offer",
+                    "sdp": pc.localDescription
+                }));
+            });
+        }, function(err) {
+            console.log("The following error occurred: " + err.name);
+        }
+    );
 }
 
 if (window["WebSocket"]) {

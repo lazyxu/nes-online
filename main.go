@@ -3,7 +3,6 @@ package main
 
 import (
 	"crypto/md5"
-	"flag"
 	"fmt"
 	"go/build"
 	"html/template"
@@ -11,7 +10,6 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"path/filepath"
 	"strconv"
 	"strings"
 )
@@ -65,23 +63,12 @@ func cs(w http.ResponseWriter, r *http.Request) {
 	renderHTML(w, "cs.html", args)
 }
 
-var (
-	addr      = flag.String("addr", ":8080", "http service address")
-	assets    = flag.String("assets", defaultAssetPath(), "path to assets")
-	homeTempl *template.Template
-)
-
 func defaultAssetPath() string {
 	p, err := build.Default.Import("gary.burd.info/go-websocket-chat", "", build.FindOnly)
 	if err != nil {
 		return "."
 	}
 	return p.Dir
-}
-
-func chatroom(w http.ResponseWriter, r *http.Request) {
-	println("chatroom")
-	homeTempl.Execute(w, r.Host)
 }
 
 func updateRomlistInHTML(src string, des string) {
@@ -139,8 +126,6 @@ func main() {
 	updateRomlistInHTML("template/index.html", "views/index.html")
 
 	fmt.Println("start")
-	flag.Parse()
-	homeTempl = template.Must(template.ParseFiles(filepath.Join(*assets, "/views/chatroom.html")))
 
 	go h.run()
 
@@ -149,12 +134,11 @@ func main() {
 	http.HandleFunc("/alone", alone)
 	http.HandleFunc("/cs", cs)
 	http.HandleFunc("/p2p", p2p)
-	http.HandleFunc("/chatroom", chatroom)
 	http.HandleFunc("/ws", wsHandler)
 	// http.HandleFunc("/update", update)
 
 	// http
-	if err := http.ListenAndServe(*addr, nil); err != nil {
+	if err := http.ListenAndServe(":8080", nil); err != nil {
 		log.Fatal("ListenAndServe:", err)
 	}
 	// if err := http.ListenAndServeTLS(":8080", "server.pem", "server.key", nil); err != nil {
