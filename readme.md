@@ -1,20 +1,26 @@
 # nes online
 http://nes.juanix.cn:8080  
-/p2p 局域网p2p传视频方式  
+/p2p p2p传视频传指令方式  
 /alone 单机模式，可以双人玩  
   
 运行 go run *.go  
 编译 go build -o main *.go  
   
 # 版本变动
-## v1.3.1
-用webRTC的createDataChannel来p2p传递按键信息
+## v1.3.2  
+完善了聊天界面的放大和缩小功能
+声音方案：  
+1.用webRTC的createDataChannel来传递buffer，再转化成声音输出，网络差的时候卡顿比较明显  
+2.用webRTC的getUserMedia来传输，需要https，带耳机时无法传输游戏声音  
 
-## v1.3 局域网版本
+## v1.3.1  
+用webRTC的createDataChannel来p2p传递按键信息  
+
+## v1.3 局域网版本  
 消息结构变为send chan map[string]interface{}  
 自乐大王说可以用webRTC技术传输视频，局域网内效果显著，校园网内看人品  
 /alone 单机模式，可以双人玩  
-/p2p 局域网p2p传视频方式  
+/p2p p2p传视频传指令方式  
   
 ## v1.2.2
 fps并不能很好的固定下来，setInterval也是有误差的  

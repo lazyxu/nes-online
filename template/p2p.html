@@ -19,7 +19,6 @@
     <link href="css/chatBoard.css" rel="stylesheet">
 
     <!--nes required-->
-    <script src="/js/dynamicaudio-min.js" type="text/javascript" charset="utf-8"></script>
     <script src="/js/jsnes/nes.js" type="text/javascript" charset="utf-8"></script>
     <script src="/js/jsnes/utils.js" type="text/javascript" charset="utf-8"></script>
     <script src="/js/jsnes/cpu.js" type="text/javascript" charset="utf-8"></script>
@@ -32,18 +31,31 @@
 </head>
 
 <body>
+    <div style="height: 30px">
+        <button id="stop">暂停</button>
+        <button id="restart">重新开始</button>
+        <button id="sound">关闭声音</button>
+        <button id="resize256" >256*240</button>
+        <button id="resize512">512*480</button>
+        <button id="resize768">768*720</button>
+        <button id="resize1024">1024*960</button>
+        <button id="hide">隐藏面板</button>
+        <button id="show">显示面板</button>
+        <button id="fullScreen">全屏显示</button>
+    </div>
+    <script src="js/settings_p2p.js"></script>
     <script type="text/babel" src="js/chatBoard.js"></script>
     <!--<script type="text/babel" src="js/webRTC.js"></script>-->
     <div align="center">
+        <!--<audio id="audio" controls="controls" autoplay="autoplay" ></audio>-->
         <video style="display: none" id="video" width="256" height="240" autoplay="autoplay"></video>
     </div>
     <div id="host" style="display: none">{{.Host1}}</div>
-    <div id="Chat" class="dragclass">
+    <div id="Chat" class="dragclass" >
 	    <div id="ChatHead">
 	              <span style="float: left">大厅</span>
-	              <a href="#" onclick="ChatHidden();">-</a>
-	              <a href="#" onclick="ChatShow();">+</a>
-	              <a href="#" onclick="ChatClose();">x</a>
+	              <a href="javascript:void(0);" onclick="$('#ChatBody').css({display: 'none'});$('#Chat').css({height: '28px'});"><img src="images/minimize.png"></img></a>
+	              <a href="javascript:void(0);" onclick="$('#ChatBody').css({display: ''});$('#Chat').css({height: '262px'});"><img src="images/maximize.png"></img></a>
 	          </div>
 		<div id="ChatBody">
             <div id="ChatContent">
@@ -60,9 +72,8 @@
     <div id="Board" class="dragclass">
         <div id="BoardHead">
             <span style="float: left"><span id="ip"></span></span>
-            <a href="#" onclick="BoardHidden();">-</a>
-            <a href="#" onclick="BoardShow();">+</a>
-            <a href="#" onclick="BoardClose();">x</a>
+            <a href="javascript:void(0);" onclick="$('#BoardBody').css({display: 'none'});"><img src="images/minimize.png"></img></a>
+            <a href="javascript:void(0);" onclick="$('#BoardBody').css({display: ''});"><img src="images/maximize.png"></img></a>
         </div>
         <div id="BoardBody">
             <div id="BoardBtn">
@@ -84,65 +95,15 @@
         </div>
     </div>
     <script src="js/chat_p2p.js"></script>
+    <script src="/js/dynamicaudio.js" type="text/javascript" charset="utf-8"></script>
     <div id="emulator" align="center"></div>
     <script type="text/javascript" charset="utf-8">
         var nes;
         $(function() {
             nes = new JSNES({
-                'ui': $('#emulator').JSNESUI({
-                    "Homebrew": [
-						['Battle City (J).nes', 'roms/Battle City (J).nes'],
-						['1942 (JU).nes', 'roms/1942 (JU).nes'],
-                    ]
-                })
+                'ui': $('#emulator').JSNESUI()
             });
         });
-        function loadRom(url, set) {
-            $.ajax({
-                url: url,
-                xhr: function() {
-                    var xhr = $.ajaxSettings.xhr();
-                    if (typeof xhr.overrideMimeType !== 'undefined') {
-                        // Download as binary
-                        xhr.overrideMimeType('text/plain; charset=x-user-defined');
-                    }
-                    return xhr;
-                },
-                complete: function(xhr, status) {
-                    var i, data;
-                    if (JSNES.Utils.isIE()) {
-                        var charCodes = JSNESBinaryToArray(
-                                xhr.responseBody
-                        ).toArray();
-                        data = String.fromCharCode.apply(
-                                undefined,
-                                charCodes
-                        );
-                    }
-                    else {
-                        data = xhr.responseText;
-                    }
-                    var ret = nes.loadRom(data);
-                    nes.start();
-                    if(set) {
-                        $("#nes-pause").attr("disabled", false);
-                        $("#nes-restart").attr("disabled", false);
-                    }
-                    if (nes.isRunning) {
-                        $("#nes-pause").val("pause");
-                    }
-                    else {
-                        $("#nes-pause").val("resume");
-                    }
-                    if (nes.opts.emulateSound) {
-                        $("#nes-sound").val("disable sound");
-                    }
-                    else {
-                        $("#nes-sound").val("enable sound");
-                    }
-                }
-            });
-        }
     </script>
     <!-- 按钮触发模态框 -->
     <div align="center">

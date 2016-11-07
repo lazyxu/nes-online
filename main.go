@@ -65,10 +65,6 @@ func cs(w http.ResponseWriter, r *http.Request) {
 	renderHTML(w, "cs.html", args)
 }
 
-func test(w http.ResponseWriter, r *http.Request) {
-	renderHTML(w, "test.html", nil)
-}
-
 var (
 	addr      = flag.String("addr", ":8080", "http service address")
 	assets    = flag.String("assets", defaultAssetPath(), "path to assets")
@@ -153,7 +149,6 @@ func main() {
 	http.HandleFunc("/alone", alone)
 	http.HandleFunc("/cs", cs)
 	http.HandleFunc("/p2p", p2p)
-	http.HandleFunc("/test", test)
 	http.HandleFunc("/chatroom", chatroom)
 	http.HandleFunc("/ws", wsHandler)
 	// http.HandleFunc("/update", update)
@@ -162,5 +157,7 @@ func main() {
 	if err := http.ListenAndServe(*addr, nil); err != nil {
 		log.Fatal("ListenAndServe:", err)
 	}
-	// http.ListenAndServeTLS(":8081", "server.crt", "server.key", nil)
+	// if err := http.ListenAndServeTLS(":8080", "server.pem", "server.key", nil); err != nil {
+	// 	log.Fatal("ListenAndServe:", err)
+	// }
 }
