@@ -25,7 +25,7 @@ func (c *connection) createPair(m map[string]interface{}) {
 	m["ip"] = c.ip
 	m["roomName"] = c.roomName
 	c.no = "1"
-	h.msg <- m
+	c.broadcast(m)
 }
 
 func (c *connection) joinPair(m map[string]interface{}) string {
@@ -144,7 +144,8 @@ func (c *connection) leavePair(roomName string) {
 					m["empty"] = "true"
 				}
 			}
-			h.msg <- m
+			log.Println("leavePair")
+			c.broadcast(m)
 			if _, ok2 := h.pair2[c.roomName]; ok2 {
 				h.pair1[c.roomName] = h.pair2[c.roomName]
 				delete(h.pair2, c.roomName)
@@ -162,7 +163,7 @@ func (c *connection) leavePair(roomName string) {
 					m["empty"] = "true"
 				}
 			}
-			h.msg <- m
+			c.broadcast(m)
 			c.roomName = ""
 			log.Println("leave success2")
 		} else {

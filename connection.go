@@ -32,7 +32,7 @@ func (c *connection) reader(ip string) {
 		message["ip"] = ip
 		switch message["opt"] {
 		case "msg":
-			h.msg <- message
+			c.broadcast(message)
 		case "createPair":
 			c.createPair(message)
 		case "joinPair":
@@ -50,7 +50,7 @@ func (c *connection) reader(ip string) {
 		// case "keyboard":
 		// 	c.keyboard(message)
 		default:
-			h.msg <- message
+			c.broadcast(message)
 		}
 	}
 	log.Println("reader Close")
@@ -81,23 +81,42 @@ func wsHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	c := &connection{send: make(chan map[string]interface{}, 256), ws: ws}
-	h.register <- c
+	c.register()
 
 	c.ip = ip
-	h.msg <- map[string]interface{}{
+	c.broadcast(map[string]interface{}{
 		"opt":  "in",
 		"data": ip,
-	}
+	})
 	c.ws.WriteJSON(map[string]interface{}{
 		"opt":  "ip",
 		"data": ip,
 	})
+	for conn, ok := range h.connections {
+		if !ok {
+			log.Println(conn)
+		}
+		log.Println(conn.ip)
+		if conn.no == "1" {
+			c.ws.WriteJSON(map[string]interface{}{
+				"opt":      "listRooms",
+				"ip":       conn.ip,
+				"roomName": conn.roomName,
+				"data":     h.gamePathPair[conn.roomName],
+			})
+		} else {
+			c.ws.WriteJSON(map[string]interface{}{
+				"opt":  "listPlayers",
+				"data": conn.ip,
+			})
+		}
+	}
 	defer func() {
-		h.msg <- map[string]interface{}{
+		c.broadcast(map[string]interface{}{
 			"opt":  "out",
 			"data": ip,
-		}
-		h.unregister <- c
+		})
+		c.unregister()
 	}()
 	go c.writer()
 	c.reader(ip)

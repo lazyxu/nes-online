@@ -52,29 +52,28 @@ var h = hub{
 	msgPair:        make(chan map[string]interface{}),
 }
 
-func (h *hub) run() {
-	h.numPair = 0
-	h.num = 0
-	for {
+func (c *connection) register() {
+	h.connections[c] = true
+}
+
+func (c *connection) unregister() {
+	if _, ok := h.connections[c]; ok {
+		if c.roomName != "" {
+			c.leavePair("")
+		}
+		delete(h.connections, c)
+		close(c.send)
+	}
+}
+
+func (c *connection) broadcast(m map[string]interface{}) {
+	for conn := range h.connections {
 		select {
-		case c := <-h.register:
-			h.connections[c] = true
-		case c := <-h.unregister:
-			if _, ok := h.connections[c]; ok {
-				delete(h.connections, c)
-				close(c.send)
-			}
-		case m := <-h.msg:
-			// log.Println(m["opt"] + " " + m["ip"] + " " + m["data"] + " " + m["roomName"])
-			for c := range h.connections {
-				select {
-				case c.send <- m:
-				default:
-					delete(h.connections, c)
-					close(c.send)
-				}
-			}
-			log.Println("send msg success")
+		case conn.send <- m:
+		default:
+			delete(h.connections, c)
+			close(c.send)
 		}
 	}
+	log.Println("send msg success")
 }

@@ -339,6 +339,17 @@ if (window["WebSocket"]) {
             case "msg":
                 appendLog($("<div/>").text(jsonData.data));
                 break; 
+            case "listRooms":
+                if (!document.getElementById(jsonData.ip)) {
+                    appendUser($("<div id=" + jsonData.ip + "/>").text(jsonData.ip));
+                }
+                appendRoom($("<div id="+jsonData.roomName+" onclick=\"joinPair('"+jsonData.roomName+"')\"/>").text(jsonData.ip+' - ' + jsonData.data));
+                break; 
+            case "listPlayers":
+                if (!document.getElementById(jsonData.data)) {
+                    appendUser($("<div id=" + jsonData.data + "/>").text(jsonData.data));
+                }
+                break; 
             case "in": 
                 if (!document.getElementById(jsonData.data)) {
                     appendUser($("<div id=" + jsonData.data + "/>").text(jsonData.data));

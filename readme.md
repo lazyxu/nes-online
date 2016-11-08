@@ -6,18 +6,24 @@ http://nes.juanix.cn:8080
 运行 go run *.go  
 编译 go build -o main *.go  
   
-# 版本变动
+# 版本变动  
+## v1.3.3  
+加入了对于浏览器是否支持webRTC组件的检查  
+登录时接收玩家列表和房间列表，退出时先退出房间  
+  
 ## v1.3.2.2  
-声音方案为  
+声音方案为   
 用webRTC的dataChannel来传递buffer  
   
 ## v1.3.2.1  
 完善了聊天界面的放大和缩小功能  
 删除多余的测试文件和测试输出  
+  
+## v1.3.2  
 声音方案：  
 1.用webRTC的dataChannel来传递buffer，再转化成声音输出，网络差的时候卡顿比较明显  
 2.用webRTC的getUserMedia来传输，需要https，带耳机时无法传输游戏声音  
-  
+
 ## v1.3.1  
 用webRTC的dataChannel来p2p传递按键信息  
   

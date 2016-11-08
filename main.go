@@ -127,10 +127,10 @@ func main() {
 
 	fmt.Println("start")
 
-	go h.run()
+	// go h.run()
 
 	// 路由设置
-	http.HandleFunc("/", p2p)
+	http.HandleFunc("/", index)
 	http.HandleFunc("/alone", alone)
 	http.HandleFunc("/cs", cs)
 	http.HandleFunc("/p2p", p2p)
