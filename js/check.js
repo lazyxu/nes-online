@@ -15,12 +15,13 @@ if ( u.indexOf('Android') > -1 || u.indexOf('iPhone') > -1 || u.indexOf('iPad') 
 }
 if (check) {
     if (dest == "mobile") {
-        window.location.href = "p2p";
+        window.location.href = "p2p.new";
     } else if (dest == "PC") {
-        window.location.href = "p2p";
+        window.location.href = "p2p.new";
     }
 } else {
     document.writeln("什么，你还在使用这么腊鸡的浏览器，还不快去下载 chrome / firefox 浏览器<br>");
+    document.writeln("要不你去玩<a href='alone'>单机版</a><br>");
 }
 
 function checkGetUserMedia(){

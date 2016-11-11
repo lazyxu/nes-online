@@ -7,6 +7,27 @@ http://nes.juanix.cn:8080
 编译 go build -o main *.go  
   
 # 版本变动  
+## 未来可能完善的点  
+帮助界面  
+房间人数的提示，加入房间失败的提示    
+玩家2关闭声音停止传输  
+加入 U I 键位  
+rom合法性检查  
+允许玩家上传rom  
+游戏列表界面做的好看点    
+  
+## v1.3.6  
+所有元素都换成了新的：暂停，重新开始，关闭声音，隐藏/显示，离开房间，准备，玩家列表，设置  
+进入前要求输入玩家昵称  
+  
+## v1.3.5  
+手机界面初步，只支持玩家2模式，但是发现效果很糟糕...  
+打算把电脑界面也变成界面大小自动调节的样子  
+  
+## v1.3.4  
+玩家2的设置－暂停，重新开始，关闭声音，界面大小调整  
+按键设置－默认提示  
+  
 ## v1.3.3  
 加入了对于浏览器是否支持webRTC组件的检查  
 登录时接收玩家列表和房间列表，退出时先退出房间  
@@ -77,7 +98,7 @@ canvas.toDataURL()保存为图片的方法也不行
 Inszva: http://blog.csdn.net/inszva/article/details/52840393  
 JSNES: https://github.com/bfirsh/jsnes  
   
-虚拟按键支持: http://joemeeks.net/tt17/  
+图标来源: Nostalgia.NES
 gamepad支持: https://github.com/josephlewis42/jsnes  
   
 # License

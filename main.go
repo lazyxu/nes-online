@@ -57,6 +57,16 @@ func p2p(w http.ResponseWriter, r *http.Request) {
 	renderHTML(w, "p2p.html", args)
 }
 
+func p2pm(w http.ResponseWriter, r *http.Request) {
+	println(r.URL)
+	args := map[string]string{"Host1": r.Host, "Host2": r.Host}
+	renderHTML(w, "p2p.m.html", args)
+}
+func p2pnew(w http.ResponseWriter, r *http.Request) {
+	println(r.URL)
+	args := map[string]string{"Host1": r.Host, "Host2": r.Host}
+	renderHTML(w, "p2p.new.html", args)
+}
 func cs(w http.ResponseWriter, r *http.Request) {
 	println(r.URL)
 	args := map[string]string{"Host1": r.Host, "Host2": r.Host}
@@ -100,7 +110,13 @@ func ListDir(dirPth string, suffix string) (files []string, err error) {
 		}
 		if strings.HasSuffix(strings.ToUpper(fi.Name()), suffix) { //匹配文件
 			Path := dirPth + fi.Name()
-			romlist += "<button id='rom-" + strconv.Itoa(i) + "' data-dismiss=\"modal\" onclick=\"loadRom('" + Path + "');createPair('" + Path + "','" + fi.Name() + "');\">" + fi.Name() + "</button>"
+			name := strings.Split(fi.Name(), ".nes")[0]
+			name = strings.Split(name, ".NES")[0]
+			result := strings.Split(name, "类 - ")
+			if len(result) > 1 {
+				name = result[1]
+			}
+			romlist += "<button class='rom-button' id='rom-" + strconv.Itoa(i) + "' data-dismiss=\"modal\" onclick=\"loadRom('" + Path + "');createPair('" + Path + "','" + fi.Name() + "');\">" + name + "</button><br>"
 			i++
 		}
 	}
@@ -122,6 +138,8 @@ func main() {
 	fmt.Println("updateRomlistInHTML")
 	updateRomlistInHTML("template/cs.html", "views/cs.html")
 	updateRomlistInHTML("template/p2p.html", "views/p2p.html")
+	updateRomlistInHTML("template/p2p.m.html", "views/p2p.m.html")
+	updateRomlistInHTML("template/p2p.new.html", "views/p2p.new.html")
 	updateRomlistInHTML("template/alone.html", "views/alone.html")
 	updateRomlistInHTML("template/index.html", "views/index.html")
 
@@ -134,6 +152,8 @@ func main() {
 	http.HandleFunc("/alone", alone)
 	http.HandleFunc("/cs", cs)
 	http.HandleFunc("/p2p", p2p)
+	http.HandleFunc("/p2p.m", p2pm)
+	http.HandleFunc("/p2p.new", p2pnew)
 	http.HandleFunc("/ws", wsHandler)
 	// http.HandleFunc("/update", update)
 

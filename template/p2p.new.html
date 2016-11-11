@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>NES Online v1.3.6</title>
+    <link href="css/bootstrap/bootstrap.css" rel="stylesheet">
+    <script src="js/jquery-3.1.1.min.js"></script>
+    <script src="js/bootstrap/bootstrap.js"></script>
+    <!--<script src="js/react/react.js"></script>
+    <script src="js/react/react-dom.js"></script>
+    <script src="js/react/browser.min.js"></script>-->
+
+    <!--手机浏览器不允许缩放-->
+    <meta content="target-densitydpi=high-dpi, user-scalable=0;" name="viewport" />
+
+    <!--不允许缓存-->
+    <!--<META HTTP-EQUIV="Pragma" CONTENT="no-cache"> 
+    <META HTTP-EQUIV="Cache-Control" CONTENT="no-cache"> 
+    <META HTTP-EQUIV="Expires" CONTENT="0"> -->
+
+    <!--chatBoard required-->
+    <!--<link href="css/chatBoard.css" rel="stylesheet">-->
+    <link href="css/m.css" rel="stylesheet">
+
+    <script src="/js/dynamicaudio.js" type="text/javascript" charset="utf-8"></script>
+    <!--nes required-->
+    <script src="/js/jsnes/nes.js" type="text/javascript" charset="utf-8"></script>
+    <script src="/js/jsnes/utils.js" type="text/javascript" charset="utf-8"></script>
+    <script src="/js/jsnes/cpu.js" type="text/javascript" charset="utf-8"></script>
+    <script src="/js/jsnes/keyboard.js" type="text/javascript" charset="utf-8"></script>
+    <script src="/js/jsnes/mappers.js" type="text/javascript" charset="utf-8"></script>
+    <script src="/js/jsnes/papu.js" type="text/javascript" charset="utf-8"></script>
+    <script src="/js/jsnes/ppu.js" type="text/javascript" charset="utf-8"></script>
+    <script src="/js/jsnes/rom.js" type="text/javascript" charset="utf-8"></script>
+    <script src="/js/jsnes/ui.js" type="text/javascript" charset="utf-8"></script>
+</head>
+
+<body style="background: black">
+    <script src="js/settings.p2p.new.js"></script>
+    <span id="info" class="info"></span>
+    <span id="room_chat" class="room_chat"></span>
+    <form id="input_name" class="input_text">
+        <div class="msg_container">
+            <span id="ip1"></span>
+            <span id="name1"></span>
+            <input type="text" id="msg_name" class="msg" autocomplete="off" placeholder="请输入你的昵称..." />
+        </div>
+    </form>
+    <form id="chat" class="input_text" hidden>
+        <div class="msg_container">
+            <span id="ip2"></span>
+            <span id="name2"></span>
+            <input type="text" id="msg" class="msg" autocomplete="off" placeholder="Say something..." />
+        </div>
+    </form>
+    <button id="button_show_menus" class="button_show_menus"></button>
+    <div id="button_menus" class="button_menus">
+        <button id="restart" type="button" class="restart"></button>
+        <button id="sound" type="button" class="sound"></button>
+        <button class="button_game_settings" id="game_settings" data-toggle="modal" data-target="#game_settings-list"/>
+        <button id="stop" type="button" class="button_stop">暂停</button>
+        <button type="button" class="button_choose-rom" data-toggle="modal" data-target="#choose-rom-list">创建游戏</button>
+        <button type="button" class="button_players" data-toggle="modal" data-target="#players-list">玩家列表</button>
+        <button type="button" class="button_rooms" data-toggle="modal" data-target="#rooms-list">房间列表</button>
+    </div>
+    <div class="button_directions">
+        <img src="/images/m/button_center.png" onmouseover="this.src='/images/m/button_center_over.png'" onmouseout="this.src='/images/m/button_center.png'" class="button_center"></img>
+        <button id="button_up" class="button_up"/>
+        <button id="button_down" class="button_down">
+        <button id="button_left" class="button_left"/>
+        <button id="button_right" class="button_right"/>
+    </div>
+    <div class="button_select_start">
+        <button id="button_select" class="button_select"/>
+        <button id="button_start" class="button_start"/>
+    </div>
+    <div class="button_AB">
+        <button id="ready" type="button" onclick="readyPair();" class="button_ready" hidden>准备</button>
+        <button id="leavePair" type="button" onclick="leavePair();" class="button_leave" hidden>离开房间</button>
+        <button id="button_chat" type="button" class="button_chat">chat</button>
+
+        <button id="button_a" class="button_a"/>
+        <button id="button_b" class="button_b"/>
+    </div>
+    <div align="center" id="vid-wrapper" class="vid-wrapper">
+        <div id="emulator" class="video" align="center"></div>
+        <video style="display:none" id="video" class="video" autoplay="autoplay"></video>
+    </div>
+    <script src="/js/dynamicaudio.js" type="text/javascript" charset="utf-8"></script>
+    <script type="text/javascript" charset="utf-8">
+        var nes;
+        $(function() {
+            nes = new JSNES({
+                'ui': $('#emulator').JSNESUI()
+            });
+            init_size();
+        });
+    </script>
+
+    <div class="modal fade" id="game_settings-list" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="closee" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title">
+                    游戏设置
+                </h4>
+            </div>
+            <div class="modal-body" align="center">
+               <div align="center" id="1-keyboard">
+                    按键设置  -  默认为 上下左右(wsad) 选择/确认(vb) A/B(jk)
+                    <div style="border-radius:22px;width:347px;height:150px;background:url(/images/controller.jpg);">
+                        <input id="KEY_LEFT" style="border-color: #262729; background: #000000; color: #ffffff; float: left; width: 24px; height: 24px; border-radius: 5px; margin-top: 78px; margin-left: 27px; text-align: center;" value="65" type="text">
+                        <input id="KEY_UP" style="border-color: #262729; background: #000000; color: #ffffff; float: left; width: 24px; height: 24px; border-radius: 5px; margin-top: 55px; margin-left: -1px; text-align: center;" value="87" type="text">
+                        <input id="KEY_DOWN" style="border-color: #262729; background: #000000; color: #ffffff; float: left; width: 24px; height: 24px; border-radius: 5px; margin-top: 99px; margin-left: -24px; text-align: center;" value="83" type="text">
+                        <input id="KEY_RIGHT" style="border-color: #262729; background: #000000; color: #ffffff; float: left; width: 24px; height: 24px; border-radius: 5px; margin-top: 78px; margin-left: -2px; text-align: center;" value="68" type="text">
+                        <input id="KEY_SELECT" style="border-color: #262729; background: #000000; color: #ffffff; float: left; width: 40px; margin-top: 97px; margin-left: 24px; height: 18px; border-radius: 31px; text-align: center;" value="86" type="text">
+                        <input id="KEY_START" style="border-color: #262729; background: #000000; color: #ffffff; float: left; width: 40px; margin-top: 97px; margin-left: 4px; height: 18px; border-radius: 20px; text-align: center;" value="66" type="text">
+                        <input id="KEY_A" style="border-color: #262729; background: #000000; color: #ffffff; float: left; border-radius: 25px; margin-top: -55px; margin-left: 285px; width: 33px; height: 33px; text-align: center;" value="75" type="text">
+                        <input id="KEY_B" style="border-color: #262729; background: #000000; color: #ffffff; float: left; width: 33px; height: 33px; border-radius: 25px; margin-top: -24px; margin-left: 253px; text-align: center;" value="74" type="text">
+                    </div>
+                </div>
+            </div>
+        </div><!-- /.modal-content -->
+    </div>
+    <div class="modal fade" id="choose-rom-list" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="closee" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title">
+                    nes游戏列表
+                </h4>
+            </div>
+            <div class="modal-body" id="rom-list" align="left">
+               {{.Romlist}}
+            </div>
+        </div><!-- /.modal-content -->
+    </div>
+    <div class="modal fade" id="players-list" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="closee" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title">
+                    玩家列表
+                </h4>
+            </div>
+            <div class="modal-body" align="center">
+                <div id="users">
+                </div>
+            </div>
+        </div><!-- /.modal-content -->
+    </div>
+    <div class="modal fade" id="rooms-list" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="closee" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title">
+                    房间列表
+                </h4>
+            </div>
+            <div class="modal-body" align="center">
+                <div id="rooms">
+                </div>
+            </div>
+        </div><!-- /.modal-content -->
+    </div>
+    <div id="host" style="display: none">{{.Host1}}</div>
+    <script src="js/chat.p2p.new.js"></script>
+    <script src="js/buttons.p2p.new.js"></script>
+    <script src="js/keyset.p2p.js"></script>
+</body>
+</html>

@@ -88,10 +88,10 @@ if (typeof jQuery !== 'undefined') {
                  */
                 $("#canvas").
                     bind('keydown', function(evt) {
-                        self.nes.keyboard.keyDown1(evt); 
+                        self.nes.keyboard.keyDown(evt); 
                     }).
                     bind('keyup', function(evt) {
-                        self.nes.keyboard.keyUp1(evt); 
+                        self.nes.keyboard.keyUp(evt); 
                     }).
                     bind('keypress', function(evt) {
                         self.nes.keyboard.keyPress(evt);
@@ -133,8 +133,10 @@ if (typeof jQuery !== 'undefined') {
                 },
             
                 writeAudio: function(samples) {
-                    if ( noPair=="1" && network ) {
-                        dataChannel.send(samples);
+                    if (typeof(noPair)!="undefined") {
+                        if ( noPair=="1" && network ) {
+                            dataChannel.send(samples);
+                        }
                     }
                     return this.dynamicaudio.writeInt(samples);
                 },

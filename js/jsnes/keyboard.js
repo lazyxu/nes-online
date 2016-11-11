@@ -76,6 +76,7 @@ JSNES.Keyboard = function() {
 
 JSNES.Keyboard.prototype = {
     setKey: function(key, value) {
+        var ret = 0;
         switch (key) {
             case this.key1Setting.KEY_A: this.state1[this.keys.KEY_A] = value; break;      // X
             case this.key1Setting.KEY_B: this.state1[this.keys.KEY_B] = value; break;      // Z
@@ -85,7 +86,9 @@ JSNES.Keyboard.prototype = {
             case this.key1Setting.KEY_DOWN: this.state1[this.keys.KEY_DOWN] = value; break;   // Down
             case this.key1Setting.KEY_LEFT: this.state1[this.keys.KEY_LEFT] = value; break;   // Left
             case this.key1Setting.KEY_RIGHT: this.state1[this.keys.KEY_RIGHT] = value; break;  // Right
-
+            default: ret++;
+        }
+        switch (key) {
             case this.key2Setting.KEY_A: this.state2[this.keys.KEY_A] = value; break;     // Num-7
             case this.key2Setting.KEY_B: this.state2[this.keys.KEY_B] = value; break;     // Num-9
             case this.key2Setting.KEY_SELECT: this.state2[this.keys.KEY_SELECT] = value; break; // Num-3
@@ -94,21 +97,30 @@ JSNES.Keyboard.prototype = {
             case this.key2Setting.KEY_DOWN: this.state2[this.keys.KEY_DOWN] = value; break;   // Num-2
             case this.key2Setting.KEY_LEFT: this.state2[this.keys.KEY_LEFT] = value; break;  // Num-4
             case this.key2Setting.KEY_RIGHT: this.state2[this.keys.KEY_RIGHT] = value; break; // Num-6
-            default: return true;
+            default: ret++;
         }
+        if (ret==2) return true;
         return false; // preventDefault
     },
     
     setKey1: function(key, value) {
         switch (key) {
-            case this.key1Setting.KEY_A: this.state1[this.keys.KEY_A] = value; break;      // X
-            case this.key1Setting.KEY_B: this.state1[this.keys.KEY_B] = value; break;      // Z
-            case this.key1Setting.KEY_SELECT: this.state1[this.keys.KEY_SELECT] = value; break; // Right Ctrl
-            case this.key1Setting.KEY_START: this.state1[this.keys.KEY_START] = value; break;  // Enter
-            case this.key1Setting.KEY_UP: this.state1[this.keys.KEY_UP] = value; break;     // Up
-            case this.key1Setting.KEY_DOWN: this.state1[this.keys.KEY_DOWN] = value; break;   // Down
-            case this.key1Setting.KEY_LEFT: this.state1[this.keys.KEY_LEFT] = value; break;   // Left
-            case this.key1Setting.KEY_RIGHT: this.state1[this.keys.KEY_RIGHT] = value; break;  // Right
+            case this.key1Setting.KEY_A: this.state1[this.keys.KEY_A] = value; 
+                document.getElementById('button_a').style.background = value==64?"url('/images/m/button_a.png')":"url('/images/m/button_a_over.png')"; break;      // X
+            case this.key1Setting.KEY_B: this.state1[this.keys.KEY_B] = value; 
+                document.getElementById('button_b').style.background = value==64?"url('/images/m/button_b.png')":"url('/images/m/button_b_over.png')"; break;      // Z
+            case this.key1Setting.KEY_SELECT: this.state1[this.keys.KEY_SELECT] = value; 
+                document.getElementById('button_select').style.background = value==64?"url('/images/m/r_button_select.png')":"url('/images/m/r_button_select_over.png')"; break; // Right Ctrl
+            case this.key1Setting.KEY_START: this.state1[this.keys.KEY_START] = value; 
+                document.getElementById('button_start').style.background = value==64?"url('/images/m/r_button_start.png')":"url('/images/m/r_button_start_over.png')"; break;  // Enter
+            case this.key1Setting.KEY_UP: this.state1[this.keys.KEY_UP] = value; 
+                document.getElementById('button_up').style.background = value==64?"url('/images/m/button_up.png')":"url('/images/m/button_up_over.png')"; break;     // Up
+            case this.key1Setting.KEY_DOWN: this.state1[this.keys.KEY_DOWN] = value;
+                document.getElementById('button_down').style.background = value==64?"url('/images/m/button_down.png')":"url('/images/m/button_down_over.png')"; break;   // Down
+            case this.key1Setting.KEY_LEFT: this.state1[this.keys.KEY_LEFT] = value; 
+                document.getElementById('button_left').style.background = value==64?"url('/images/m/button_left.png')":"url('/images/m/button_left_over.png')"; break;   // Left
+            case this.key1Setting.KEY_RIGHT: this.state1[this.keys.KEY_RIGHT] = value; 
+                document.getElementById('button_right').style.background = value==64?"url('/images/m/button_right.png')":"url('/images/m/button_right_over.png')"; break;  // Right
             default: return true;
         }
         return false; // preventDefault

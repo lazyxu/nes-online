@@ -130,6 +130,7 @@ func (c *connection) answer(m map[string]interface{}) {
 
 func (c *connection) leavePair(roomName string) {
 	m := make(map[string]interface{})
+	m["name"] = c.name
 	c.no = "0"
 	if c.roomName != "" && c.roomName != roomName {
 		m["empty"] = "false"

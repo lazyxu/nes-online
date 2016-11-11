@@ -11,6 +11,7 @@ type connection struct {
 	// websocket 连接器
 	ws       *websocket.Conn
 	roomName string
+	name     string
 	ip       string
 	no       string
 	ping     int64
@@ -30,8 +31,14 @@ func (c *connection) reader(ip string) {
 		}
 		log.Println(message["opt"])
 		message["ip"] = ip
+		message["name"] = c.name
 		switch message["opt"] {
 		case "msg":
+			message["data"] = message["ip"].(string) + " - " + message["name"].(string) + ": " + message["data"].(string)
+			c.broadcast(message)
+		case "name":
+			c.name = message["data"].(string)
+			log.Println(c.name)
 			c.broadcast(message)
 		case "createPair":
 			c.createPair(message)
@@ -86,10 +93,12 @@ func wsHandler(w http.ResponseWriter, r *http.Request) {
 	c.ip = ip
 	c.broadcast(map[string]interface{}{
 		"opt":  "in",
+		"name": c.name,
 		"data": ip,
 	})
 	c.ws.WriteJSON(map[string]interface{}{
 		"opt":  "ip",
+		"name": c.name,
 		"data": ip,
 	})
 	for conn, ok := range h.connections {
@@ -100,6 +109,7 @@ func wsHandler(w http.ResponseWriter, r *http.Request) {
 		if conn.no == "1" {
 			c.ws.WriteJSON(map[string]interface{}{
 				"opt":      "listRooms",
+				"name":     conn.name,
 				"ip":       conn.ip,
 				"roomName": conn.roomName,
 				"data":     h.gamePathPair[conn.roomName],
@@ -107,6 +117,7 @@ func wsHandler(w http.ResponseWriter, r *http.Request) {
 		} else {
 			c.ws.WriteJSON(map[string]interface{}{
 				"opt":  "listPlayers",
+				"name": conn.name,
 				"data": conn.ip,
 			})
 		}
@@ -114,6 +125,7 @@ func wsHandler(w http.ResponseWriter, r *http.Request) {
 	defer func() {
 		c.broadcast(map[string]interface{}{
 			"opt":  "out",
+			"name": c.name,
 			"data": ip,
 		})
 		c.unregister()

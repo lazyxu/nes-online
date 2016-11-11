@@ -71,7 +71,7 @@ function appendRoom(msg) {
 }
 function createPair(url, romName) {
     $("#1-keyboard").show();
-    $("#2-keyboard").hide();
+    // $("#2-keyboard").hide();
     if (!conn) {
         return false;
     }
@@ -82,7 +82,23 @@ function createPair(url, romName) {
 }
 function leavePair() {
     $("#1-keyboard").show();
-    $("#2-keyboard").hide();
+    // $("#2-keyboard").show();
+    $("#emulator").css({display: ""});
+    $("#video").css({display: "none"});
+    document.getElementById('stop').onclick = function() {
+        if (nes.isRunning) {
+            nes.stop();
+            document.getElementById('stop').innerHTML = "继续";
+        }
+        else {
+            nes.start();
+            document.getElementById('stop').innerHTML = "暂停";
+        }
+    }
+    document.getElementById('restart').onclick = function() {
+        nes.reloadRom();
+        nes.start();
+    }
     if (!conn) {
         return false;
     }
@@ -112,8 +128,6 @@ function loadButtonSet2(jsonData){
 }
 
 function disableButtons(set){
-    $("#nes-pause").attr("disabled", set);
-    $("#nes-restart").attr("disabled", set);
     $("#choose-rom").attr("disabled", set);
 
     $("#KEY_LEFT").attr("disabled", set);
@@ -144,6 +158,7 @@ function readyPair(){
             "opt": "readyPair"
         }));
     } else if (noPair=="2") {
+        $("#stop").attr("disabled", true);
         conn.send(JSON.stringify({
             "opt": "readyPair", 
             "KEY_UP":$('#KEY_UP').val(),
@@ -156,6 +171,8 @@ function readyPair(){
             "KEY_B":$('#KEY_B').val(),
         }));
     }
+    $("#1-keyboard").hide();
+    // $("#2-keyboard").hide();
     $("#ready").attr("disabled", true);
     disableButtons(true);
 }
@@ -266,15 +283,20 @@ var audioContext = new AudioContext();
             // appendLog($("<div/>").text("onmessage"));
             if (noPair=="1") {
                 var jsonData=JSON.parse(event.data);
-                switch (jsonData.keyCode) {
-                    case nes.keyboard.key2Setting.KEY_A: nes.keyboard.state2[nes.keyboard.keys.KEY_A] = jsonData.value; break;     // Num-7
-                    case nes.keyboard.key2Setting.KEY_B: nes.keyboard.state2[nes.keyboard.keys.KEY_B] = jsonData.value; break;     // Num-9
-                    case nes.keyboard.key2Setting.KEY_SELECT: nes.keyboard.state2[nes.keyboard.keys.KEY_SELECT] = jsonData.value; break; // Num-3
-                    case nes.keyboard.key2Setting.KEY_START: nes.keyboard.state2[nes.keyboard.keys.KEY_START] = jsonData.value; break;  // Num-1
-                    case nes.keyboard.key2Setting.KEY_UP: nes.keyboard.state2[nes.keyboard.keys.KEY_UP] = jsonData.value; break;    // Num-8
-                    case nes.keyboard.key2Setting.KEY_DOWN: nes.keyboard.state2[nes.keyboard.keys.KEY_DOWN] = jsonData.value; break;   // Num-2
-                    case nes.keyboard.key2Setting.KEY_LEFT: nes.keyboard.state2[nes.keyboard.keys.KEY_LEFT] = jsonData.value; break;  // Num-4
-                    case nes.keyboard.key2Setting.KEY_RIGHT: nes.keyboard.state2[nes.keyboard.keys.KEY_RIGHT] = jsonData.value; break; // Num-6
+                if (jsonData.keyCode) {
+                    switch (jsonData.keyCode) {
+                        case nes.keyboard.key2Setting.KEY_A: nes.keyboard.state2[nes.keyboard.keys.KEY_A] = jsonData.value; break;     // Num-7
+                        case nes.keyboard.key2Setting.KEY_B: nes.keyboard.state2[nes.keyboard.keys.KEY_B] = jsonData.value; break;     // Num-9
+                        case nes.keyboard.key2Setting.KEY_SELECT: nes.keyboard.state2[nes.keyboard.keys.KEY_SELECT] = jsonData.value; break; // Num-3
+                        case nes.keyboard.key2Setting.KEY_START: nes.keyboard.state2[nes.keyboard.keys.KEY_START] = jsonData.value; break;  // Num-1
+                        case nes.keyboard.key2Setting.KEY_UP: nes.keyboard.state2[nes.keyboard.keys.KEY_UP] = jsonData.value; break;    // Num-8
+                        case nes.keyboard.key2Setting.KEY_DOWN: nes.keyboard.state2[nes.keyboard.keys.KEY_DOWN] = jsonData.value; break;   // Num-2
+                        case nes.keyboard.key2Setting.KEY_LEFT: nes.keyboard.state2[nes.keyboard.keys.KEY_LEFT] = jsonData.value; break;  // Num-4
+                        case nes.keyboard.key2Setting.KEY_RIGHT: nes.keyboard.state2[nes.keyboard.keys.KEY_RIGHT] = jsonData.value; break; // Num-6
+                    }
+                } else if (jsonData.restart) {
+                    nes.reloadRom();
+                    nes.start();
                 }
             } else if (noPair=="2") {
                 nes.ui.dynamicaudio.writeInt(event.data.split(","));
@@ -378,6 +400,7 @@ if (window["WebSocket"]) {
                         removeDiv(jsonData.roomName);
                     }
                 }
+                $("#stop").attr("disabled", false);
                 disableButtons(false);
                 bindLocal();
                 appendLog($("<div/>").text(jsonData.ip+"离开了双人房"+jsonData.roomName));
@@ -385,8 +408,6 @@ if (window["WebSocket"]) {
             case "joinPair":
                 unbindButton(jsonData);
                 if (noPair == "2") {
-                    $("#1-keyboard").hide();
-                    $("#2-keyboard").show();
                     $("#leavePair").attr("disabled", false);
                     $("#ready").attr("disabled", false);
                     loadRom(jsonData.url);
@@ -399,10 +420,12 @@ if (window["WebSocket"]) {
                     appendLog($("<div/>").text("正在加载玩家2按键设置..."));
                     loadButtonSet2(jsonData);
                 }
+                document.getElementById('restart').onclick = function() {
+                    dataChannel.send(JSON.stringify({"restart": true}));
+                }
                 bindNetwork();
                 appendLog($("<div/>").text("游戏开始"));
                 prepare();
-                network = true;
                 if(noPair=="1"){
                     startGame();
                     video();
@@ -431,6 +454,7 @@ if (window["WebSocket"]) {
                 });
                 break;
             case "__answer":
+                network = true;
                 appendLog($("<div/>").text("__answer"));
                 var mid = new RTCSessionDescription(jsonData.sdp);
                 pc.setRemoteDescription(mid);
