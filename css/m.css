@@ -8,10 +8,32 @@ body {
     -moz-user-select: none;
     user-select: none;
 }
-.info {
+.position {
     position: fixed;
     left: 0;
     top: 0;
+    height: 25px;
+    font-size: 15px;
+    color: #27b4e7;
+    margin:5px
+}
+.MyHall {
+    display:inline;
+}
+.MyRoomName {
+    display:inline;
+}
+.MyGameName {
+    display:inline;
+}
+.MyPlayerNum {
+    display:inline;
+}
+
+.info {
+    position: fixed;
+    left: 0;
+    top: 20px;
     color: #a6e0f5;
     filter:alpha(opacity=90);
     -moz-opacity:0.9; 
@@ -21,7 +43,7 @@ body {
 .room_chat {
     position: fixed;
     left: 45%;
-    top: 0;
+    top: 20px;
     color: #a6e0f5;
     filter:alpha(opacity=90);
     -moz-opacity:0.9; 
@@ -43,6 +65,7 @@ body {
     height: 0;
     width: 100%;
     z-index: 100;
+    background:rgba(0,0,0,0);
 }
 .msg_container {
     position: absolute;
@@ -57,7 +80,7 @@ body {
     padding: 0;
     border: none;
     outline: none;
-    background: #28b8ec;
+    background: #27b4e7;
     border-radius: 5px;
     color: black;
 }
@@ -70,22 +93,22 @@ body {
     padding-left: 5px;
     border: none;
     outline: none;
-    background: black;
-    border: 1px solid #28b8ec;
+    background:rgba(0,0,0,0);
+    border: 1px solid #27b4e7;
     border-radius: 5px;
     color: #a6e0f5;
 }
 .msg::-webkit-input-placeholder { /* WebKit browsers */ 
-    color: #28b8ec;
+    color: #27b4e7;
 } 
 .msg:-moz-placeholder { /* Mozilla Firefox 4 to 18 */ 
-    color: #28b8ec;
+    color: #27b4e7;
 } 
 .msg::-moz-placeholder { /* Mozilla Firefox 19+ */ 
-    color: #28b8ec;
+    color: #27b4e7;
 } 
 .msg:-ms-input-placeholder { /* Internet Explorer 10+ */ 
-    color: #28b8ec;
+    color: #27b4e7;
 } 
 .button_show_menus {
     position: fixed;
@@ -110,12 +133,34 @@ body {
     width: 0;
     z-index: 100;
 }
+.button_help {
+    position: absolute;
+    height: 48px;
+    width: 48px;
+    left: -240px;
+    top: 0;
+    padding: 0;
+    border: none;
+    outline: none;
+    background:url('/images/m/ic_help_mnu.png');
+}
+.button_about {
+    position: absolute;
+    height: 48px;
+    width: 48px;
+    left: -288px;
+    top: 0;
+    padding: 0;
+    border: none;
+    outline: none;
+    background:url('/images/m/ic_about.png');
+}
 .button_game_settings {
     position: absolute;
     height: 48px;
     width: 48px;
-    left: -48px;
-    top: 48px;
+    left: -96px;
+    top: 0;
     padding: 0;
     border: none;
     outline: none;
@@ -125,8 +170,8 @@ body {
     position: absolute;
     height: 48px;
     width: 48px;
-    left: -96px;
-    top: 48px;
+    left: -144px;
+    top: 0;
     padding: 0;
     border: none;
     outline: none;
@@ -136,8 +181,8 @@ body {
     position: absolute;
     height: 48px;
     width: 48px;
-    left: -144px;
-    top: 48px;
+    left: -192px;
+    top: 0;
     padding: 0;
     border: none;
     outline: none;
@@ -145,8 +190,8 @@ body {
 }
 .button_stop {
     position: absolute;
-    left: -185px;
-    top: 4px;
+    left: -137px;
+    top: 48px;
     height: 41px;
     width: 137px;
     padding: 0;
@@ -159,10 +204,10 @@ body {
     color: #a6e0f5;
     background:url('/images/m/button_panel_over.png');
 }
-.button_choose-rom {
+.button_network-choose-rom {
     position: absolute;
-    left: -322px;
-    top: 4px;
+    left: -274px;
+    top: 48px;
     height: 41px;
     width: 137px;
     padding: 0;
@@ -171,14 +216,30 @@ body {
     color: #27b4e7;
     background:url('/images/m/button_panel.png');
 }
-.button_choose-rom:hover {
+.button_network-choose-rom:hover {
+    color: #a6e0f5;
+    background:url('/images/m/button_panel_over.png');
+}
+.button_local-choose-rom {
+    position: absolute;
+    left: -274px;
+    top: 96px;
+    height: 41px;
+    width: 137px;
+    padding: 0;
+    border: none;
+    outline: none;
+    color: #27b4e7;
+    background:url('/images/m/button_panel.png');
+}
+.button_local-choose-rom:hover {
     color: #a6e0f5;
     background:url('/images/m/button_panel_over.png');
 }
 .button_players {
     position: absolute;
-    left: -459px;
-    top: 4px;
+    left: -411px;
+    top: 96px;
     height: 41px;
     width: 137px;
     padding: 0;
@@ -193,8 +254,8 @@ body {
 }
 .button_rooms {
     position: absolute;
-    left: -596px;
-    top: 4px;
+    left: -411px;
+    top: 48px;
     height: 41px;
     width: 137px;
     padding: 0;
@@ -209,10 +270,10 @@ body {
 }
 .modal {
     position: fixed;
-    top: 100px;
-    right: 137px;
+    top: 48px;
+    right: 144px;
     bottom: 48px;
-    left: 246px;
+    left: 144px;
     z-index: 1040;
     display: none;
     overflow: hidden;
@@ -229,7 +290,7 @@ body {
     opacity:0.9;
     -webkit-background-clip: padding-box;
     background-clip: padding-box;
-    border: 1px solid #28b8ec;
+    border: 1px solid #27b4e7;
     /*border: 1px solid rgba(0, 0, 0, .2);*/
     /*border-radius: 6px;*/
     outline: 0;
@@ -239,7 +300,7 @@ body {
 .modal-header {
     min-height: 16.42857143px;
     padding: 5px;
-    border-bottom: 1px solid #28b8ec;
+    border-bottom: 1px solid #27b4e7;
 }
 .modal-title {
     margin: 0;
@@ -256,7 +317,7 @@ body {
     float: right;
     font-size: 30px;
     /*font-weight: bold;*/
-    color: #28b8ec;
+    color: #27b4e7;
     outline: none;
     /*text-shadow: 0 1px 0 #fff;*/
 }
@@ -445,16 +506,43 @@ body {
 .button_b:hover {
     background:url('/images/m/button_b_over.png');
 }
+.button_a_turbo {
+    position: absolute;
+    left: -87px;
+    top: 28px;
+    height: 80px;
+    width: 87px;
+    outline: none;
+    border: 0;
+    background:url('/images/m/button_a_turbo.png');
+}
+.button_a_turbo:hover {
+    background:url('/images/m/button_a_turbo_over.png');
+}
+.button_b_turbo {
+    position: absolute;
+    left: -87px;
+    top: 115px;
+    height: 80px;
+    width: 87px;
+    outline: none;
+    border: 0;
+    background:url('/images/m/button_b_turbo.png');
+}
+.button_b_turbo:hover {
+    background:url('/images/m/button_b_turbo_over.png');
+}
 .video {
     border: 1px #091e26 solid;
 }
 .rom-button {
-    color: #28b8ec;
+    color: #27b4e7;
     background: black;
     margin: 2px;
+    border: 0;
     outline: none;
     padding: 0;
-    border: 1px solid #28b8ec;
+    /*border: 1px solid #27b4e7;*/
 }
 .rom-button:hover {
     color: #a6e0f5;
@@ -462,7 +550,7 @@ body {
 .tabs {
   font-size:20px;
   height: 31px;
-  border-bottom: 1px solid #28b8ec;
+  border-bottom: 1px solid #27b4e7;
   padding-left: 0;
   margin-bottom: 10px;
   list-style: none;
@@ -484,13 +572,156 @@ body {
 }
 .tabs > li > a:hover {
   text-decoration: none;
-  background-color: #28b8ec;
+  background-color: #27b4e7;
 }
 .tabs > li > a.active,
 .tabs > li > a.active:hover,
 .tabs > li > a.active:focus {
   color: #555;
   cursor: default;
-  background-color: #28b8ec;
+  background-color: #27b4e7;
   border-bottom-color: transparent;
+}
+
+/* room status */
+.Room {
+    width: 100%;
+    height: 40px;
+    background: #033459;
+    border-radius: 7px;
+/*     border: 1px solid #28b8ec; */
+    margin: 5px;
+}
+.RoomName {
+    float: left;
+    word-break:break-all;
+    width: 20%;
+    height: 40px;
+    padding-box:2px;
+}
+.Name {
+    float: left;
+    width: 30%;
+    left: 10%;
+    word-break:break-all;
+    height: 40px;
+    border-left: 1px solid #27b4e7;
+    border-right: 1px solid #27b4e7;
+}
+.GameName {
+    float: left;
+    width: 40%;
+    left: 50%;
+    word-break:break-all;
+    height: 40px;
+}
+.PlayerNum {
+    float: left;
+    width: 10%;
+    word-break:break-all;
+    left: 90%;
+    height: 40px;
+    border-left: 1px solid #27b4e7;
+}
+
+
+/*keyboard*/
+.controller {
+    position: relative;
+    border-radius:22px;
+    width:347px;
+    height:150px;
+    background:url(/images/controller.jpg);
+}
+.KEY_LEFT,
+.KEY_UP,
+.KEY_DOWN,
+.KEY_RIGHT,
+.KEY_SELECT,
+.KEY_START,
+.KEY_A,
+.KEY_B,
+.KEY_X,
+.KEY_Y {
+    border-color: #262729;
+    background: #000000; 
+    color: #ffffff; 
+    position: absolute;
+    /*width: 24px; 
+    height: 24px; 
+    border-radius: 5px; 
+    margin-top: 99px; 
+    margin-left: -24px; */
+    text-align: center;
+}
+
+.KEY_LEFT {
+    width: 24px;
+    height: 24px;
+    border-radius: 5px;
+    left: 30px;
+    top: 77px;
+}
+.KEY_UP {
+    width: 24px;
+    height: 24px;
+    border-radius: 5px;
+    left: 50px;
+    top: 56px;
+}
+.KEY_DOWN {
+    width: 24px;
+    height: 24px;
+    border-radius: 5px;
+    left: 50px;
+    top: 97px;
+}
+.KEY_RIGHT {
+    width: 24px;
+    height: 24px;
+    border-radius: 5px;
+    left: 71px;
+    top: 78px;
+}
+.KEY_SELECT {
+    width: 40px;
+    height: 18px;
+    border-radius: 20px;
+    left: 121px;
+    top: 97px;
+}
+.KEY_START {
+    width: 40px;
+    height: 18px;
+    border-radius: 20px;
+    left: 163px;
+    top: 97px;
+}
+.KEY_A {
+    width: 33px;
+    height: 33px;
+    border-radius: 25px;
+    left: 284px;
+    top: 60px;
+}
+.KEY_B {
+    width: 33px;
+    height: 33px;
+    border-radius: 25px;
+    left: 253px;
+    top: 92px;
+}
+.KEY_X {
+    width: 33px;
+    height: 33px;
+    border-radius: 25px;
+    left: 253px;
+    top: 29px;
+}
+.KEY_Y {
+    width: 33px;
+    height: 33px;
+    border-radius: 25px;
+    left: 220px;
+    top: 60px;
 }

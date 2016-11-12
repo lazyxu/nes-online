@@ -164,6 +164,8 @@ JSNES.prototype = {
                 this.fpsFrameCount / ((now - this.lastFpsTime) / 1000)
             ).toFixed(2)+' FPS';
         }
+        
+        // appendChat("fpsFrameCount: "+this.fpsFrameCount);
         // $('#frameCount').text(this.frameCount);
         this.ui.updateStatus(s);
         this.fpsFrameCount = 0;
@@ -210,6 +212,7 @@ JSNES.prototype = {
         else {
             this.ui.updateStatus("Invalid ROM!");
         }
+        appendChat("rom vaild check: "+this.rom.valid);
         return this.rom.valid;
     },
     

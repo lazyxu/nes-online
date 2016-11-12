@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <title>NES Online v1.3.6</title>
+    <title>{{.version}}</title>
     <link href="css/bootstrap/bootstrap.css" rel="stylesheet">
     <script src="js/jquery-3.1.1.min.js"></script>
     <script src="js/bootstrap/bootstrap.js"></script>
@@ -19,7 +19,7 @@
     <META HTTP-EQUIV="Expires" CONTENT="0"> -->
 
     <!--chatBoard required-->
-    <!--<link href="css/chatBoard.css" rel="stylesheet">-->
+    <link href="css/chatBoard.p2p.new.css" rel="stylesheet">
     <link href="css/m.css" rel="stylesheet">
 
     <script src="/js/dynamicaudio.js" type="text/javascript" charset="utf-8"></script>
@@ -37,8 +37,15 @@
 
 <body style="background: black">
     <script src="js/settings.p2p.new.js"></script>
-    <span id="info" class="info"></span>
-    <span id="room_chat" class="room_chat"></span>
+    <div id="position" class="position">
+        <div class='MyHall' id='MyHall'>NES Online</div> 
+        <div id="MyRoom" style="display: none">
+            >> 
+            <div class='MyRoomName' id='MyRoomName' ></div>
+            <div class='MyGameName' id='MyGameName'></div>
+            <div class='MyPlayerNum' id='MyPlayerNum' ></div>
+        </div>
+    </div>
     <form id="input_name" class="input_text">
         <div class="msg_container">
             <span id="ip1"></span>
@@ -46,22 +53,51 @@
             <input type="text" id="msg_name" class="msg" autocomplete="off" placeholder="请输入你的昵称..." />
         </div>
     </form>
-    <form id="chat" class="input_text" hidden>
+    <!--<form id="chat" class="input_text" hidden>
         <div class="msg_container">
             <span id="ip2"></span>
             <span id="name2"></span>
             <input type="text" id="msg" class="msg" autocomplete="off" placeholder="Say something..." />
         </div>
-    </form>
+    </form>-->
+
+    <!--<script type="text/javascript" src="js/chatBoard.js"></script>-->
+    <div id="Chat" class="dragclass" >
+	    <div id="ChatHead">
+            <span style="float: left">
+            <span id="ip2"></span>
+            <span id="name2"></span></span>
+            <a href="javascript:void(0);" onclick="$('#Chat').hide();"><img src="images/minimize.png"></img></a>
+        </div>
+        <div id="ChatContent">
+            <span id="info" hidden></span>
+            <span id="room_chat" hidden></span>
+            <span id="mixinfo"></span>
+        </div>
+        <div id="ChatBtn">
+                <div class="click_box">
+                    大厅<button id="HallChat" class="HallChat"></button>
+                </div>
+                <div class="click_box">
+                    房间<button id="RoomChat" class="RoomChat"></button>
+                </div>
+            <form id="chat" style="display: inline">
+                <input type="text" id="msg" class="ChatSendMsg" autocomplete="off" placeholder="Say something..."  />
+            </form>
+        </div>
+    </div>
     <button id="button_show_menus" class="button_show_menus"></button>
     <div id="button_menus" class="button_menus">
-        <button id="restart" type="button" class="restart"></button>
-        <button id="sound" type="button" class="sound"></button>
-        <button class="button_game_settings" id="game_settings" data-toggle="modal" data-target="#game_settings-list"/>
-        <button id="stop" type="button" class="button_stop">暂停</button>
-        <button type="button" class="button_choose-rom" data-toggle="modal" data-target="#choose-rom-list">创建游戏</button>
-        <button type="button" class="button_players" data-toggle="modal" data-target="#players-list">玩家列表</button>
-        <button type="button" class="button_rooms" data-toggle="modal" data-target="#rooms-list">房间列表</button>
+        <button id="restart" class="restart"></button>
+        <button id="sound" class="sound"></button>
+        <button id="help" class="button_help" data-toggle="modal" data-target="#help-list"></button>
+        <button id="about" class="button_about" data-toggle="modal" data-target="#about-list"></button>
+        <button id="game_settings" class="button_game_settings" data-toggle="modal" data-target="#game_settings-list"/>
+        <button id="stop" class="button_stop">暂停</button>
+        <button id="button_local-choose-rom" class="button_local-choose-rom" data-toggle="modal" data-target="#local-choose-rom-list">单机游戏</button>
+        <button class="button_network-choose-rom" data-toggle="modal" data-target="#network-choose-rom-list">网络对战</button>
+        <button class="button_players" data-toggle="modal" data-target="#players-list">玩家列表</button>
+        <button class="button_rooms" data-toggle="modal" data-target="#rooms-list">房间列表</button>
     </div>
     <div class="button_directions">
         <img src="/images/m/button_center.png" onmouseover="this.src='/images/m/button_center_over.png'" onmouseout="this.src='/images/m/button_center.png'" class="button_center"></img>
@@ -75,12 +111,14 @@
         <button id="button_start" class="button_start"/>
     </div>
     <div class="button_AB">
-        <button id="ready" type="button" onclick="readyPair();" class="button_ready" hidden>准备</button>
-        <button id="leavePair" type="button" onclick="leavePair();" class="button_leave" hidden>离开房间</button>
-        <button id="button_chat" type="button" class="button_chat">chat</button>
+        <button id="readyDoubleRoom" onclick="readyDoubleRoom();" class="button_ready" hidden>准备</button>
+        <button id="leaveDoubleRoom" onclick="leaveDoubleRoom();" class="button_leave" hidden>离开房间</button>
+        <button id="button_chat" class="button_chat">chat</button>
 
         <button id="button_a" class="button_a"/>
         <button id="button_b" class="button_b"/>
+        <button id="button_a_turbo" class="button_a_turbo"/>
+        <button id="button_b_turbo" class="button_b_turbo"/>
     </div>
     <div align="center" id="vid-wrapper" class="vid-wrapper">
         <div id="emulator" class="video" align="center"></div>
@@ -100,45 +138,88 @@
     <div class="modal fade" id="game_settings-list" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
         <div class="modal-content">
             <div class="modal-header">
-                <button type="button" class="closee" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <button class="closee" data-dismiss="modal" aria-hidden="true">&times;</button>
                 <h4 class="modal-title">
                     游戏设置
                 </h4>
             </div>
             <div class="modal-body" align="center">
-               <div align="center" id="1-keyboard">
-                    按键设置  -  默认为 上下左右(wsad) 选择/确认(vb) A/B(jk)
-                    <div style="border-radius:22px;width:347px;height:150px;background:url(/images/controller.jpg);">
-                        <input id="KEY_LEFT" style="border-color: #262729; background: #000000; color: #ffffff; float: left; width: 24px; height: 24px; border-radius: 5px; margin-top: 78px; margin-left: 27px; text-align: center;" value="65" type="text">
-                        <input id="KEY_UP" style="border-color: #262729; background: #000000; color: #ffffff; float: left; width: 24px; height: 24px; border-radius: 5px; margin-top: 55px; margin-left: -1px; text-align: center;" value="87" type="text">
-                        <input id="KEY_DOWN" style="border-color: #262729; background: #000000; color: #ffffff; float: left; width: 24px; height: 24px; border-radius: 5px; margin-top: 99px; margin-left: -24px; text-align: center;" value="83" type="text">
-                        <input id="KEY_RIGHT" style="border-color: #262729; background: #000000; color: #ffffff; float: left; width: 24px; height: 24px; border-radius: 5px; margin-top: 78px; margin-left: -2px; text-align: center;" value="68" type="text">
-                        <input id="KEY_SELECT" style="border-color: #262729; background: #000000; color: #ffffff; float: left; width: 40px; margin-top: 97px; margin-left: 24px; height: 18px; border-radius: 31px; text-align: center;" value="86" type="text">
-                        <input id="KEY_START" style="border-color: #262729; background: #000000; color: #ffffff; float: left; width: 40px; margin-top: 97px; margin-left: 4px; height: 18px; border-radius: 20px; text-align: center;" value="66" type="text">
-                        <input id="KEY_A" style="border-color: #262729; background: #000000; color: #ffffff; float: left; border-radius: 25px; margin-top: -55px; margin-left: 285px; width: 33px; height: 33px; text-align: center;" value="75" type="text">
-                        <input id="KEY_B" style="border-color: #262729; background: #000000; color: #ffffff; float: left; width: 33px; height: 33px; border-radius: 25px; margin-top: -24px; margin-left: 253px; text-align: center;" value="74" type="text">
+                <p>按键设置默认为 <br>
+                    上下左右: WSAD <br>
+                    选择/确认: VB <br>
+                    A B: J K <br>
+                    X Y: U I</p>
+                <div align="center" id="1-keyboard">
+                    <p>玩家1</p>
+                    <div class="controller">
+                        <input id="KEY_LEFT" class="KEY_LEFT" value="65" type="text">
+                        <input id="KEY_UP" class="KEY_UP" value="87" type="text">
+                        <input id="KEY_DOWN" class="KEY_DOWN" value="83" type="text">
+                        <input id="KEY_RIGHT" class="KEY_RIGHT" value="68" type="text">
+                        <input id="KEY_SELECT" class="KEY_SELECT" value="86" type="text">
+                        <input id="KEY_START" class="KEY_START" value="66" type="text">
+                        <input id="KEY_A" class="KEY_A" value="75" type="text">
+                        <input id="KEY_B" class="KEY_B" value="74" type="text">
+                        <input id="KEY_X" class="KEY_X" value="73" type="text">
+                        <input id="KEY_Y" class="KEY_Y" value="85" type="text">
+                    </div>
+                </div>
+                <div align="center" id="2-keyboard">
+                    <p>玩家2</p>
+                    <div class="controller">
+                        <input id="KEY_LEFT2" class="KEY_LEFT" value="65" type="text">
+                        <input id="KEY_UP2" class="KEY_UP" value="87" type="text">
+                        <input id="KEY_DOWN2" class="KEY_DOWN" value="83" type="text">
+                        <input id="KEY_RIGHT2" class="KEY_RIGHT" value="68" type="text">
+                        <input id="KEY_SELECT2" class="KEY_SELECT" value="86" type="text">
+                        <input id="KEY_START2" class="KEY_START" value="66" type="text">
+                        <input id="KEY_A2" class="KEY_A" value="75" type="text">
+                        <input id="KEY_B2" class="KEY_B" value="74" type="text">
+                        <input id="KEY_X2" class="KEY_X" value="73" type="text">
+                        <input id="KEY_Y2" class="KEY_Y" value="85" type="text">
                     </div>
                 </div>
             </div>
-        </div><!-- /.modal-content -->
+        </div>
     </div>
-    <div class="modal fade" id="choose-rom-list" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal fade" id="help-list" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
         <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="closee" data-dismiss="modal" aria-hidden="true">&times;</button>
-                <h4 class="modal-title">
-                    nes游戏列表
-                </h4>
+            <div class="modal-body" align="left">
+                <p>双人房内所有玩家都准备好后游戏自动开始</p>
+                <p>按键设置默认为 <br>
+                    上下左右: WSAD <br>
+                    选择/确认: VB <br>
+                    A B: J K <br>
+                    X Y: U I</p>
+                <p>浏览器的宽度必须大于高度才能正常显示</p>
             </div>
-            <div class="modal-body" id="rom-list" align="left">
-               {{.Romlist}}
+        </div>
+    </div>
+    <div class="modal fade" id="about-list" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-content">
+            <div class="modal-body" align="center">
+                <p>github: <a href="https://github.com/MeteorKL/nes-online">https://github.com/MeteorKL/nes-online</a></p>
             </div>
-        </div><!-- /.modal-content -->
+        </div>
+    </div>
+    <div class="modal fade" id="network-choose-rom-list" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-content">
+            <div class="modal-body" id="network-rom-list" align="left">
+               {{.networkRomlist}}
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="local-choose-rom-list" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-content">
+            <div class="modal-body" id="local-rom-list" align="left">
+               {{.localRomlist}}
+            </div>
+        </div>
     </div>
     <div class="modal fade" id="players-list" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
         <div class="modal-content">
             <div class="modal-header">
-                <button type="button" class="closee" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <button class="closee" data-dismiss="modal" aria-hidden="true">&times;</button>
                 <h4 class="modal-title">
                     玩家列表
                 </h4>
@@ -147,12 +228,12 @@
                 <div id="users">
                 </div>
             </div>
-        </div><!-- /.modal-content -->
+        </div>
     </div>
     <div class="modal fade" id="rooms-list" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
         <div class="modal-content">
             <div class="modal-header">
-                <button type="button" class="closee" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <button class="closee" data-dismiss="modal" aria-hidden="true">&times;</button>
                 <h4 class="modal-title">
                     房间列表
                 </h4>
@@ -161,11 +242,11 @@
                 <div id="rooms">
                 </div>
             </div>
-        </div><!-- /.modal-content -->
+        </div>
     </div>
     <div id="host" style="display: none">{{.Host1}}</div>
     <script src="js/chat.p2p.new.js"></script>
     <script src="js/buttons.p2p.new.js"></script>
-    <script src="js/keyset.p2p.js"></script>
+    <script src="js/keyset.js"></script>
 </body>
 </html>

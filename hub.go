@@ -1,79 +1,86 @@
 package main
 
-import "log"
+import (
+	"log"
+	"sync"
+	"time"
 
-type hub struct {
-	// all connections
-	connections map[*connection]bool
+	"math/rand"
+)
 
-	// msg from connection
-	msg chan map[string]interface{}
+// Hub -
+type Hub struct {
+	// Connections
+	Connections   map[*Connection]bool
+	ConnectionNum int
 
-	// register from connection
-	register chan *connection
-
-	// unregister from connection
-	unregister chan *connection
-
-	// pair mode
-	pair1          map[string]*connection
-	pair2          map[string]*connection
-	pairReady      map[string]bool
-	pairStart      map[string]bool
-	maxPingPair    map[string]int64
-	buttonSetPair1 map[string]interface{}
-	buttonSetPair2 map[string]interface{}
-	gamePathPair   map[string]string
-	// msgPair from connection
-	msgPair chan map[string]interface{}
-	// pair number
-	numPair int
-
-	// connection number
-	num int32
-	// connections
-	names []string
+	// DoubleRooms
+	DoubleRoom    map[int]*DoubleRoom
+	DoubleRoomNum int
+	// Mutex
+	rwmutex sync.RWMutex
 }
 
-var h = hub{
-	connections: make(map[*connection]bool),
-	msg:         make(chan map[string]interface{}),
-	register:    make(chan *connection),
-	unregister:  make(chan *connection),
-
-	pair1:          make(map[string]*connection),
-	pair2:          make(map[string]*connection),
-	pairReady:      make(map[string]bool),
-	pairStart:      make(map[string]bool),
-	maxPingPair:    make(map[string]int64),
-	buttonSetPair1: make(map[string]interface{}),
-	buttonSetPair2: make(map[string]interface{}),
-	gamePathPair:   make(map[string]string),
-	msgPair:        make(chan map[string]interface{}),
+var h = Hub{
+	Connections: make(map[*Connection]bool),
+	DoubleRoom:  make(map[int]*DoubleRoom),
 }
 
-func (c *connection) register() {
-	h.connections[c] = true
+var names = []string{
+	"Jaina",
+	"MountainKing",
+	"Medivh",
+	"Blademaster",
+	"ShadowHunter",
+	"Lich",
+	"DreadLord",
+	"DarkRanger",
+	"Deathkinght",
+	"DemonHunter",
+	"Illidan",
+	"Furion",
+	"Tyrande",
+	"Maiev",
+	"Footman",
 }
 
-func (c *connection) unregister() {
-	if _, ok := h.connections[c]; ok {
-		if c.roomName != "" {
-			c.leavePair("")
+func (h *Hub) init() {
+	h.ConnectionNum = 0
+	h.DoubleRoomNum = 0
+}
+
+func (c *Connection) register() {
+	h.Connections[c] = true
+	r := rand.New(rand.NewSource(time.Now().UnixNano()))
+	c.UserName = names[r.Intn(len(names))]
+	c.RoomID = 0
+	c.RoomPlayerNO = 0
+	h.ConnectionNum++
+}
+
+func (c *Connection) unregister() {
+	if _, ok := h.Connections[c]; ok {
+		if c.RoomID != 0 {
+			c.leaveDoubleRoom(map[string]interface{}{
+				"Handle": "leaveDoubleRoom",
+				"IP":     c.IP,
+				"Name":   c.UserName,
+			})
 		}
-		delete(h.connections, c)
-		close(c.send)
+		h.ConnectionNum--
+		delete(h.Connections, c)
+		close(c.Msg)
 	}
 }
 
-func (c *connection) broadcast(m map[string]interface{}) {
-	for conn := range h.connections {
+func (c *Connection) broadcast(m map[string]interface{}) {
+	for conn := range h.Connections {
 		select {
-		case conn.send <- m:
+		case conn.Msg <- m:
 		default:
-			delete(h.connections, c)
-			close(c.send)
+			delete(h.Connections, c)
+			close(c.Msg)
 		}
 	}
-	log.Println("send msg success")
+	log.Println("broadcast")
 }

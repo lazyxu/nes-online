@@ -14,7 +14,9 @@ import (
 	"strings"
 )
 
-var romlist string
+var localRomlist string
+var networkRomlist string
+var version = "NES Online v1.4"
 
 func checkErr(err error) {
 	if err != nil {
@@ -41,35 +43,36 @@ func hashFile(path string) (string, error) {
 
 func index(w http.ResponseWriter, r *http.Request) {
 	println(r.URL)
-	args := map[string]string{"Host1": r.Host, "Host2": r.Host}
+	args := map[string]string{"version": version}
 	renderHTML(w, "index.html", args)
 }
 
 func alone(w http.ResponseWriter, r *http.Request) {
 	println(r.URL)
-	args := map[string]string{"Host1": r.Host, "Host2": r.Host}
+	args := map[string]string{"version": version}
 	renderHTML(w, "alone.html", args)
 }
 
 func p2p(w http.ResponseWriter, r *http.Request) {
 	println(r.URL)
-	args := map[string]string{"Host1": r.Host, "Host2": r.Host}
+	args := map[string]string{"Host1": r.Host, "version": version}
 	renderHTML(w, "p2p.html", args)
 }
 
 func p2pm(w http.ResponseWriter, r *http.Request) {
 	println(r.URL)
-	args := map[string]string{"Host1": r.Host, "Host2": r.Host}
+	args := map[string]string{"Host1": r.Host, "version": version}
 	renderHTML(w, "p2p.m.html", args)
 }
 func p2pnew(w http.ResponseWriter, r *http.Request) {
+	log.Println(r.RemoteAddr)
 	println(r.URL)
-	args := map[string]string{"Host1": r.Host, "Host2": r.Host}
+	args := map[string]string{"Host1": r.Host, "version": version}
 	renderHTML(w, "p2p.new.html", args)
 }
 func cs(w http.ResponseWriter, r *http.Request) {
 	println(r.URL)
-	args := map[string]string{"Host1": r.Host, "Host2": r.Host}
+	args := map[string]string{"Host1": r.Host, "version": version}
 	renderHTML(w, "cs.html", args)
 }
 
@@ -81,9 +84,19 @@ func defaultAssetPath() string {
 	return p.Dir
 }
 
-func updateRomlistInHTML(src string, des string) {
+func updateRomlistInHTML(src string, des string, opt string) {
 	data, _ := ioutil.ReadFile(src)
-	newData := strings.Replace(string(data), "{{.Romlist}}", romlist, -1)
+	var newData string
+	if opt == "local" {
+		newData = strings.Replace(string(data), "{{.localRomlist}}", localRomlist, -1)
+	} else if opt == "network" {
+		newData = strings.Replace(string(data), "{{.networkRomlist}}", networkRomlist, -1)
+	} else if opt == "both" {
+		newData = strings.Replace(string(data), "{{.localRomlist}}", localRomlist, -1)
+		newData = strings.Replace(newData, "{{.networkRomlist}}", networkRomlist, -1)
+	} else if opt == "none" {
+		newData = string(data)
+	}
 	dstFile, err := os.Create(des)
 	if err != nil {
 		fmt.Println(err.Error())
@@ -102,7 +115,8 @@ func ListDir(dirPth string, suffix string) (files []string, err error) {
 	}
 	suffix = strings.ToUpper(suffix) //忽略后缀匹配的大小写
 	i := 1
-	romlist = ""
+	localRomlist = ""
+	networkRomlist = ""
 	for _, fi := range dir {
 		// fmt.Println(fi.Name())
 		if fi.IsDir() { // 忽略目录
@@ -116,7 +130,8 @@ func ListDir(dirPth string, suffix string) (files []string, err error) {
 			if len(result) > 1 {
 				name = result[1]
 			}
-			romlist += "<button class='rom-button' id='rom-" + strconv.Itoa(i) + "' data-dismiss=\"modal\" onclick=\"loadRom('" + Path + "');createPair('" + Path + "','" + fi.Name() + "');\">" + name + "</button><br>"
+			networkRomlist += "<button class='rom-button' id='rom-" + strconv.Itoa(i) + "' data-dismiss=\"modal\" onclick=\"loadRom('" + Path + "');createDoubleRoom('" + Path + "','" + name + "');\">" + name + "</button><br>"
+			localRomlist += "<button class='rom-button' data-dismiss=\"modal\" onclick=\"loadRom('" + Path + "');\">" + name + "</button><br>"
 			i++
 		}
 	}
@@ -136,16 +151,14 @@ func main() {
 	fmt.Println("getRomList")
 	ListDir("roms/", ".nes")
 	fmt.Println("updateRomlistInHTML")
-	updateRomlistInHTML("template/cs.html", "views/cs.html")
-	updateRomlistInHTML("template/p2p.html", "views/p2p.html")
-	updateRomlistInHTML("template/p2p.m.html", "views/p2p.m.html")
-	updateRomlistInHTML("template/p2p.new.html", "views/p2p.new.html")
-	updateRomlistInHTML("template/alone.html", "views/alone.html")
-	updateRomlistInHTML("template/index.html", "views/index.html")
+	updateRomlistInHTML("template/cs.html", "views/cs.html", "network")
+	updateRomlistInHTML("template/p2p.html", "views/p2p.html", "network")
+	updateRomlistInHTML("template/p2p.new.html", "views/p2p.new.html", "both")
+	updateRomlistInHTML("template/alone.html", "views/alone.html", "local")
 
 	fmt.Println("start")
 
-	// go h.run()
+	h.init()
 
 	// 路由设置
 	http.HandleFunc("/", index)

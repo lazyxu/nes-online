@@ -106,6 +106,38 @@ function activeButtons(noPair) {
         document.getElementById('button_b').style.background = "url('/images/m/button_b.png')";
     }, false);
 
+    document.getElementById('button_a_turbo').addEventListener("touchstart",function(){
+        event.preventDefault();
+        if (noPair==1)
+            nes.keyboard.state1[nes.keyboard.keys.KEY_X] = 65;
+        else if (noPair==2)
+            dataChannel.send(JSON.stringify({"keyCode": nes.keyboard.key2Setting.KEY_X, "value": 65}));
+        document.getElementById('button_a_turbo').style.background = "url('/images/m/button_a_turbo_over.png')";
+    }, false);
+    document.getElementById('button_a_turbo').addEventListener("touchend",function(){
+        if (noPair==1)
+            nes.keyboard.state1[nes.keyboard.keys.KEY_X] = 64;
+        else if (noPair==2)
+            dataChannel.send(JSON.stringify({"keyCode": nes.keyboard.key2Setting.KEY_X, "value": 64}));
+        document.getElementById('button_a_turbo').style.background = "url('/images/m/button_a_turbo.png')";
+    }, false);
+
+    document.getElementById('button_b_turbo').addEventListener("touchstart",function(){
+        event.preventDefault();
+        if (noPair==1)
+            nes.keyboard.state1[nes.keyboard.keys.KEY_Y] = 65;
+        else if (noPair==2)
+            dataChannel.send(JSON.stringify({"keyCode": nes.keyboard.key2Setting.KEY_Y, "value": 65}));
+        document.getElementById('button_b_turbo').style.background = "url('/images/m/button_b_turbo_over.png')";
+    }, false);
+    document.getElementById('button_b_turbo').addEventListener("touchend",function(){
+        if (noPair==1)
+            nes.keyboard.state1[nes.keyboard.keys.KEY_Y] = 64;
+        else if (noPair==2)
+            dataChannel.send(JSON.CHATstringify({"keyCode": nes.keyboard.key2Setting.KEY_Y, "value": 64}));
+        document.getElementById('button_b_turbo').style.background = "url('/images/m/button_b_turbo.png')";
+    }, false);
+
     document.getElementById('button_select').addEventListener("touchstart",function(){
         event.preventDefault();
         if (noPair==1)
@@ -151,30 +183,89 @@ $("#input_name").submit(function() {
     if (!msg.val()) {
         return false;
     }
-    conn.send(JSON.stringify({"opt": "name", "data": msg.val()}));
+    conn.send(JSON.stringify({"Handle": "Rename", "NewName": msg.val()}));
     $("#input_name").hide();
+    $("#msg").focus();
     return false;
 });
 
 $("#chat").submit(function() {
-    if (!conn) {
-        return false;
-    }
     if (!msg.val()) {
         return false;
     }
-    conn.send(JSON.stringify({"opt": "msg", "data": msg.val()}));
+    conn.send(JSON.stringify({"Handle": "Msg", "Msg": msg.val()}));
     msg.val("");
-    $("#chat").hide();
     return false;
 });
 
 document.getElementById('button_chat').onclick = function() {
-    if ($("#chat").is(":hidden")) {
-        $("#chat").show();
+    if ($("#Chat").is(":hidden")) {
+        $("#Chat").show();
         $("#msg").focus();
     } else {
-        $("#chat").hide();
+        $("#Chat").hide();
+    }
+}
+var HallChat = true, RoomChat = true;
+document.getElementById('HallChat').onclick = function() {
+    HallChat = !HallChat;
+    if (HallChat) {
+        document.getElementById('HallChat').style.background = "url('/images/m/checkbox_sel.png')";
+        if (!RoomChat) {
+            $("#info").show();
+            $("#room_chat").hide();
+            $("#room_chat").hide();
+        } else {
+            $("#mixinfo").show();
+            $("#info").hide();
+            $("#room_chat").hide();
+        }
+    } else {
+        document.getElementById('HallChat').style.background = "url('/images/m/checkbox_unsel.png')";
+        if (RoomChat) {
+            $("#room_chat").show();
+            $("#info").hide();
+            $("#mixinfo").hide();
+        } else {
+            $("#info").hide();
+            $("#room_chat").hide();
+            $("#mixinfo").hide();
+        }
+    }
+}
+document.getElementById('RoomChat').onclick = function() {
+    RoomChat = !RoomChat;
+    if (RoomChat) {
+        document.getElementById('RoomChat').style.background = "url('/images/m/checkbox_sel.png')";
+        if (!HallChat) {
+            $("#room_chat").show();
+            $("#info").hide();
+            $("#mixinfo").hide();
+        } else {
+            $("#mixinfo").show();
+            $("#info").hide();
+            $("#room_chat").hide();
+        }
+    } else {
+        document.getElementById('RoomChat').style.background = "url('/images/m/checkbox_unsel.png')";
+        if (HallChat) {
+            $("#info").show();
+            $("#room_chat").hide();
+            $("#mixinfo").hide();
+        } else {
+            $("#info").hide();
+            $("#room_chat").hide();
+            $("#mixinfo").hide();
+        }
+    }
+}
+
+document.getElementById('button_chat').onclick = function() {
+    if ($("#Chat").is(":hidden")) {
+        $("#Chat").show();
+        $("#msg").focus();
+    } else {
+        $("#Chat").hide();
     }
 }
 

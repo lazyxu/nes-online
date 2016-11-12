@@ -1,20 +1,24 @@
 # nes online
 http://nes.juanix.cn:8080  
-/p2p p2p传视频传指令方式  
 /alone 单机模式，可以双人玩  
   
 运行 go run *.go  
 编译 go build -o main *.go  
   
 # 版本变动  
-## 未来可能完善的点  
-帮助界面  
-房间人数的提示，加入房间失败的提示    
-玩家2关闭声音停止传输  
-加入 U I 键位  
+## 未来可能完善的点
 rom合法性检查  
 允许玩家上传rom  
-游戏列表界面做的好看点    
+
+## v1.4    
+加入 U I 键位  
+玩家2关闭声音停止传输  
+加入房间失败的提示, 房间人数的提示  
+游戏列表界面做的好看点  
+帮助界面  
+    双人房内所有玩家都准备好后游戏自动开始
+    按键设置默认为 上下左右(WSAD) 选择/确认(VB) A/B(J/K) X/Y(U/I)
+    浏览器的宽度必须大于高度才能正常显示
   
 ## v1.3.6  
 所有元素都换成了新的：暂停，重新开始，关闭声音，隐藏/显示，离开房间，准备，玩家列表，设置  
@@ -98,7 +102,7 @@ canvas.toDataURL()保存为图片的方法也不行
 Inszva: http://blog.csdn.net/inszva/article/details/52840393  
 JSNES: https://github.com/bfirsh/jsnes  
   
-图标来源: Nostalgia.NES
+图标来源: Nostalgia.NES  
 gamepad支持: https://github.com/josephlewis42/jsnes  
   
 # License

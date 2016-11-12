@@ -32,6 +32,8 @@ JSNES.Keyboard = function() {
     };
 
     this.key1Setting = {
+        KEY_X: 73,
+        KEY_Y: 85,
         KEY_A: 75,
         KEY_B: 74,
         KEY_SELECT: 86,
@@ -43,6 +45,8 @@ JSNES.Keyboard = function() {
     };
 
     this.key2Setting = {
+        KEY_X: 73,
+        KEY_Y: 85,
         KEY_A: 75,
         KEY_B: 74,
         KEY_SELECT: 86,
@@ -72,13 +76,55 @@ JSNES.Keyboard = function() {
     for (i = 0; i < this.state2.length; i++) {
         this.state2[i] = 0x40;
     }
+    var IntervalX1 = null;
+    var IntervalX2 = null;
+    var IntervalY1 = null;
+    var IntervalY2 = null;
 };
 
 JSNES.Keyboard.prototype = {
     setKey: function(key, value) {
         var ret = 0;
         switch (key) {
+            case this.key1Setting.KEY_X:
+                if (value==0x41) {
+                    if (this.IntervalX1) {
+                        window.clearInterval(this.IntervalX1);
+                        this.IntervalX1 = null;
+                    }
+                    this.IntervalX1 = setInterval(function(){
+                        if (nes.keyboard.state1[nes.keyboard.keys.KEY_A]==0x40)
+                            nes.keyboard.state1[nes.keyboard.keys.KEY_A] = 0x41;
+                        else if (nes.keyboard.state1[nes.keyboard.keys.KEY_A]==0x41)
+                            nes.keyboard.state1[nes.keyboard.keys.KEY_A] = 0x40;
+                    }, 50);
+                }
+                else if (value==0x40) {
+                    window.clearInterval(this.IntervalX1);
+                    this.IntervalX1 = null;
+                    nes.keyboard.state1[nes.keyboard.keys.KEY_A] = 0x40;
+                }
+                break; 
             case this.key1Setting.KEY_A: this.state1[this.keys.KEY_A] = value; break;      // X
+            case this.key1Setting.KEY_Y:
+                if (value==0x41) {
+                    if (this.IntervalY1) {
+                        window.clearInterval(this.IntervalY1);
+                        this.IntervalY1 = null;
+                    }
+                    this.IntervalY1 = setInterval(function(){
+                        if (nes.keyboard.state1[nes.keyboard.keys.KEY_B]==0x40)
+                            nes.keyboard.state1[nes.keyboard.keys.KEY_B] = 0x41;
+                        else if (nes.keyboard.state1[nes.keyboard.keys.KEY_B]==0x41)
+                            nes.keyboard.state1[nes.keyboard.keys.KEY_B] = 0x40;
+                    }, 50);
+                }
+                else if (value==0x40) {
+                    window.clearInterval(this.IntervalY1);
+                    this.IntervalY1 = null;
+                    nes.keyboard.state1[nes.keyboard.keys.KEY_B] = 0x40;
+                }
+                break; 
             case this.key1Setting.KEY_B: this.state1[this.keys.KEY_B] = value; break;      // Z
             case this.key1Setting.KEY_SELECT: this.state1[this.keys.KEY_SELECT] = value; break; // Right Ctrl
             case this.key1Setting.KEY_START: this.state1[this.keys.KEY_START] = value; break;  // Enter
@@ -89,7 +135,45 @@ JSNES.Keyboard.prototype = {
             default: ret++;
         }
         switch (key) {
+            case this.key2Setting.KEY_X:
+                if (value==0x41) {
+                    if (this.IntervalX2) {
+                        window.clearInterval(this.IntervalX2);
+                        this.IntervalX2 = null;
+                    }
+                    this.IntervalX2 = setInterval(function(){
+                        if (nes.keyboard.state2[nes.keyboard.keys.KEY_A]==0x40)
+                            nes.keyboard.state2[nes.keyboard.keys.KEY_A] = 0x41;
+                        else if (nes.keyboard.state2[nes.keyboard.keys.KEY_A]==0x41)
+                            nes.keyboard.state2[nes.keyboard.keys.KEY_A] = 0x40;
+                    }, 50);
+                }
+                else if (value==0x40) {
+                    window.clearInterval(this.IntervalX2);
+                    this.IntervalX2 = null;
+                    nes.keyboard.state2[nes.keyboard.keys.KEY_A] = 0x40;
+                }
+                break; 
             case this.key2Setting.KEY_A: this.state2[this.keys.KEY_A] = value; break;     // Num-7
+            case this.key2Setting.KEY_Y:
+                if (value==0x41) {
+                    if (this.IntervalY2) {
+                        window.clearInterval(this.IntervalY2);
+                        this.IntervalY2 = null;
+                    }
+                    this.IntervalY2 = setInterval(function(){
+                        if (nes.keyboard.state2[nes.keyboard.keys.KEY_B]==0x40)
+                            nes.keyboard.state2[nes.keyboard.keys.KEY_B] = 0x41;
+                        else if (nes.keyboard.state2[nes.keyboard.keys.KEY_B]==0x41)
+                            nes.keyboard.state2[nes.keyboard.keys.KEY_B] = 0x40;
+                    }, 50);
+                }
+                else if (value==0x40) {
+                    window.clearInterval(this.IntervalY2);
+                    this.IntervalY2 = null;
+                    nes.keyboard.state2[nes.keyboard.keys.KEY_B] = 0x40;
+                }
+                break; 
             case this.key2Setting.KEY_B: this.state2[this.keys.KEY_B] = value; break;     // Num-9
             case this.key2Setting.KEY_SELECT: this.state2[this.keys.KEY_SELECT] = value; break; // Num-3
             case this.key2Setting.KEY_START: this.state2[this.keys.KEY_START] = value; break;  // Num-1
@@ -105,8 +189,48 @@ JSNES.Keyboard.prototype = {
     
     setKey1: function(key, value) {
         switch (key) {
+            case this.key1Setting.KEY_X:
+                if (value==0x41) {
+                    if (this.IntervalX1) {
+                        window.clearInterval(this.IntervalX1);
+                        this.IntervalX1 = null;
+                    }
+                    this.IntervalX1 = setInterval(function(){
+                        if (nes.keyboard.state1[nes.keyboard.keys.KEY_A]==0x40)
+                            nes.keyboard.state1[nes.keyboard.keys.KEY_A] = 0x41;
+                        else if (nes.keyboard.state1[nes.keyboard.keys.KEY_A]==0x41)
+                            nes.keyboard.state1[nes.keyboard.keys.KEY_A] = 0x40;
+                    }, 50);
+                }
+                else if (value==0x40) {
+                    window.clearInterval(this.IntervalX1);
+                    this.IntervalX1 = null;
+                    nes.keyboard.state1[nes.keyboard.keys.KEY_A] = 0x40;
+                }
+                document.getElementById('button_a_turbo').style.background = value==64?"url('/images/m/button_a_turbo.png')":"url('/images/m/button_a_turbo_over.png')";
+                break; 
             case this.key1Setting.KEY_A: this.state1[this.keys.KEY_A] = value; 
                 document.getElementById('button_a').style.background = value==64?"url('/images/m/button_a.png')":"url('/images/m/button_a_over.png')"; break;      // X
+            case this.key1Setting.KEY_Y:
+                if (value==0x41) {
+                    if (this.IntervalY1) {
+                        window.clearInterval(this.IntervalY1);
+                        this.IntervalY1 = null;
+                    }
+                    this.IntervalY1 = setInterval(function(){
+                        if (nes.keyboard.state1[nes.keyboard.keys.KEY_B]==0x40)
+                            nes.keyboard.state1[nes.keyboard.keys.KEY_B] = 0x41;
+                        else if (nes.keyboard.state1[nes.keyboard.keys.KEY_B]==0x41)
+                            nes.keyboard.state1[nes.keyboard.keys.KEY_B] = 0x40;
+                    }, 50);
+                }
+                else if (value==0x40) {
+                    window.clearInterval(this.IntervalY1);
+                    this.IntervalY1 = null;
+                    nes.keyboard.state1[nes.keyboard.keys.KEY_B] = 0x40;
+                }
+                document.getElementById('button_b_turbo').style.background = value==64?"url('/images/m/button_b_turbo.png')":"url('/images/m/button_b_turbo_over.png')";
+                break; 
             case this.key1Setting.KEY_B: this.state1[this.keys.KEY_B] = value; 
                 document.getElementById('button_b').style.background = value==64?"url('/images/m/button_b.png')":"url('/images/m/button_b_over.png')"; break;      // Z
             case this.key1Setting.KEY_SELECT: this.state1[this.keys.KEY_SELECT] = value; 
@@ -128,7 +252,45 @@ JSNES.Keyboard.prototype = {
 
     setKey2: function(key, value) {
         switch (key) {
+            case this.key2Setting.KEY_X:
+                if (value==0x41) {
+                    if (this.IntervalX2) {
+                        window.clearInterval(this.IntervalX2);
+                        this.IntervalX2 = null;
+                    }
+                    this.IntervalX2 = setInterval(function(){
+                        if (nes.keyboard.state2[nes.keyboard.keys.KEY_A]==0x40)
+                            nes.keyboard.state2[nes.keyboard.keys.KEY_A] = 0x41;
+                        else if (nes.keyboard.state2[nes.keyboard.keys.KEY_A]==0x41)
+                            nes.keyboard.state2[nes.keyboard.keys.KEY_A] = 0x40;
+                    }, 50);
+                }
+                else if (value==0x40) {
+                    window.clearInterval(this.IntervalX2);
+                    this.IntervalX2 = null;
+                    nes.keyboard.state2[nes.keyboard.keys.KEY_A] = 0x40;
+                }
+                break; 
             case this.key2Setting.KEY_A: this.state2[this.keys.KEY_A] = value; break;     // Num-7
+            case this.key2Setting.KEY_Y:
+                if (value==0x41) {
+                    if (this.IntervalY2) {
+                        window.clearInterval(this.IntervalY2);
+                        this.IntervalY2 = null;
+                    }
+                    this.IntervalY2 = setInterval(function(){
+                        if (nes.keyboard.state2[nes.keyboard.keys.KEY_B]==0x40)
+                            nes.keyboard.state2[nes.keyboard.keys.KEY_B] = 0x41;
+                        else if (nes.keyboard.state2[nes.keyboard.keys.KEY_B]==0x41)
+                            nes.keyboard.state2[nes.keyboard.keys.KEY_B] = 0x40;
+                    }, 50);
+                }
+                else if (value==0x40) {
+                    window.clearInterval(this.IntervalY2);
+                    this.IntervalY2 = null;
+                    nes.keyboard.state2[nes.keyboard.keys.KEY_B] = 0x40;
+                }
+                break; 
             case this.key2Setting.KEY_B: this.state2[this.keys.KEY_B] = value; break;     // Num-9
             case this.key2Setting.KEY_SELECT: this.state2[this.keys.KEY_SELECT] = value; break; // Num-3
             case this.key2Setting.KEY_START: this.state2[this.keys.KEY_START] = value; break;  // Num-1
@@ -141,6 +303,12 @@ JSNES.Keyboard.prototype = {
         return false; // preventDefault
     },
 
+    updateKEY_X: function(KEY_X) {
+        this.key2Setting.KEY_X = KEY_X;
+    },
+    updateKEY_Y: function(KEY_Y) {
+        this.key2Setting.KEY_Y = KEY_Y;
+    },
     updateKEY_A: function(KEY_A) {
         this.key1Setting.KEY_A = KEY_A;
     },
@@ -166,6 +334,12 @@ JSNES.Keyboard.prototype = {
         this.key1Setting.KEY_RIGHT = KEY_RIGHT;
     },
 
+    updateKEY_X2: function(KEY_X) {
+        this.key2Setting.KEY_X = KEY_X;
+    },
+    updateKEY_Y2: function(KEY_Y) {
+        this.key2Setting.KEY_Y = KEY_Y;
+    },
     updateKEY_A2: function(KEY_A) {
         this.key2Setting.KEY_A = KEY_A;
     },

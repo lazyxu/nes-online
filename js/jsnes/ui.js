@@ -133,8 +133,8 @@ if (typeof jQuery !== 'undefined') {
                 },
             
                 writeAudio: function(samples) {
-                    if (typeof(noPair)!="undefined") {
-                        if ( noPair=="1" && network ) {
+                    if (typeof(RoomPlayerNO)!="undefined" && typeof(dataChannel)!="undefined") {
+                        if ( RoomPlayerNO==1 && dataChannel.readyState=="open" ) {
                             dataChannel.send(samples);
                         }
                     }

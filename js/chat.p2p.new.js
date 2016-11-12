@@ -2,13 +2,15 @@ var conn;
 var msg = $("#msg");
 var Chat = $("#info");
 var roomChat = $("#room_chat");
+var Mix = $("#mixinfo");
 var users = $("#users");
 var rooms = $("#rooms");
-var ChatID = 0;
-var RoomChatID = 0;
-var ip;
-var noPair = "0";
+var IP="";
+var RoomPlayerNO = 0;
+var RoomID = 0;
 var network = false;
+var button_x = false; //85
+var button_y = false; //73
 
 function loadRom(url) {
     $.ajax({
@@ -41,31 +43,34 @@ function loadRom(url) {
     });
 }
 
-function appendChat(msg) {
+function appendMix(msg) {
     var d = Chat[0]
     var doScroll = d.scrollTop == d.scrollHeight - d.clientHeight;
-    $("<div id='Chat"+ChatID+"'/>").text(msg).appendTo(Chat);
-    ChatID++;
+    $("<div/>").text(msg).appendTo(Mix);
     if (doScroll) {
         d.scrollTop = d.scrollHeight - d.clientHeight;
     }
-    if (ChatID > 10) {
-        var tempID = ChatID - 11;
-        removeDiv("Chat"+tempID);
+}
+
+function appendChat(msg) {
+    msg = "[大厅]: "+msg;
+    appendMix(msg);
+    var d = Chat[0]
+    var doScroll = d.scrollTop == d.scrollHeight - d.clientHeight;
+    $("<div/>").text(msg).appendTo(Chat);
+    if (doScroll) {
+        d.scrollTop = d.scrollHeight - d.clientHeight;
     }
 }
 
 function appendRoomChat(msg) {
+    msg = "[双人房]: "+msg;
+    appendMix(msg);
     var d = roomChat[0]
     var doScroll = d.scrollTop == d.scrollHeight - d.clientHeight;
-    $("<div id='RoomChat"+RoomChatID+"'/>").text(msg).appendTo(roomChat);
-    RoomChatID++;
+    $("<div/>").text(msg).appendTo(roomChat);
     if (doScroll) {
         d.scrollTop = d.scrollHeight - d.clientHeight;
-    }
-    if (RoomChatID > 10) {
-        var tempID = RoomChatID - 11;
-        removeDiv("RoomChat"+tempID);
     }
 }
 
@@ -77,6 +82,7 @@ function appendUser(msg) {
         d.scrollTop = d.scrollHeight - d.clientHeight;
     }
 }
+
 function removeDiv(id) {
     var d = document.getElementById(id)
     var doScroll = d.scrollTop == d.scrollHeight - d.clientHeight;
@@ -85,34 +91,72 @@ function removeDiv(id) {
         d.scrollTop = d.scrollHeight - d.clientHeight;
     }
 }
-function appendRoom(msg) {
+function appendRoom(jsonData) {
     var d = rooms[0]
     var doScroll = d.scrollTop == d.scrollHeight - d.clientHeight;
-    msg.appendTo(rooms)
+    var Room = $("<div class='Room' id='Room"+jsonData.RoomID+"' onclick=\"joinDoubleRoom("+jsonData.RoomID+")\">"
+        +"<div class='RoomName' id='RoomName"+jsonData.RoomID+"' >"+jsonData.RoomName+"</div>"
+        +"<div class='Name' id='Name"+jsonData.RoomID+"' >"+jsonData.Name+"</div>"
+        +"<div class='GameName'>"+jsonData.GameName+"</div>"
+        +"<div class='PlayerNum' id='PlayerNum"+jsonData.RoomID+"' >"+jsonData.PlayerNum +"/"+ jsonData.PlayerMaxNum+"</div>"
+        +"</div>");
+    Room.appendTo(rooms);
+    // document.getElementById("Room"+jsonData.RoomID).style.backgroundColor = "red";
     if (doScroll) {
-    d.scrollTop = d.scrollHeight - d.clientHeight;
+        d.scrollTop = d.scrollHeight - d.clientHeight;
     }
 }
-function createPair(url, romName) {
-    $("#1-keyboard").show();
-    if (!conn) {
-        return false;
+
+function updatePosition(jsonData) {
+    if (RoomID!=0 && RoomPlayerNO!=0) {
+        document.getElementById("MyRoom").style.display = "inline";
+        document.getElementById("MyRoomName").innerHTML = "双人房"+jsonData.RoomID;
+        document.getElementById("MyGameName").innerHTML = jsonData.GameName;
+        document.getElementById("MyPlayerNum").innerHTML = " - ["+jsonData.PlayerNum +"/"+ jsonData.PlayerMaxNum+"]";
+    } else {
+        document.getElementById("MyRoom").style.display = "none";
+        document.getElementById("MyRoomName").innerHTML = "";
+        document.getElementById("MyGameName").innerHTML = "";
+        document.getElementById("MyPlayerNum").innerHTML = "";
     }
-    conn.send(JSON.stringify({"opt": "createPair", "data": romName, "url": url}));
-    $("#leavePair").show();
-    $("#ready").show();
-    noPair = "1";
 }
-function leavePair() {
-    $("#1-keyboard").show();
+
+function updateRoomPlayerNum(jsonData){
+    if (jsonData.PlayerMaxNum) {
+        if (jsonData.PlayerNum == jsonData.PlayerMaxNum) {
+            document.getElementById("Room"+jsonData.RoomID).style.backgroundColor = "black";
+        } else {
+            document.getElementById("Room"+jsonData.RoomID).style.backgroundColor = "#033459";
+        }
+        document.getElementById("PlayerNum"+jsonData.RoomID).innerHTML = jsonData.PlayerNum +"/"+ jsonData.PlayerMaxNum;
+    }
+}
+
+function createDoubleRoom(GamePath, GameName) {
+    conn.send(JSON.stringify({"Handle": "createDoubleRoom", "GamePath": GamePath, "GameName": GameName}));
+}
+function clearRom() {
+    nes.rom=null;
+    nes.stop();
+    nes.start();
+    nes.ui.resetCanvas();
+}
+
+function leaveDoubleRoom() {
+    clearRom();
     $("#emulator").show();
     $("#video").hide();
-    if (noPair==2) {
+    if (RoomPlayerNO==2) {
         if (nes.isRunning) {
             document.getElementById('stop').innerHTML = "暂停";
         }
         else {
             document.getElementById('stop').innerHTML = "继续";
+        }
+        if (nes.opts.emulateSound == true) {
+            document.getElementById('sound').style.background = "url('/images/m/ic_sound.png')";
+        } else if (nes.opts.emulateSound == false) {
+            document.getElementById('sound').style.background = "url('/images/m/ic_device_access_volume_muted.png')";
         }
     }
     document.getElementById('stop').onclick = function() {
@@ -129,79 +173,36 @@ function leavePair() {
         nes.reloadRom();
         nes.start();
     }
-    if (!conn) {
-        return false;
+    document.getElementById('sound').onclick = function() {
+        if (nes.opts.emulateSound == true) {
+            nes.opts.emulateSound = false;
+            document.getElementById("video").muted = true;
+            document.getElementById('sound').style.background = "url('/images/m/ic_device_access_volume_muted.png')";
+        } else if (nes.opts.emulateSound == false) {
+            nes.opts.emulateSound = true;
+            document.getElementById("video").muted = false;
+            document.getElementById('sound').style.background = "url('/images/m/ic_sound.png')";
+        }
     }
-    conn.send(JSON.stringify({"opt": "leavePair"}));
-    $("#leavePair").hide();
-    $("#ready").hide();
-    noPair = "0";
+    conn.send(JSON.stringify({"Handle": "leaveDoubleRoom"}));
+    $("#leaveDoubleRoom").hide();
+    $("#readyDoubleRoom").hide();
+    RoomPlayerNO = 0;
 }
 
-function joinPair(roomName){
-    if (!conn) {
-        return false;
-    }
-    conn.send(JSON.stringify({"opt": "joinPair", "roomName": roomName}));
-    noPair = "2";
-}
-
-function loadButtonSet2(jsonData){
-    nes.keyboard.updateKEY_A2(Number(jsonData.KEY_A));
-    nes.keyboard.updateKEY_B2(Number(jsonData.KEY_B));
-    nes.keyboard.updateKEY_SELECT2(Number(jsonData.KEY_SELECT));
-    nes.keyboard.updateKEY_START2(Number(jsonData.KEY_START));
-    nes.keyboard.updateKEY_UP2(Number(jsonData.KEY_UP));
-    nes.keyboard.updateKEY_DOWN2(Number(jsonData.KEY_DOWN));
-    nes.keyboard.updateKEY_LEFT2(Number(jsonData.KEY_LEFT));
-    nes.keyboard.updateKEY_RIGHT2(Number(jsonData.KEY_RIGHT));
+function joinDoubleRoom(RoomID){
+    conn.send(JSON.stringify({"Handle": "joinDoubleRoom", "RoomID": RoomID}));
 }
 
 function disableButtons(set){
     $("#choose-rom").attr("disabled", set);
-
-    $("#KEY_LEFT").attr("disabled", set);
-    $("#KEY_UP").attr("disabled", set);
-    $("#KEY_DOWN").attr("disabled", set);
-    $("#KEY_RIGHT").attr("disabled", set);
-    $("#KEY_SELECT").attr("disabled", set);
-    $("#KEY_START").attr("disabled", set);
-    $("#KEY_A").attr("disabled", set);
-    $("#KEY_B").attr("disabled", set);
-
-    $("#KEY_LEFT2").attr("disabled", set);
-    $("#KEY_UP2").attr("disabled", set);
-    $("#KEY_DOWN2").attr("disabled", set);
-    $("#KEY_RIGHT2").attr("disabled", set);
-    $("#KEY_SELECT2").attr("disabled", set);
-    $("#KEY_START2").attr("disabled", set);
-    $("#KEY_A2").attr("disabled", set);
-    $("#KEY_B2").attr("disabled", set);
 }
 
-function readyPair(){
-    if (!conn) {
-        return false;
-    }
-    if (noPair=="1") {
-        conn.send(JSON.stringify({
-            "opt": "readyPair"
-        }));
-    } else if (noPair=="2") {
-        conn.send(JSON.stringify({
-            "opt": "readyPair", 
-            "KEY_UP":$('#KEY_UP').val(),
-            "KEY_DOWN":$('#KEY_DOWN').val(),
-            "KEY_LEFT":$('#KEY_LEFT').val(),
-            "KEY_RIGHT":$('#KEY_RIGHT').val(),
-            "KEY_SELECT":$('#KEY_SELECT').val(),
-            "KEY_START":$('#KEY_START').val(),
-            "KEY_A":$('#KEY_A').val(),
-            "KEY_B":$('#KEY_B').val(),
-        }));
-    }
-    $("#1-keyboard").hide();
-    $("#ready").hide();
+function readyDoubleRoom(){
+    conn.send(JSON.stringify({
+        "Handle": "readyDoubleRoom"
+    }));
+    $("#readyDoubleRoom").hide();
     disableButtons(true);
 }
 
@@ -229,7 +230,7 @@ function bindLocal() {
 
 function bindNetwork() {
     unbindButton();
-    if (noPair=="1") {
+    if (RoomPlayerNO==1) {
         $(document).
             bind('keydown', function(evt) {
                 self.nes.keyboard.keyDown1(evt);
@@ -237,14 +238,15 @@ function bindNetwork() {
             bind('keyup', function(evt) {
                 self.nes.keyboard.keyUp1(evt);
             });
-    } else if (noPair=="2") {
+    } else if (RoomPlayerNO==2) {
         appendRoomChat("你是可怜的玩家2啊");
         $(document).
             bind('keydown', function(evt) {
-                // conn.send(JSON.stringify({"opt": "keyboard", "keyCode": evt.keyCode.toString(), "value": "65"}));
                 dataChannel.send(JSON.stringify({"keyCode": evt.keyCode, "value": 65}));
                 value = 65;
                 switch (evt.keyCode) {
+                    case nes.keyboard.key1Setting.KEY_X: document.getElementById('button_a_turbo').style.background = value==64?"url('/images/m/button_a_turbo.png')":"url('/images/m/button_a_turbo_over.png')"; break; 
+                    case nes.keyboard.key1Setting.KEY_Y: document.getElementById('button_b_turbo').style.background = value==64?"url('/images/m/button_b_turbo.png')":"url('/images/m/button_b_turbo_over.png')"; break; 
                     case nes.keyboard.key1Setting.KEY_A: document.getElementById('button_a').style.background = value==64?"url('/images/m/button_a.png')":"url('/images/m/button_a_over.png')"; break;      // X
                     case nes.keyboard.key1Setting.KEY_B: document.getElementById('button_b').style.background = value==64?"url('/images/m/button_b.png')":"url('/images/m/button_b_over.png')"; break;      // Z
                     case nes.keyboard.key1Setting.KEY_SELECT: document.getElementById('button_select').style.background = value==64?"url('/images/m/r_button_select.png')":"url('/images/m/r_button_select_over.png')"; break; // Right Ctrl
@@ -257,10 +259,11 @@ function bindNetwork() {
                 }
             }).
             bind('keyup', function(evt) {
-                // conn.send(JSON.stringify({"opt": "keyboard", "keyCode": evt.keyCode.toString(), "value": "64"}));
                 dataChannel.send(JSON.stringify({"keyCode": evt.keyCode, "value": 64}));
                 value = 64;
                 switch (evt.keyCode) {
+                    case nes.keyboard.key1Setting.KEY_X: document.getElementById('button_a_turbo').style.background = value==64?"url('/images/m/button_a_turbo.png')":"url('/images/m/button_a_turbo_over.png')"; break; 
+                    case nes.keyboard.key1Setting.KEY_Y: document.getElementById('button_b_turbo').style.background = value==64?"url('/images/m/button_b_turbo.png')":"url('/images/m/button_b_turbo_over.png')"; break; 
                     case nes.keyboard.key1Setting.KEY_A: document.getElementById('button_a').style.background = value==64?"url('/images/m/button_a.png')":"url('/images/m/button_a_over.png')"; break;      // X
                     case nes.keyboard.key1Setting.KEY_B: document.getElementById('button_b').style.background = value==64?"url('/images/m/button_b.png')":"url('/images/m/button_b_over.png')"; break;      // Z
                     case nes.keyboard.key1Setting.KEY_SELECT: document.getElementById('button_select').style.background = value==64?"url('/images/m/r_button_select.png')":"url('/images/m/r_button_select_over.png')"; break; // Right Ctrl
@@ -294,7 +297,7 @@ function prepare() {
     //发送ICE候选到其他客户端
     pc.onicecandidate = function(event){
         conn.send(JSON.stringify({
-            "opt": "__ice_candidate",
+            "Handle": "__ice_candidate",
             "candidate": event.candidate
         }));
     };
@@ -304,7 +307,18 @@ function prepare() {
     }
     dataChannel = pc.createDataChannel("button", dataChannelOptions);
     dataChannel.onopen = function(event) {
-        appendRoomChat("dataChannel start");
+        appendRoomChat("dataChannel建立成功，可以开始游戏了");
+        dataChannel.send(JSON.stringify({
+            "keyboardSet": true, 
+            "KEY_UP":$('#KEY_UP').val(),
+            "KEY_DOWN":$('#KEY_DOWN').val(),
+            "KEY_LEFT":$('#KEY_LEFT').val(),
+            "KEY_RIGHT":$('#KEY_RIGHT').val(),
+            "KEY_SELECT":$('#KEY_SELECT').val(),
+            "KEY_START":$('#KEY_START').val(),
+            "KEY_A":$('#KEY_A').val(),
+            "KEY_B":$('#KEY_B').val(),
+        }));
     }
     dataChannel.onmessage = function(event) {
         appendRoomChat("dataChannel message");
@@ -321,10 +335,48 @@ var audioContext = new AudioContext();
         }
         receiveChannel.onmessage = function(event) {
             // appendChat("onmessage"));
-            if (noPair=="1") {
+            if (RoomPlayerNO==1) {
                 var jsonData=JSON.parse(event.data);
                 if (jsonData.keyCode) {
                     switch (jsonData.keyCode) {
+                        case nes.keyboard.key2Setting.KEY_X:
+                            if (jsonData.value==0x41) {
+                                if (nes.keyboard.IntervalX2) {
+                                    window.clearInterval(nes.keyboard.IntervalX2);
+                                    nes.keyboard.IntervalX2 = null;
+                                }
+                                nes.keyboard.IntervalX2 = setInterval(function(){
+                                    if (nes.keyboard.state2[nes.keyboard.keys.KEY_A]==0x40)
+                                        nes.keyboard.state2[nes.keyboard.keys.KEY_A] = 0x41;
+                                    else if (nes.keyboard.state2[nes.keyboard.keys.KEY_A]==0x41)
+                                        nes.keyboard.state2[nes.keyboard.keys.KEY_A] = 0x40;
+                                }, 50);
+                            }
+                            else if (jsonData.value==0x40) {
+                                window.clearInterval(nes.keyboard.IntervalX2);
+                                nes.keyboard.IntervalX2 = null;
+                                nes.keyboard.state2[nes.keyboard.keys.KEY_A] = 0x40;
+                            }
+                            break; 
+                        case nes.keyboard.key2Setting.KEY_Y:
+                            if (jsonData.value==0x41) {
+                                if (nes.keyboard.IntervalY2) {
+                                    window.clearInterval(nes.keyboard.IntervalY2);
+                                    nes.keyboard.IntervalY2 = null;
+                                }
+                                nes.keyboard.IntervalY2 = setInterval(function(){
+                                    if (nes.keyboard.state2[nes.keyboard.keys.KEY_B]==0x40)
+                                        nes.keyboard.state2[nes.keyboard.keys.KEY_B] = 0x41;
+                                    else if (nes.keyboard.state2[nes.keyboard.keys.KEY_B]==0x41)
+                                        nes.keyboard.state2[nes.keyboard.keys.KEY_B] = 0x40;
+                                }, 50);
+                            }
+                            else if (jsonData.value==0x40) {
+                                window.clearInterval(nes.keyboard.IntervalY2);
+                                nes.keyboard.IntervalY2 = null;
+                                nes.keyboard.state2[nes.keyboard.keys.KEY_B] = 0x40;
+                            }
+                            break; 
                         case nes.keyboard.key2Setting.KEY_A: nes.keyboard.state2[nes.keyboard.keys.KEY_A] = jsonData.value; break;     // Num-7
                         case nes.keyboard.key2Setting.KEY_B: nes.keyboard.state2[nes.keyboard.keys.KEY_B] = jsonData.value; break;     // Num-9
                         case nes.keyboard.key2Setting.KEY_SELECT: nes.keyboard.state2[nes.keyboard.keys.KEY_SELECT] = jsonData.value; break; // Num-3
@@ -341,14 +393,70 @@ var audioContext = new AudioContext();
                     if (nes.isRunning) {
                         nes.stop();
                         document.getElementById('stop').innerHTML = "继续";
+                        dataChannel.send(JSON.stringify({"stop": false}));
                     }
                     else {
                         nes.start();
                         document.getElementById('stop').innerHTML = "暂停";
+                        dataChannel.send(JSON.stringify({"stop": true}));
+                    }
+                } else if (jsonData.sound) {
+                    if (nes.opts.emulateSound == true) {
+                        nes.opts.emulateSound = false;
+                        document.getElementById('sound').style.background = "url('/images/m/ic_device_access_volume_muted.png')";
+                        dataChannel.send(JSON.stringify({"sound": false}));
+                    } else if (nes.opts.emulateSound == false) {
+                        nes.opts.emulateSound = true;
+                        document.getElementById('sound').style.background = "url('/images/m/ic_sound.png')";
+                        dataChannel.send(JSON.stringify({"sound": true}));
+                    }
+                } else if (jsonData.keyboardSet) {
+                    appendRoomChat("正在更新玩家2的按键设置...");
+                    if (jsonData.KEY_X)
+                        nes.keyboard.updateKEY_X2(jsonData.KEY_X);
+                    if (jsonData.KEY_Y)
+                        nes.keyboard.updateKEY_Y2(jsonData.KEY_Y);
+                    if (jsonData.KEY_A)
+                        nes.keyboard.updateKEY_A2(jsonData.KEY_A);
+                    if (jsonData.KEY_B)
+                        nes.keyboard.updateKEY_B2(jsonData.KEY_B);
+                    if (jsonData.KEY_SELECT)
+                        nes.keyboard.updateKEY_SELECT2(jsonData.KEY_SELECT);
+                    if (jsonData.KEY_START)
+                        nes.keyboard.updateKEY_START2(jsonData.KEY_START);
+                    if (jsonData.KEY_UP)
+                        nes.keyboard.updateKEY_UP2(jsonData.KEY_UP);
+                    if (jsonData.KEY_DOWN)
+                        nes.keyboard.updateKEY_DOWN2(jsonData.KEY_DOWN);
+                    if (jsonData.KEY_LEFT)
+                        nes.keyboard.updateKEY_LEFT2(jsonData.KEY_LEFT);
+                    if (jsonData.KEY_RIGHT)
+                        nes.keyboard.updateKEY_RIGHT2(jsonData.KEY_RIGHT);
+                }
+            } else if (RoomPlayerNO==2) {
+                if ( event.data.length > 1000) {
+                    nes.ui.dynamicaudio.writeInt(event.data.split(","));
+                } else {
+                    var jsonData=JSON.parse(event.data);
+                    if (jsonData.samples){
+                        nes.ui.dynamicaudio.writeInt(jsonData.samples.split(","));
+                    } else if (jsonData.sound!="undefined") {
+                        if (!jsonData.sound) {
+                            document.getElementById("video").muted = true;
+                            document.getElementById('sound').style.background = "url('/images/m/ic_device_access_volume_muted.png')";
+                        } else {
+                            document.getElementById("video").muted = false;
+                            document.getElementById('sound').style.background = "url('/images/m/ic_sound.png')";
+                        }
+                    } else if (jsonData.stop!=null) {
+                        if (jsonData.stop) {
+                            document.getElementById('stop').innerHTML = "暂停";
+                        }
+                        else {
+                            document.getElementById('stop').innerHTML = "继续";
+                        }
                     }
                 }
-            } else if (noPair=="2") {
-                nes.ui.dynamicaudio.writeInt(event.data.split(","));
             }
         }
         receiveChannel.onclose = function(event) {
@@ -360,9 +468,7 @@ var audioContext = new AudioContext();
         // appendChat("pc.onaddstream"));
         $("#emulator").hide();
         $("#video").show();
-        nes.rom=null;
-        nes.stop();
-        nes.start();
+        clearRom()
         videoElement.src = URL.createObjectURL(event.stream);
     };
 }
@@ -387,7 +493,7 @@ function video() {
                 return pc.setLocalDescription(offer);
             }).then(function() {
                 conn.send(JSON.stringify({
-                    "opt": "__offer",
+                    "Handle": "__offer",
                     "sdp": pc.localDescription
                 }));
             });
@@ -404,104 +510,170 @@ if (window["WebSocket"]) {
     }
     conn.onmessage = function(evt) {
         var jsonData=JSON.parse(evt.data);
-        // appendChat(jsonData.opt+": "+jsonData.data));
-        switch(jsonData.opt) 
+        // appendChat(jsonData.Handle+": "+jsonData.data));
+        switch(jsonData.Handle) 
         { 
-            case "msg":
-                appendChat(jsonData.data);
+            case "Msg":
+                appendChat(jsonData.Msg);
                 break; 
-            case "name":
-                if ($('#ip1').text()==jsonData.ip) {
-                    $('#name1').text(jsonData.data);
-                    $('#name2').text(jsonData.data);
+            case "Rename":
+                if ($('#ip1').text()==jsonData.IP) {
+                    $('#name1').text(jsonData.NewName);
+                    $('#name2').text(jsonData.NewName);
                 }
-                appendChat(jsonData.ip+"修改他的昵称为"+jsonData.data);
-                if (document.getElementById(jsonData.ip)) {
-                    removeDiv(jsonData.ip);
-                    appendUser($("<div id=" + jsonData.ip + "/>").text(jsonData.ip+" - "+jsonData.data));
+                appendChat(jsonData.IP+"修改他的昵称为"+jsonData.NewName);
+                if (document.getElementById(jsonData.IP)) {
+                    removeDiv(jsonData.IP);
+                    appendUser($("<div id=" + jsonData.IP + "/>").text(jsonData.IP+" - "+jsonData.NewName));
                 }
-                break; 
-            case "msgPair":
-                appendRoomChat(jsonData.data);
                 break; 
             case "listRooms":
-                if (!document.getElementById(jsonData.ip)) {
-                    appendUser($("<div id=" + jsonData.ip + "/>").text(jsonData.ip+" - "+jsonData.name));
+                if (!document.getElementById(jsonData.IP)) {
+                    appendUser($("<div id=" + jsonData.IP + "/>").text(jsonData.IP+" - "+jsonData.Name));
                 }
-                appendRoom($("<div id="+jsonData.roomName+" onclick=\"joinPair('"+jsonData.roomName+"')\"/>").text(jsonData.ip+" - "+jsonData.name+' - ' + jsonData.data));
+                appendRoom(jsonData);
                 break; 
             case "listPlayers":
-                if (!document.getElementById(jsonData.data)) {
-                    appendUser($("<div id=" + jsonData.data + "/>").text(jsonData.data+" - "+jsonData.name));
+                if (!document.getElementById(jsonData.IP)) {
+                    appendUser($("<div id=" + jsonData.IP + "/>").text(jsonData.IP+" - "+jsonData.Name));
                 }
                 break; 
-            case "in": 
-                if (!document.getElementById(jsonData.data)) {
-                    appendUser($("<div id=" + jsonData.data + "/>").text(jsonData.data+" - "+jsonData.name));
+            case "IN": 
+                if (!document.getElementById(jsonData.IP)) {
+                    appendUser($("<div id=" + jsonData.IP + "/>").text(jsonData.IP));
                 }
-                appendChat(jsonData.data+" - "+jsonData.name+"来到了平台");
+                appendChat(jsonData.IP+" - "+jsonData.Name+"来到了平台");
                 break; 
-            case "ip":
-                $('#ip1').text(jsonData.data);
-                $('#ip2').text(jsonData.data);
+            case "IP":
+                IP = jsonData.IP
+                $('#ip1').text(jsonData.IP);
+                $('#ip2').text(jsonData.IP);
+                $('#name1').text(jsonData.Name);
+                $('#name2').text(jsonData.Name);
                 break; 
             case "out": 
-                if (document.getElementById(jsonData.data)) {
-                    removeDiv(jsonData.data);
-                    appendChat(jsonData.data+" - "+jsonData.name+'离开了平台，回家吃饭了');
+                if (document.getElementById(jsonData.IP)) {
+                    removeDiv(jsonData.IP);
+                    appendChat(jsonData.IP+" - "+jsonData.Name+'离开了平台，回家吃饭了');
                 }
                 break; 
-            case "readyPair":
-                appendRoomChat("玩家"+jsonData.no+" "+jsonData.ip+" - "+jsonData.name+"已经准备好了");
+            case "createDoubleRoom":
+                appendRoom(jsonData);
+                appendChat(jsonData.IP+" - "+jsonData.Name+"创建了游戏"+jsonData.GameName);
+                if (jsonData.IP == IP) {
+                    $("#leaveDoubleRoom").show();
+                    $("#readyDoubleRoom").show();
+                    $("#button_local-choose-rom").hide();
+                    RoomID = jsonData.RoomID;
+                    RoomPlayerNO = 1;
+                    appendRoomChat(jsonData.IP+" - "+jsonData.Name+"来到了双人房"+jsonData.RoomID);
+                    updatePosition(jsonData);
+                }
                 break; 
-            case "createPair":
-                appendRoom($("<div id="+jsonData.roomName+" onclick=\"joinPair('"+jsonData.roomName+"')\"/>").text(jsonData.ip+" - "+jsonData.name+' - ' + jsonData.data));
-                appendChat(jsonData.ip+" - "+jsonData.name+"创建了游戏"+jsonData.data);
-                break; 
-            case "leavePair":
-                activeButtons(1);
-                if (jsonData.empty=="true") {
-                    if (document.getElementById(jsonData.roomName)) {
-                        removeDiv(jsonData.roomName);
+            case "readyDoubleRoom":
+                if (jsonData.IP == IP) {
+                    $("#1-keyboard").hide();
+                    $("#2-keyboard").hide();
+                }
+                appendRoomChat("玩家"+jsonData.RoomPlayerNO+" "+jsonData.IP+" - "+jsonData.Name+"已经准备好了");
+                break;
+            case "leaveDoubleRoom":
+                updateRoomPlayerNum(jsonData);
+                appendRoomChat(jsonData.IP+" - "+jsonData.Name+"离开了双人房"+jsonData.RoomID);
+                if (jsonData.Empty) {
+                    if (document.getElementById("Room"+jsonData.RoomID)) {
+                        removeDiv("Room"+jsonData.RoomID);
+                    }
+                    appendRoomChat("双人房"+jsonData.RoomID+"已经被炸毁...");
+                    if ( jsonData.RoomID == RoomID ) {
+                        $("#leaveDoubleRoom").hide();
+                        $("#readyDoubleRoom").hide();
+                        $("#button_local-choose-rom").show();
+                        RoomPlayerNO = 0;
+                        RoomID = 0;
                     }
                 }
-                disableButtons(false);
-                bindLocal();
-                appendRoomChat(jsonData.ip+" - "+jsonData.name+"离开了双人房"+jsonData.roomName);
-                break; 
-            case "joinPair":
-                unbindButton(jsonData);
-                if (noPair == "2") {
-                    $("#leavePair").show();
-                    $("#ready").show();
-                    appendRoomChat("等待其他玩家准备");
+                if (jsonData.RoomID == RoomID) {
+                    updatePosition(jsonData);
                 }
-                appendRoomChat(jsonData.ip+" - "+jsonData.name+"来到了双人房"+jsonData.roomName);
+                if ( jsonData.IP == IP ) {
+                    $("#leaveDoubleRoom").hide();
+                    $("#readyDoubleRoom").hide();
+                    $("#button_local-choose-rom").show();
+                    RoomPlayerNO = 0;
+                    RoomID = 0;
+                    activeButtons(1);
+                    disableButtons(false);
+                    bindLocal();
+                    $("#1-keyboard").show();
+                    $("#2-keyboard").show();
+                    updatePosition(jsonData);
+                }
+                break; 
+            case "joinDoubleRoomFailed":
+                appendChat("加入该双人房"+jsonData.RoomID+"失败: "+jsonData.ErrMsg);
                 break;
-            case "startPair":
-                if(noPair=="1"){
-                    appendRoomChat("正在加载玩家2按键设置...");
-                    loadButtonSet2(jsonData);
-                } else if(noPair=="2"){
-                    document.getElementById('stop').innerHTML = "暂停/继续";
+            case "joinDoubleRoom":
+                updateRoomPlayerNum(jsonData);
+                if (jsonData.IP == IP) {
+                    RoomPlayerNO = 2;
+                    RoomID = jsonData.RoomID;
+                    $("#leaveDoubleRoom").show();
+                    $("#readyDoubleRoom").show();
+                    $("#button_local-choose-rom").hide();
+                    updatePosition(jsonData);
+                }
+                if (jsonData.RoomID == RoomID) {
+                    appendRoomChat(jsonData.IP+" - "+jsonData.Name+"来到了双人房"+jsonData.RoomID);
+                    updatePosition(jsonData);
+                }
+                break;
+            case "startDoubleRoom":
+                appendRoomChat("所有玩家都准备好了");
+                if(RoomPlayerNO==1){
+                    document.getElementById('sound').onclick = function() {
+                        if (nes.opts.emulateSound == true) {
+                            nes.opts.emulateSound = false;
+                            document.getElementById('sound').style.background = "url('/images/m/ic_device_access_volume_muted.png')";
+                            dataChannel.send(JSON.stringify({"sound": false}));
+                        } else if (nes.opts.emulateSound == false) {
+                            nes.opts.emulateSound = true;
+                            document.getElementById('sound').style.background = "url('/images/m/ic_sound.png')";
+                            dataChannel.send(JSON.stringify({"sound": true}));
+                        }
+                    }
+
+                    document.getElementById('stop').onclick = function() {
+                        if (nes.isRunning) {
+                            nes.stop();
+                            document.getElementById('stop').innerHTML = "继续";
+                            dataChannel.send(JSON.stringify({"stop": false}));
+                        }
+                        else {
+                            nes.start();
+                            document.getElementById('stop').innerHTML = "暂停";
+                            dataChannel.send(JSON.stringify({"stop": true}));
+                        }
+                    }
+                } else if(RoomPlayerNO==2){
                     document.getElementById('stop').onclick = function() {
                         dataChannel.send(JSON.stringify({"stop": true}));
+                    }
+                    document.getElementById('sound').onclick = function() {
+                        dataChannel.send(JSON.stringify({"sound": true}));
                     }
                     document.getElementById('restart').onclick = function() {
                         dataChannel.send(JSON.stringify({"restart": true}));
                     }
                 }
                 bindNetwork();
-                appendRoomChat("游戏开始");
+                appendRoomChat("正在进行p2p连接...");
                 prepare();
-                if(noPair=="1"){
+                if(RoomPlayerNO==1){
                     startGame();
                     video();
                 }
                 break;
-            // case "keyboard":
-            //     keyboard(jsonData);
-            //     break;
             case "__ice_candidate":
                 appendRoomChat("__ice_candidate");
                 var mid = new RTCIceCandidate(jsonData.candidate);
@@ -516,7 +688,7 @@ if (window["WebSocket"]) {
                     return pc.setLocalDescription(answer);
                 }).then(function() {
                     conn.send(JSON.stringify({
-                        "opt": "__answer",
+                        "Handle": "__answer",
                         "sdp": pc.localDescription
                     }));
                 });

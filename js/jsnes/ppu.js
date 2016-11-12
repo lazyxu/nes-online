@@ -1008,7 +1008,8 @@ JSNES.PPU.prototype = {
                     }else {
                         // Fetch data:
                         t = ptTile[baseTile+nameTable[this.curNt].getTileIndex(this.cntHT,this.cntVT)];
-                        tpix = t.pix;
+                        if (t)
+                            tpix = t.pix;
                         att = nameTable[this.curNt].getAttrib(this.cntHT,this.cntVT);
                         scantile[tile] = t;
                         attrib[tile] = att;

@@ -3,71 +3,70 @@ package main
 import (
 	"log"
 	"net/http"
+	"sync"
 
-	"github.com/gorilla/websocket"
+	"gitHub.com/gorilla/websocket"
 )
 
-type connection struct {
+// Connection -
+type Connection struct {
 	// websocket 连接器
-	ws       *websocket.Conn
-	roomName string
-	name     string
-	ip       string
-	no       string
-	ping     int64
-	// 发送信息的缓冲 channel
-	send chan map[string]interface{}
+	ws           *websocket.Conn
+	RoomID       int
+	RoomPlayerNO int
+	UserName     string
+	IP           string
+	Msg          chan map[string]interface{}
+	// Mutex
+	rwmutex sync.RWMutex
 }
 
-// 客户端到服务器
-func (c *connection) reader(ip string) {
+// client send ms to server
+func (c *Connection) reader(IP string) {
 	for {
-		message := make(map[string]interface{})
-		err := c.ws.ReadJSON(&message)
+		m := make(map[string]interface{})
+		err := c.ws.ReadJSON(&m)
 		if err != nil {
 			println("ReadJSON err")
 			println(err)
 			break
 		}
-		log.Println(message["opt"])
-		message["ip"] = ip
-		message["name"] = c.name
-		switch message["opt"] {
-		case "msg":
-			message["data"] = message["ip"].(string) + " - " + message["name"].(string) + ": " + message["data"].(string)
-			c.broadcast(message)
-		case "name":
-			c.name = message["data"].(string)
-			log.Println(c.name)
-			c.broadcast(message)
-		case "createPair":
-			c.createPair(message)
-		case "joinPair":
-			c.joinPair(message)
-		case "readyPair":
-			c.readyPair(message)
-		case "leavePair":
-			c.leavePair("")
+		log.Println(m)
+		m["IP"] = c.IP
+		m["Name"] = c.UserName
+		switch m["Handle"] {
+		case "Msg":
+			m["Msg"] = m["IP"].(string) + " - " + m["Name"].(string) + ": " + m["Msg"].(string)
+			c.broadcast(m)
+		case "Rename":
+			c.UserName = m["NewName"].(string)
+			c.broadcast(m)
+		case "createDoubleRoom":
+			c.createDoubleRoom(m)
+		case "joinDoubleRoom":
+			c.joinDoubleRoom(m)
+		case "readyDoubleRoom":
+			c.readyDoubleRoom(m)
+		case "leaveDoubleRoom":
+			c.leaveDoubleRoom(m)
 		case "__ice_candidate":
-			c.iceCandidate(message)
+			c.p2pIceCandidate(m)
 		case "__offer":
-			c.offer(message)
+			c.p2pOffer(m)
 		case "__answer":
-			c.answer(message)
-		// case "keyboard":
-		// 	c.keyboard(message)
+			c.p2pAnswer(m)
 		default:
-			c.broadcast(message)
+			c.broadcast(m)
 		}
 	}
 	log.Println("reader Close")
 	c.ws.Close()
 }
 
-// 服务器到客户端
-func (c *connection) writer() {
-	for message := range c.send {
-		err := c.ws.WriteJSON(message)
+// server send ms to client
+func (c *Connection) writer() {
+	for m := range c.Msg {
+		err := c.ws.WriteJSON(m)
 		if err != nil {
 			println("WriteJSON err")
 			println(err)
@@ -81,55 +80,62 @@ func (c *connection) writer() {
 var upgrader = &websocket.Upgrader{ReadBufferSize: 1024, WriteBufferSize: 1024}
 
 func wsHandler(w http.ResponseWriter, r *http.Request) {
-	ip := r.RemoteAddr
+	IP := r.RemoteAddr
 	ws, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		println(err)
 		return
 	}
-	c := &connection{send: make(chan map[string]interface{}, 256), ws: ws}
+	c := &Connection{
+		Msg: make(chan map[string]interface{}, 256),
+		ws:  ws,
+	}
 	c.register()
 
-	c.ip = ip
+	c.IP = IP
 	c.broadcast(map[string]interface{}{
-		"opt":  "in",
-		"name": c.name,
-		"data": ip,
+		"Handle": "IN",
+		"IP":     IP,
+		"Name":   c.UserName,
 	})
 	c.ws.WriteJSON(map[string]interface{}{
-		"opt":  "ip",
-		"name": c.name,
-		"data": ip,
+		"Handle": "IP",
+		"IP":     IP,
+		"Name":   c.UserName,
 	})
-	for conn, ok := range h.connections {
+	for conn, ok := range h.Connections {
 		if !ok {
 			log.Println(conn)
 		}
-		log.Println(conn.ip)
-		if conn.no == "1" {
+		log.Println(conn.IP)
+		if conn.RoomPlayerNO == 1 {
+			r := h.DoubleRoom[conn.RoomID]
 			c.ws.WriteJSON(map[string]interface{}{
-				"opt":      "listRooms",
-				"name":     conn.name,
-				"ip":       conn.ip,
-				"roomName": conn.roomName,
-				"data":     h.gamePathPair[conn.roomName],
+				"Handle":       "listRooms",
+				"Name":         conn.UserName,
+				"IP":           conn.IP,
+				"RoomName":     r.Name,
+				"GameName":     r.GameName,
+				"RoomID":       r.ID,
+				"PlayerNum":    r.PlayerNum,
+				"PlayerMaxNum": r.PlayerMaxNum,
 			})
 		} else {
 			c.ws.WriteJSON(map[string]interface{}{
-				"opt":  "listPlayers",
-				"name": conn.name,
-				"data": conn.ip,
+				"Handle": "listPlayers",
+				"Name":   conn.UserName,
+				"IP":     conn.IP,
 			})
 		}
 	}
 	defer func() {
 		c.broadcast(map[string]interface{}{
-			"opt":  "out",
-			"name": c.name,
-			"data": ip,
+			"Handle": "out",
+			"Name":   c.UserName,
+			"IP":     IP,
 		})
 		c.unregister()
 	}()
 	go c.writer()
-	c.reader(ip)
+	c.reader(IP)
 }

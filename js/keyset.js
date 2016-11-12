@@ -1,3 +1,13 @@
+$('#KEY_X').bind("keyup", function (e) {
+    $("#KEY_X").val(e.keyCode);
+    nes.keyboard.updateKEY_X(e.keyCode);
+    $("#KEY_Y").focus();
+});
+$("#KEY_Y").bind("keyup", function (e) {
+    $("#KEY_Y").val(e.keyCode);
+    nes.keyboard.updateKEY_Y(e.keyCode);
+    $("#KEY_UP").focus();
+});
 $('#KEY_A').bind("keyup", function (e) {
     $("#KEY_A").val(e.keyCode);
     nes.keyboard.updateKEY_A(e.keyCode);
@@ -40,15 +50,25 @@ $("#KEY_RIGHT").bind("keyup", function (e) {
 });
 
 // <!--player 2-->
+$('#KEY_X2').bind("keyup", function (e) {
+    $("#KEY_X2").val(e.keyCode);
+    nes.keyboard.updateKEY_X2(e.keyCode);
+    $("#KEY_Y2").focus();
+});
+$("#KEY_Y2").bind("keyup", function (e) {
+    $("#KEY_Y2").val(e.keyCode);
+    nes.keyboard.updateKEY_Y2(e.keyCode);
+    $("#KEY_UP2").focus();
+});
 $('#KEY_A2').bind("keyup", function (e) {
     $("#KEY_A2").val(e.keyCode);
     nes.keyboard.updateKEY_A2(e.keyCode);
-    $("#KEY_UP2").focus();
+    $("#KEY_B2").focus();
 });
 $("#KEY_B2").bind("keyup", function (e) {
     $("#KEY_B2").val(e.keyCode);
     nes.keyboard.updateKEY_B2(e.keyCode);
-    $("#KEY_A2").focus();
+    $("#KEY_X2").focus();
 });
 $("#KEY_SELECT2").bind("keyup", function (e) {
     $("#KEY_SELECT2").val(e.keyCode);
@@ -58,7 +78,7 @@ $("#KEY_SELECT2").bind("keyup", function (e) {
 $("#KEY_START2").bind("keyup", function (e) {
     $("#KEY_START2").val(e.keyCode);
     nes.keyboard.updateKEY_START2(e.keyCode);
-    $("#KEY_B2").focus();
+    $("#KEY_A2").focus();
 });
 $("#KEY_UP2").bind("keyup", function (e) {
     $("#KEY_UP2").val(e.keyCode);

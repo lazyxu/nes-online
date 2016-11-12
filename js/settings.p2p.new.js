@@ -19,7 +19,7 @@ function init_size(){
         // emulator.style.height = height + "px";
         video.style.width = ( (height+32) / 240 * 256) + "px";
         video.style.height = (height+32) + "px";
-        appendChat("按键设置默认为 上下左右(wsad) 选择/确认(vb) A/B(jk)");
+        appendChat("按键设置默认为 上下左右(WSAD) 选择/确认(VB) A/B(J/K) X/Y(U/I)");
     }
 }
 
