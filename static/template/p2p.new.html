@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>{{.version}}</title>
+    <link href="css/bootstrap/bootstrap.css" rel="stylesheet">
+    <script src="js/jquery-3.1.1.min.js"></script>
+    <script src="js/bootstrap/bootstrap.js"></script>
+    <!--<script src="js/react/react.js"></script>
+    <script src="js/react/react-dom.js"></script>
+    <script src="js/react/browser.min.js"></script>-->
+
+    <!--手机浏览器不允许缩放-->
+    <meta content="target-densitydpi=high-dpi, user-scalable=0;" name="viewport" />
+
+    <!--不允许缓存-->
+    <!--<META HTTP-EQUIV="Pragma" CONTENT="no-cache"> 
+    <META HTTP-EQUIV="Cache-Control" CONTENT="no-cache"> 
+    <META HTTP-EQUIV="Expires" CONTENT="0"> -->
+
+    <!--chatBoard required-->
+    <link href="css/chatBoard.p2p.new.css" rel="stylesheet">
+    <link href="css/m.css" rel="stylesheet">
+
+    <script src="/js/dynamicaudio.js" type="text/javascript" charset="utf-8"></script>
+    <!--nes required-->
+    <script src="/js/jsnes/nes.js" type="text/javascript" charset="utf-8"></script>
+    <script src="/js/jsnes/utils.js" type="text/javascript" charset="utf-8"></script>
+    <script src="/js/jsnes/cpu.js" type="text/javascript" charset="utf-8"></script>
+    <script src="/js/jsnes/keyboard.js" type="text/javascript" charset="utf-8"></script>
+    <script src="/js/jsnes/mappers.js" type="text/javascript" charset="utf-8"></script>
+    <script src="/js/jsnes/papu.js" type="text/javascript" charset="utf-8"></script>
+    <script src="/js/jsnes/ppu.js" type="text/javascript" charset="utf-8"></script>
+    <script src="/js/jsnes/rom.js" type="text/javascript" charset="utf-8"></script>
+    <script src="/js/jsnes/ui.js" type="text/javascript" charset="utf-8"></script>
+</head>
+
+<body style="background: black">
+    <script src="js/settings.p2p.new.js"></script>
+    <div id="position" class="position">
+        <div class='MyHall' id='MyHall'>NES Online</div> 
+        <div id="MyRoom" style="display: none">
+            >> 
+            <div class='MyRoomName' id='MyRoomName' ></div>
+            <div class='MyGameName' id='MyGameName'></div>
+            <div class='MyPlayerNum' id='MyPlayerNum' ></div>
+        </div>
+    </div>
+    <form id="input_name" class="input_text" hidden>
+        <div class="msg_container">
+            <span id="ip1"></span>
+            <span id="name1"></span>
+            <input type="text" id="msg_name" class="msg" autocomplete="off" placeholder="请输入你的昵称..." />
+        </div>
+    </form>
+    <div id="Chat" class="dragclass" >
+	    <div id="ChatHead">
+            <span style="float: left">
+                <span id="ip2"></span>
+                <span id="name2"></span>
+            </span>
+            <a href="javascript:void(0);" onclick="$('#Chat').hide();"><img src="images/minimize.png"></img></a>
+        </div>
+        <div id="ChatContent">
+            <span id="info" hidden></span>
+            <span id="room_chat" hidden></span>
+            <span id="mixinfo"></span>
+        </div>
+        <div id="ChatBtn">
+            <div class="buttons">
+                大厅<button id="HallChat" class="HallChat"></button>
+                房间<button id="RoomChat" class="RoomChat"></button>
+                <button id="rename" class="rename">改名</button>
+            </div>
+            <form id="chat" style="display: inline">
+                <input type="text" id="msg" class="ChatSendMsg" autocomplete="off" placeholder="Say something..."  />
+            </form>
+        </div>
+    </div>
+    <button id="button_show_menus" class="button_show_menus"></button>
+    <div id="button_menus" class="button_menus">
+        <button id="restart" class="restart"></button>
+        <button id="sound" class="sound"></button>
+        <button id="help" class="button_help" data-toggle="modal" data-target="#help-list"></button>
+        <button id="about" class="button_about" data-toggle="modal" data-target="#about-list"></button>
+        <button id="game_settings" class="button_game_settings" data-toggle="modal" data-target="#game_settings-list"/>
+        <button id="stop" class="button_stop">暂停</button>
+        <button id="button_local-choose-rom" class="button_local-choose-rom" data-toggle="modal" data-target="#local-choose-rom-list">单机模式</button>
+        <button class="button_network-choose-rom" data-toggle="modal" data-target="#network-choose-rom-list">网络对战</button>
+        <button class="button_players" data-toggle="modal" data-target="#players-list">玩家列表</button>
+        <button class="button_rooms" data-toggle="modal" data-target="#rooms-list">房间列表</button>
+    </div>
+    <div class="button_directions">
+        <img src="/images/m/button_center.png" onmouseover="this.src='/images/m/button_center_over.png'" onmouseout="this.src='/images/m/button_center.png'" class="button_center"></img>
+        <button id="button_up" class="button_up"/>
+        <button id="button_down" class="button_down">
+        <button id="button_left" class="button_left"/>
+        <button id="button_right" class="button_right"/>
+    </div>
+    <div class="button_select_start">
+        <button id="button_select" class="button_select"/>
+        <button id="button_start" class="button_start"/>
+    </div>
+    <div class="button_AB">
+        <button id="readyDoubleRoom" onclick="readyDoubleRoom();" class="button_ready" hidden>准备</button>
+        <button id="leaveDoubleRoom" onclick="leaveDoubleRoom();" class="button_leave" hidden>离开房间</button>
+        <button id="button_chat" class="button_chat">chat</button>
+
+        <button id="button_a" class="button_a"/>
+        <button id="button_b" class="button_b"/>
+        <button id="button_a_turbo" class="button_a_turbo"/>
+        <button id="button_b_turbo" class="button_b_turbo"/>
+    </div>
+    <div align="center" id="vid-wrapper" class="vid-wrapper">
+        <div id="emulator" class="video" align="center"></div>
+        <video style="display:none" id="video" class="video" autoplay="autoplay"></video>
+    </div>
+    <script src="/js/dynamicaudio.js" type="text/javascript" charset="utf-8"></script>
+    <script type="text/javascript" charset="utf-8">
+        var nes;
+        $(function() {
+            nes = new JSNES({
+                'ui': $('#emulator').JSNESUI()
+            });
+            init_size();
+        });
+    </script>
+
+    <div class="modal fade" id="game_settings-list" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button class="closee" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title">
+                    游戏设置
+                </h4>
+            </div>
+            <div class="modal-body" align="center">
+                <p>按键设置默认为 <br>
+                    上下左右: WSAD <br>
+                    选择/确认: VB <br>
+                    A B: J K <br>
+                    X Y: U I</p>
+                <div align="center" id="1-keyboard">
+                    <p>玩家1</p>
+                    <div class="controller">
+                        <input id="KEY_LEFT" class="KEY_LEFT" value="65" type="text">
+                        <input id="KEY_UP" class="KEY_UP" value="87" type="text">
+                        <input id="KEY_DOWN" class="KEY_DOWN" value="83" type="text">
+                        <input id="KEY_RIGHT" class="KEY_RIGHT" value="68" type="text">
+                        <input id="KEY_SELECT" class="KEY_SELECT" value="86" type="text">
+                        <input id="KEY_START" class="KEY_START" value="66" type="text">
+                        <input id="KEY_A" class="KEY_A" value="75" type="text">
+                        <input id="KEY_B" class="KEY_B" value="74" type="text">
+                        <input id="KEY_X" class="KEY_X" value="73" type="text">
+                        <input id="KEY_Y" class="KEY_Y" value="85" type="text">
+                    </div>
+                </div>
+                <div align="center" id="2-keyboard">
+                    <p>玩家2</p>
+                    <div class="controller">
+                        <input id="KEY_LEFT2" class="KEY_LEFT" value="65" type="text">
+                        <input id="KEY_UP2" class="KEY_UP" value="87" type="text">
+                        <input id="KEY_DOWN2" class="KEY_DOWN" value="83" type="text">
+                        <input id="KEY_RIGHT2" class="KEY_RIGHT" value="68" type="text">
+                        <input id="KEY_SELECT2" class="KEY_SELECT" value="86" type="text">
+                        <input id="KEY_START2" class="KEY_START" value="66" type="text">
+                        <input id="KEY_A2" class="KEY_A" value="75" type="text">
+                        <input id="KEY_B2" class="KEY_B" value="74" type="text">
+                        <input id="KEY_X2" class="KEY_X" value="73" type="text">
+                        <input id="KEY_Y2" class="KEY_Y" value="85" type="text">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="help-list" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-content">
+            <div class="modal-body" align="left">
+                <p>双人房内所有玩家都准备好后游戏自动开始</p>
+                <p>按键设置默认为 <br>
+                    上下左右: WSAD <br>
+                    选择/确认: VB <br>
+                    A B: J K <br>
+                    X Y: U I</p>
+                <p>浏览器的宽度必须大于高度才能正常显示</p>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="about-list" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-content">
+            <div class="modal-body" align="center">
+                <p>github: <a href="https://github.com/MeteorKL/nes-online">https://github.com/MeteorKL/nes-online</a></p>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="network-choose-rom-list" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-content">
+            <div class="modal-body" id="network-rom-list" align="left">
+                <form id="form_rom_network"class="fupload" enctype="multipart/form-data" action="/upload" method="POST" onsubmit="return uploadRom('rom_network', true);">  
+                    <a href="javascript:void(0)" class="upload-img"><label for="upload-file">选择本地rom</label></a>
+                    <input id="rom_network" name="rom_network" type="file" />  
+                    <div id="rom_network_name" class="rom_name" >未选择任何游戏</div>  
+                    <input type="submit" value="创建游戏" />  
+                </form> 
+                {{.networkRomlist}}
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="local-choose-rom-list" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-content">
+            <div class="modal-body" id="local-rom-list" align="left">
+                <form id="form_rom_local"class="fupload" enctype="multipart/form-data" action="/upload" method="POST" onsubmit="return uploadRom('rom_local', false);">
+                    <a href="javascript:void(0)" class="upload-img"><label for="upload-file">选择本地rom</label></a>
+                    <input id="rom_local" name="rom_local" type="file" /> 
+                    <div id="rom_local_name" class="rom_name" >未选择任何游戏</div>  
+                    <input type="submit" value="创建游戏" />  
+                </form> 
+                {{.localRomlist}}
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="players-list" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button class="closee" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title">
+                    玩家列表
+                </h4>
+            </div>
+            <div class="modal-body" align="center">
+                <div id="users">
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="rooms-list" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button class="closee" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title">
+                    房间列表
+                </h4>
+            </div>
+            <div class="modal-body" align="center">
+                <div id="rooms">
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="host" style="display: none">{{.Host1}}</div>
+    <script src="js/chat.p2p.new.js"></script>
+    <script src="js/buttons.p2p.new.js"></script>
+    <script src="js/keyset.js"></script>
+
+    <!--{{.gamePathList}}
+    <input type="text" style="position: fixed;top: 30%;right: 80px; border: 1px solid blue; background: rgba(0,0,0,0)" id="start" value="1"></input>
+    <button id="check" style="position: fixed;top: 40%;right: 80px;color: yellow; background: rgba(0,0,0,0)">rom检测</button>-->
+    <!--<div id="test" style="position: fixed;top: 50%;right: 80px;color: red; ">
+        NO: <div id="index" style="display: inline"></div><br>
+        game name: <div id="index_name" style="display: inline"></div><br>
+        loaded: <div id="loaded" style="display: inline"></div><br>
+        vaild check: <div id="isVaild" style="display: inline"></div><br>
+        run check: <div id="runOK" style="display: inline"></div><br>
+        next: <div id="next" style="display: inline"></div><br>
+        Game crashed:  <div id="crashed" style="display: inline"></div>
+    </div>-->
+    <script src="js/vaildcheck.js"></script>
+</body>
+</html>

@@ -10,7 +10,6 @@ import (
 type DoubleRoom struct {
 	ID           int
 	Name         string
-	GamePath     string
 	GameName     string
 	Players      map[int]*Connection
 	PlayerNum    int
@@ -26,7 +25,7 @@ type DoubleRoom struct {
 	rwmutex sync.RWMutex
 }
 
-// createDoubleRoom - "Handle": "createDoubleRoom", "GamePath": GamePath, "GameName": GameName
+// createDoubleRoom - "Handle": "createDoubleRoom", "GameName": GameName
 func (c *Connection) createDoubleRoom(m map[string]interface{}) {
 	if c.RoomID != 0 {
 		c.leaveDoubleRoom(map[string]interface{}{
@@ -47,7 +46,6 @@ func (c *Connection) createDoubleRoom(m map[string]interface{}) {
 	r.PlayerNum = 1
 	r.PlayerMaxNum = 2
 	r.GameName = m["GameName"].(string)
-	r.GamePath = m["GamePath"].(string)
 	for _, conn := range r.Players {
 		r.Ready[conn.RoomID] = false
 	}
@@ -134,7 +132,6 @@ func (c *Connection) joinDoubleRoom(m map[string]interface{}) {
 			m["PlayerMaxNum"] = r.PlayerMaxNum
 			m["GameName"] = r.GameName
 			m["RoomID"] = c.RoomID
-			m["GamePath"] = r.GamePath
 			c.broadcast(m)
 		} else {
 			log.Println("error! " + strconv.Itoa(r.PlayerNum) + "/" + strconv.Itoa(r.PlayerMaxNum))

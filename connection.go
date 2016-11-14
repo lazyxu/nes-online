@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"sync"
 
-	"gitHub.com/gorilla/websocket"
+	"github.com/gorilla/websocket"
 )
 
 // Connection -
@@ -35,6 +35,10 @@ func (c *Connection) reader(IP string) {
 		m["IP"] = c.IP
 		m["Name"] = c.UserName
 		switch m["Handle"] {
+		// case "UploadRom":
+		// 	saveRom(m)
+		case "InvaildRom":
+			deleteRom(m)
 		case "Msg":
 			m["Msg"] = m["IP"].(string) + " - " + m["Name"].(string) + ": " + m["Msg"].(string)
 			c.broadcast(m)
