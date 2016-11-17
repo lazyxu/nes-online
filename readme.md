@@ -5,6 +5,9 @@ http://nes.juanix.cn:8080
 编译 go build -o main *.go  
   
 # 版本变动  
+## v1.5.1.2  
+删除文件没有同步...  
+
 ## v1.5.1.1  
 .gitignore配置的使用...  
 其他一些小修改  
