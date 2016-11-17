@@ -173,7 +173,7 @@ function activeButtons(RoomPlayerNO) {
 activeButtons(1);
 
 
-$("#msg_name").focus();
+$("#msg").focus();
 
 $("#input_name").submit(function() {
     var msg = $("#msg_name");
@@ -194,7 +194,7 @@ $("#chat").submit(function() {
     if (!msg.val()) {
         return false;
     }
-    conn.send(JSON.stringify({"Handle": "Msg", "Msg": msg.val()}));
+    conn.send(JSON.stringify({"Handle": chatPos, "Msg": msg.val()}));
     msg.val("");
     return false;
 });
@@ -216,6 +216,7 @@ document.getElementById('button_chat').onclick = function() {
 }
 var HallChat = true, RoomChat = true;
 document.getElementById('HallChat').onclick = function() {
+    chatPos = "Msg";
     HallChat = !HallChat;
     if (HallChat) {
         document.getElementById('HallChat').style.background = "url('/images/m/checkbox_sel.png')";
@@ -232,6 +233,7 @@ document.getElementById('HallChat').onclick = function() {
         document.getElementById('HallChat').style.background = "url('/images/m/checkbox_unsel.png')";
         if (RoomChat) {
             $("#room_chat").show();
+            chatPos = "RoomMsg";
             $("#info").hide();
             $("#mixinfo").hide();
         } else {
@@ -242,11 +244,13 @@ document.getElementById('HallChat').onclick = function() {
     }
 }
 document.getElementById('RoomChat').onclick = function() {
+    chatPos = "Msg";
     RoomChat = !RoomChat;
     if (RoomChat) {
         document.getElementById('RoomChat').style.background = "url('/images/m/checkbox_sel.png')";
         if (!HallChat) {
             $("#room_chat").show();
+            chatPos = "RoomMsg";
             $("#info").hide();
             $("#mixinfo").hide();
         } else {
@@ -337,7 +341,7 @@ $("#form_rom_network").on("change","input[type='file']",function(){
     }
 })
 
-function uploadRom (id, network) {
+function uploadRom (modalID, id, network) {
     event.preventDefault();
     // appendChat("upload start!");
     // $.ajax({
@@ -378,4 +382,5 @@ function uploadRom (id, network) {
             // }));
         }
     }
+    $(modalID).modal('hide');
 };

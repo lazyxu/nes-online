@@ -1,11 +1,20 @@
 # nes online
-http://nes.juanix.cn:8080  
-/alone 单机模式，可以双人玩  
+http://nes.juanix.cn:8080   
   
 运行 go run *.go  
 编译 go build -o main *.go  
   
 # 版本变动  
+## v1.5.1.1  
+.gitignore配置的使用...  
+其他一些小修改  
+  
+## v1.5.1  
+创建游戏，加入房间关闭遮罩窗  
+增加了系统提示  
+按键触发区域改为document  
+可以在房间中发言  
+  
 ## v1.5  
 rom合法性检查  
 又从网上找了些rom  
@@ -14,8 +23,8 @@ rom合法性检查
 将路由功能独立了出来  
 新增改名按键  
 感觉功能已经差不多了呢～～～   
-   
-## v1.4    
+  
+## v1.4  
 加入 U I 键位  
 玩家2关闭声音停止传输  
 加入房间失败的提示, 房间人数的提示  
@@ -106,9 +115,9 @@ canvas.toDataURL()保存为图片的方法也不行
 # Thanks to
 Inszva: http://blog.csdn.net/inszva/article/details/52840393  
 JSNES: https://github.com/bfirsh/jsnes  
+UI: Nostalgia.NES  
   
-图标来源: Nostalgia.NES  
-gamepad支持: https://github.com/josephlewis42/jsnes  
+Gamepad: https://github.com/josephlewis42/jsnes  
   
 # License
 JSNES, based on Jamie Sanders' vNES  

@@ -86,15 +86,12 @@ if (typeof jQuery !== 'undefined') {
                 /*
                  * Keyboard
                  */
-                $("#canvas").
+                $(document).
                     bind('keydown', function(evt) {
                         self.nes.keyboard.keyDown(evt); 
                     }).
                     bind('keyup', function(evt) {
                         self.nes.keyboard.keyUp(evt); 
-                    }).
-                    bind('keypress', function(evt) {
-                        self.nes.keyboard.keyPress(evt);
                     });
             
                 /*

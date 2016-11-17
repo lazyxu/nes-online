@@ -42,6 +42,17 @@ func (c *Connection) reader(IP string) {
 		case "Msg":
 			m["Msg"] = m["IP"].(string) + " - " + m["Name"].(string) + ": " + m["Msg"].(string)
 			c.broadcast(m)
+		case "RoomMsg":
+			r := h.DoubleRoom[c.RoomID]
+			m["Msg"] = m["IP"].(string) + " - " + m["Name"].(string) + ": " + m["Msg"].(string)
+			if r != nil {
+				r.broadcast(m)
+			} else {
+				c.ws.WriteJSON(map[string]interface{}{
+					"Handle": "RoomMsg",
+					"Msg":    "你不在房间中,不能在房间中说悄悄话哦",
+				})
+			}
 		case "Rename":
 			c.UserName = m["NewName"].(string)
 			c.broadcast(m)

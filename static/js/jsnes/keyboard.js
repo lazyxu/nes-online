@@ -367,41 +367,41 @@ JSNES.Keyboard.prototype = {
 
     keyDown: function(evt) {
         if (!this.setKey(evt.keyCode, 0x41) && evt.preventDefault) {
-            evt.preventDefault();
+            // evt.preventDefault();
         }
     },
     
     keyUp: function(evt) {
         if (!this.setKey(evt.keyCode, 0x40) && evt.preventDefault) {
-            evt.preventDefault();
+            // evt.preventDefault();
         }
     },
 
     keyDown1: function(evt) {
         if (!this.setKey1(evt.keyCode, 0x41) && evt.preventDefault) {
-            evt.preventDefault();
+            // evt.preventDefault();
         }
     },
     
     keyUp1: function(evt) {
         if (!this.setKey1(evt.keyCode, 0x40) && evt.preventDefault) {
-            evt.preventDefault();
+            // evt.preventDefault();
         }
     },
 
     keyDown2: function(evt) {
         if (!this.setKey2(evt.keyCode, 0x41) && evt.preventDefault) {
-            evt.preventDefault();
+            // evt.preventDefault();
         }
     },
     
     keyUp2: function(evt) {
         if (!this.setKey2(evt.keyCode, 0x40) && evt.preventDefault) {
-            evt.preventDefault();
+            // evt.preventDefault();
         }
     },
     
     keyPress: function(evt) {
-        evt.preventDefault();
+        // evt.preventDefault();
     }
 };

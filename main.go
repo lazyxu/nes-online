@@ -13,7 +13,7 @@ import (
 var localRomlist string
 var networkRomlist string
 var gamePathList string
-var version = "NES Online v1.5"
+var version = "NES Online v1.5.1"
 
 func updateRomlistInHTML(src string, des string, opt string) {
 	data, _ := ioutil.ReadFile(src)
@@ -58,8 +58,8 @@ func gerRomList(dirPath string, suffix string) {
 			if len(result) > 1 {
 				name = result[1]
 			}
-			networkRomlist += "<button class='rom-button' id='rom-" + strconv.Itoa(i) + "' data-dismiss=\"modal\" onclick=\"loadRom('" + path + "');createDoubleRoom('" + path + "','" + name + "');\">" + name + "</button><br>"
-			localRomlist += "<button class='rom-button' data-dismiss=\"modal\" onclick=\"loadRom('" + path + "');\">" + name + "</button><br>"
+			networkRomlist += "<button class='rom-button' data-dismiss='modal' aria-hidden='true'  id='rom-" + strconv.Itoa(i) + "' data-dismiss=\"modal\" onclick=\"loadRom('" + path + "');createDoubleRoom('" + path + "','" + name + "');\">" + name + "</button><br>"
+			localRomlist += "<button class='rom-button' data-dismiss='modal' aria-hidden='true'  onclick=\"loadRom('" + path + "');\">" + name + "</button><br>"
 			gamePathList += "<div id='" + strconv.Itoa(i) + "' hidden>" + path + "</div>"
 			i++
 		}

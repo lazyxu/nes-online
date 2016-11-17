@@ -7,7 +7,6 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
-	"os"
 )
 
 func checkErr(err error) {
@@ -67,13 +66,13 @@ func csHandler(w http.ResponseWriter, r *http.Request) {
 	renderHTML(w, "cs.html", args)
 }
 
-type Size interface {
-	Size() int64
-}
+// type Size interface {
+// 	Size() int64
+// }
 
-type Stat interface {
-	Stat() (os.FileInfo, error)
-}
+// type Stat interface {
+// 	Stat() (os.FileInfo, error)
+// }
 
 // func uploadHandler(w http.ResponseWriter, r *http.Request) {
 // 	if "POST" == r.Method {
@@ -108,6 +107,12 @@ type Stat interface {
 // 	}
 // }
 
+// func bugHandler(w http.ResponseWriter, r *http.Request) {
+// 	if "POST" == r.Method {
+
+// 	}
+// }
+
 func routerInit() {
 	// files
 	http.Handle("/js/", http.StripPrefix("/js/", http.FileServer(http.Dir("static/js"))))
@@ -119,6 +124,7 @@ func routerInit() {
 
 	// website
 	// http.HandleFunc("/upload", uploadHandler)
+	// http.HandleFunc("/bug", bugHandler)
 	http.HandleFunc("/", indexHandler)
 	http.HandleFunc("/alone", aloneHandler)
 	http.HandleFunc("/cs", csHandler)

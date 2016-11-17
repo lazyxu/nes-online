@@ -11,7 +11,7 @@ var RoomID = 0;
 var network = false;
 var button_x = false; //85
 var button_y = false; //73
-
+var chatPos = "Msg";
 function loadRom(url) {
     $.ajax({
         url: url,
@@ -53,7 +53,14 @@ function appendMix(msg) {
         d.scrollTop = d.scrollHeight - d.clientHeight;
     }
 }
-
+function appendSys(msg) {
+    var d = Chat[0]
+    var doScroll = d.scrollTop == d.scrollHeight - d.clientHeight;
+    msg.appendTo(Mix);
+    if (doScroll) {
+        d.scrollTop = d.scrollHeight - d.clientHeight;
+    }
+}
 function appendChat(msg) {
     msg = "[大厅]: "+msg;
     appendMix(msg);
@@ -96,7 +103,7 @@ function removeDiv(id) {
 function appendRoom(jsonData) {
     var d = rooms[0]
     var doScroll = d.scrollTop == d.scrollHeight - d.clientHeight;
-    var Room = $("<div class='Room' id='Room"+jsonData.RoomID+"' onclick=\"joinDoubleRoom("+jsonData.RoomID+")\">"
+    var Room = $("<div class='Room' id='Room"+jsonData.RoomID+"' data-dismiss='modal' aria-hidden='true' onclick=\"joinDoubleRoom("+jsonData.RoomID+")\">"
         +"<div class='RoomName' id='RoomName"+jsonData.RoomID+"' >"+jsonData.RoomName+"</div>"
         +"<div class='Name' id='Name"+jsonData.RoomID+"' >"+jsonData.Name+"</div>"
         +"<div class='GameName'>"+jsonData.GameName+"</div>"
@@ -190,6 +197,7 @@ function leaveDoubleRoom() {
     $("#leaveDoubleRoom").hide();
     $("#readyDoubleRoom").hide();
     RoomPlayerNO = 0;
+    RoomID = 0;
 }
 
 function joinDoubleRoom(RoomID){
@@ -304,7 +312,7 @@ function prepare() {
         }));
     };
     var dataChannelOptions = {
-        ordered:false,
+        ordered:true,
         maxRetransmitTime: 3000
     }
     dataChannel = pc.createDataChannel("button", dataChannelOptions);
@@ -342,7 +350,7 @@ var audioContext = new AudioContext();
             if (RoomPlayerNO==1) {
                 var jsonData=JSON.parse(event.data);
                 if (jsonData.keyCode) {
-                    appendChat(jsonData.keyCode);
+                    // appendChat(jsonData.keyCode);
                     switch (jsonData.keyCode) {
                         case nes.keyboard.key2Setting.KEY_X:
                             if (jsonData.value==0x41) {
@@ -521,13 +529,16 @@ if (window["WebSocket"]) {
             case "Msg":
                 appendChat(jsonData.Msg);
                 break; 
+            case "RoomMsg":
+                appendRoomChat(jsonData.Msg);
+                break; 
             case "Rename":
                 if ($('#ip1').text()==jsonData.IP) {
                     $('#name1').text(jsonData.NewName);
                     $('#name2').text(jsonData.NewName);
                     $('#name3').text(jsonData.Name);
                 }
-                appendChat(jsonData.IP+"修改他的昵称为"+jsonData.NewName);
+                appendChat(jsonData.IP+" 修改他的昵称为 "+jsonData.NewName);
                 if (document.getElementById(jsonData.IP)) {
                     removeDiv(jsonData.IP);
                     appendUser($("<div id=" + jsonData.IP + "/>").text(jsonData.IP+" - "+jsonData.NewName));
@@ -546,9 +557,9 @@ if (window["WebSocket"]) {
                 break; 
             case "IN": 
                 if (!document.getElementById(jsonData.IP)) {
-                    appendUser($("<div id=" + jsonData.IP + "/>").text(jsonData.IP));
+                    appendUser($("<div id=" + jsonData.IP + "/>").text(jsonData.IP+" - "+jsonData.Name));
                 }
-                appendChat(jsonData.IP+" - "+jsonData.Name+"来到了平台");
+                appendChat(jsonData.IP+" - "+jsonData.Name+" 来到了平台");
                 break; 
             case "IP":
                 IP = jsonData.IP
@@ -562,12 +573,12 @@ if (window["WebSocket"]) {
             case "out": 
                 if (document.getElementById(jsonData.IP)) {
                     removeDiv(jsonData.IP);
-                    appendChat(jsonData.IP+" - "+jsonData.Name+'离开了平台，回家吃饭了');
+                    appendChat(jsonData.IP+" - "+jsonData.Name+' 离开了平台，回家吃饭了');
                 }
                 break; 
             case "createDoubleRoom":
                 appendRoom(jsonData);
-                appendChat(jsonData.IP+" - "+jsonData.Name+"创建了游戏"+jsonData.GameName);
+                appendChat(jsonData.IP+" - "+jsonData.Name+" 创建了游戏"+jsonData.GameName);
                 if (jsonData.IP == IP) {
                     activeButtons(1);
                     bindLocal();
@@ -576,7 +587,7 @@ if (window["WebSocket"]) {
                     $("#button_local-choose-rom").hide();
                     RoomID = jsonData.RoomID;
                     RoomPlayerNO = 1;
-                    appendRoomChat(jsonData.IP+" - "+jsonData.Name+"来到了双人房"+jsonData.RoomID);
+                    appendRoomChat(jsonData.IP+" - "+jsonData.Name+" 来到了双人房"+jsonData.RoomID);
                     updatePosition(jsonData);
                 }
                 break; 
@@ -589,22 +600,27 @@ if (window["WebSocket"]) {
                 break;
             case "leaveDoubleRoom":
                 updateRoomPlayerNum(jsonData);
-                appendRoomChat(jsonData.IP+" - "+jsonData.Name+"离开了双人房"+jsonData.RoomID);
+                appendRoomChat(jsonData.IP+" - "+jsonData.Name+" 离开了双人房"+jsonData.RoomID);
                 if (jsonData.Empty) {
                     if (document.getElementById("Room"+jsonData.RoomID)) {
                         removeDiv("Room"+jsonData.RoomID);
                     }
-                    appendRoomChat("双人房"+jsonData.RoomID+"已经被炸毁...");
+                    appendRoomChat("双人房"+jsonData.RoomID+" 已经被炸毁...");
                     if ( jsonData.RoomID == RoomID ) {
                         $("#leaveDoubleRoom").hide();
                         $("#readyDoubleRoom").hide();
                         $("#button_local-choose-rom").show();
                         RoomPlayerNO = 0;
                         RoomID = 0;
+                        activeButtons(1);
+                        disableButtons(false);
+                        bindLocal();
+                        $("#1-keyboard").show();
+                        $("#2-keyboard").show();
+                        updatePosition(jsonData);
+                        if(pc)
+                            pc.close();
                     }
-                }
-                if (jsonData.RoomID == RoomID) {
-                    updatePosition(jsonData);
                 }
                 if ( jsonData.IP == IP ) {
                     $("#leaveDoubleRoom").hide();
@@ -618,6 +634,8 @@ if (window["WebSocket"]) {
                     $("#1-keyboard").show();
                     $("#2-keyboard").show();
                     updatePosition(jsonData);
+                    if(pc)
+                            pc.close();
                 }
                 break; 
             case "joinDoubleRoomFailed":
@@ -634,7 +652,7 @@ if (window["WebSocket"]) {
                     updatePosition(jsonData);
                 }
                 if (jsonData.RoomID == RoomID) {
-                    appendRoomChat(jsonData.IP+" - "+jsonData.Name+"来到了双人房"+jsonData.RoomID);
+                    appendRoomChat(jsonData.IP+" - "+jsonData.Name+" 来到了双人房"+jsonData.RoomID);
                     updatePosition(jsonData);
                 }
                 break;

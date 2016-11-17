@@ -24,6 +24,7 @@
 
     <script src="/js/dynamicaudio.js" type="text/javascript" charset="utf-8"></script>
     <!--nes required-->
+    <!--<script src="/js/jsnes.min.js" type="text/javascript" charset="utf-8"></script>-->
     <script src="/js/jsnes/nes.js" type="text/javascript" charset="utf-8"></script>
     <script src="/js/jsnes/utils.js" type="text/javascript" charset="utf-8"></script>
     <script src="/js/jsnes/cpu.js" type="text/javascript" charset="utf-8"></script>
@@ -176,13 +177,14 @@
     <div class="modal fade" id="help-list" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
         <div class="modal-content">
             <div class="modal-body" align="left">
-                <p>双人房内所有玩家都准备好后游戏自动开始</p>
-                <p>按键设置默认为 <br>
-                    上下左右: WSAD <br>
-                    选择/确认: VB <br>
-                    A B: J K <br>
-                    X Y: U I</p>
                 <p>浏览器的宽度必须大于高度才能正常显示</p>
+                <p>右上角的按键分别为关于，帮助，重新开始，静音，按键设置</p>
+                <p>按键设置默认为 <br>
+                    上下左右:  W S A D <br>
+                    选择/确认: V B <br>
+                    A B:     J K <br>
+                    X Y:     U I</p>
+                <p>双人房内两只都准备好了才可以开始玩哦</p>
             </div>
         </div>
     </div>
@@ -190,13 +192,14 @@
         <div class="modal-content">
             <div class="modal-body" align="center">
                 <p>github: <a href="https://github.com/MeteorKL/nes-online">https://github.com/MeteorKL/nes-online</a></p>
+                <p>e-mail: meteor@juanix.cn</p>
             </div>
         </div>
     </div>
     <div class="modal fade" id="network-choose-rom-list" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
         <div class="modal-content">
             <div class="modal-body" id="network-rom-list" align="left">
-                <form id="form_rom_network"class="fupload" enctype="multipart/form-data" action="/upload" method="POST" onsubmit="return uploadRom('rom_network', true);">  
+                <form id="form_rom_network" class="fupload" enctype="multipart/form-data" action="/upload" method="POST" onsubmit="return uploadRom('#network-choose-rom-list', 'rom_network', true);">  
                     <a href="javascript:void(0)" class="upload-img"><label for="upload-file">选择本地rom</label></a>
                     <input id="rom_network" name="rom_network" type="file" />  
                     <div id="rom_network_name" class="rom_name" >未选择任何游戏</div>  
@@ -209,11 +212,11 @@
     <div class="modal fade" id="local-choose-rom-list" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
         <div class="modal-content">
             <div class="modal-body" id="local-rom-list" align="left">
-                <form id="form_rom_local"class="fupload" enctype="multipart/form-data" action="/upload" method="POST" onsubmit="return uploadRom('rom_local', false);">
+                <form id="form_rom_local" class="fupload" enctype="multipart/form-data" action="/upload" method="POST" onsubmit="return uploadRom('#local-choose-rom-list', 'rom_local', false);">
                     <a href="javascript:void(0)" class="upload-img"><label for="upload-file">选择本地rom</label></a>
                     <input id="rom_local" name="rom_local" type="file" /> 
                     <div id="rom_local_name" class="rom_name" >未选择任何游戏</div>  
-                    <input type="submit" value="创建游戏" />  
+                    <input type="submit" value="创建游戏" /> 
                 </form> 
                 {{.localRomlist}}
             </div>

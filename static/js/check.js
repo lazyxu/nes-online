@@ -21,7 +21,7 @@ if (check) {
     }
 } else {
     document.writeln("什么，你还在使用这么腊鸡的浏览器，还不快去下载 chrome / firefox 浏览器<br>");
-    document.writeln("要不你去玩<a href='alone'>单机版</a><br>");
+    document.writeln("如果你想要做一个吃瓜群众，点击<a href='p2p.new'>这里</a>吧，不过要注意你不能进行网络游戏哦<br>");
 }
 
 function checkGetUserMedia(){

@@ -11,7 +11,8 @@ body {
 #canvas {
     /*border: 1px solid #27b4e7;*/
     /*outline: 1px solid #27b4e7;*/
-    outline-width:1px;
+    outline-width: 0;
+    border: 0;
 }
 .position {
     position: fixed;
@@ -69,7 +70,7 @@ body {
     right: 0;
     height: 0;
     width: 100%;
-    z-index: 100;
+    z-index: 200;
     background:rgba(0,0,0,0);
 }
 .msg_container {
@@ -182,7 +183,7 @@ body {
     width/*\**/:10px\9;
     opacity:0;
     filter:alpha(opacity=0);
-    z-index:2;
+    z-index:400;
 }
 a.upload-img{
 	position: absolute;
@@ -346,7 +347,7 @@ a.upload-img:hover{
     right: 144px;
     bottom: 48px;
     left: 144px;
-    z-index: 1040;
+    z-index: 300;
     display: none;
     overflow: hidden;
     color: #a6e0f5;
@@ -606,6 +607,7 @@ a.upload-img:hover{
 }
 .video {
     border: 1px #091e26 solid;
+    z-index: 0;
 }
 .rom-button {
     color: #27b4e7;
