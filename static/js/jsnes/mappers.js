@@ -20,6 +20,9 @@ JSNES.Mappers = {};
 
 JSNES.Mappers[0] = function(nes) {
     this.nes = nes;
+    this.joy1StrobeState = 0;
+    this.joy2StrobeState = 0;
+    this.joypadLastWrite = 0;
 };
 
 JSNES.Mappers[0].prototype = {
@@ -788,7 +791,7 @@ JSNES.Mappers[1].prototype.switch32to16 = function() {
 };
 
 JSNES.Mappers[1].prototype.toJSON = function() {
-    var s = JSNES.Mappers[0].prototype.toJSON.apply(this);
+    var s = JSNES.Mappers[0].prototype.toJSON.call(this);
     s.mirroring = this.mirroring;
     s.oneScreenMirroring = this.oneScreenMirroring;
     s.prgSwitchingArea = this.prgSwitchingArea;
@@ -803,7 +806,7 @@ JSNES.Mappers[1].prototype.toJSON = function() {
 };
 
 JSNES.Mappers[1].prototype.fromJSON = function(s) {
-    JSNES.Mappers[0].prototype.fromJSON.apply(this, s);
+    JSNES.Mappers[0].prototype.fromJSON.call(this, s);
     this.mirroring = s.mirroring;
     this.oneScreenMirroring = s.oneScreenMirroring;
     this.prgSwitchingArea = s.prgSwitchingArea;
@@ -1103,7 +1106,7 @@ JSNES.Mappers[4].prototype.clockIrqCounter = function() {
 };
 
 JSNES.Mappers[4].prototype.toJSON = function() {
-    var s = JSNES.Mappers[0].prototype.toJSON.apply(this);
+    var s = JSNES.Mappers[0].prototype.toJSON.call(this);
     s.command = this.command;
     s.prgAddressSelect = this.prgAddressSelect;
     s.chrAddressSelect = this.chrAddressSelect;
@@ -1116,7 +1119,7 @@ JSNES.Mappers[4].prototype.toJSON = function() {
 };
 
 JSNES.Mappers[4].prototype.fromJSON = function(s) {
-    JSNES.Mappers[0].prototype.fromJSON.apply(this, s);
+    JSNES.Mappers[0].prototype.fromJSON.call(this, s);
     this.command = s.command;
     this.prgAddressSelect = s.prgAddressSelect;
     this.chrAddressSelect = s.chrAddressSelect;

@@ -8,6 +8,7 @@ var rooms = $("#rooms");
 var IP="";
 var RoomPlayerNO = 0;
 var RoomID = 0;
+var GameName = "";
 var network = false;
 var button_x = false; //85
 var button_y = false; //73
@@ -37,6 +38,7 @@ function loadRom(url) {
             else {
                 data = xhr.responseText;
             }
+            GameName = url;
             var ret = nes.loadRom(data);
             // document.getElementById("loaded").innerHTML = ret;
             // appendChat("ret: "+ret);

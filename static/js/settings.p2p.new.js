@@ -31,6 +31,7 @@ function init_size(){
         +"<span style='color: red'>[系统]</span>: 更多说明请点击右上角的帮助按钮(?) 或者 点击<a  data-toggle='modal' data-target='#help-list'>这里</a><br>"
         +"<span style='color: red'>[系统]</span>: 强烈建议在同一网络下进行游戏<br>"
         +"<span style='color: red'>[系统]</span>: 如果你收到的是av画质或者延迟无比巨大一定是因为主机的网络太垃圾，快去吐槽他<br>"
+        +"<span style='color: red'>[系统]: v1.5.2更新说明: 加入了保存游戏功能，装载游戏需要先创建该游戏才能起作用</span><br>"
         +"</div>");
         appendSys(sysInfo);
     }

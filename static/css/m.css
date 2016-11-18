@@ -261,6 +261,38 @@ a.upload-img:hover{
     outline: none;
     background:url('/images/m/ic_restart.png');
 }
+.button_save {
+    position: absolute;
+    left: -411px;
+    top: 144px;
+    height: 41px;
+    width: 137px;
+    padding: 0;
+    border: none;
+    outline: none;
+    color: #27b4e7;
+    background:url('/images/m/button_panel.png');
+}
+.button_save:hover {
+    color: #a6e0f5;
+    background:url('/images/m/button_panel_over.png');
+}
+.button_load {
+    position: absolute;
+    left: -274px;
+    top: 144px;
+    height: 41px;
+    width: 137px;
+    padding: 0;
+    border: none;
+    outline: none;
+    color: #27b4e7;
+    background:url('/images/m/button_panel.png');
+}
+.button_load:hover {
+    color: #a6e0f5;
+    background:url('/images/m/button_panel_over.png');
+}
 .button_stop {
     position: absolute;
     left: -137px;

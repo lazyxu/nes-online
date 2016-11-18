@@ -1,10 +1,20 @@
 # nes online
+forked from [bfirsh/jsnes](https://github.com/bfirsh/jsnes)  
 http://nes.juanix.cn:8080   
   
-运行 go run *.go  
-编译 go build -o main *.go  
+run: go run *.go  
+compile: go build -o main *.go  
   
-# 版本变动  
+# Thanks to
+JSNES: https://github.com/bfirsh/jsnes  
+Inszva: http://blog.csdn.net/inszva/article/details/52840393  
+localStorage & Gamepad: https://github.com/josephlewis42/jsnes
+UI: Nostalgia.NES  
+
+# logs 
+## v1.5.2  
+加入了游戏状态本地存储功能...  
+  
 ## v1.5.1.2  
 删除文件没有同步...  
 
@@ -114,13 +124,6 @@ canvas.toDataURL()保存为图片的方法也不行
 指令传到服务器再传到其他客户端进行相应的响应   
   
 效果感人...  
-  
-# Thanks to
-Inszva: http://blog.csdn.net/inszva/article/details/52840393  
-JSNES: https://github.com/bfirsh/jsnes  
-UI: Nostalgia.NES  
-  
-Gamepad: https://github.com/josephlewis42/jsnes  
   
 # License
 JSNES, based on Jamie Sanders' vNES  

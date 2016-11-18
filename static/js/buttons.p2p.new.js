@@ -365,6 +365,7 @@ function uploadRom (modalID, id, network) {
     for ( var i = 0; i < fileList.length; i++) {
 　　　   var reader = new FileReader();
         reader.readAsBinaryString(fileList[i]);
+        GameName = fileList[i].name;
         if (network)
             createDoubleRoom(fileList[i].name);
         reader.onload = function loaded(evt) {
@@ -383,4 +384,40 @@ function uploadRom (modalID, id, network) {
         }
     }
     $(modalID).modal('hide');
+};
+
+document.getElementById('button_save').onclick = function() {
+    var rompath = escape(GameName);
+    console.log("saving " + rompath);
+    var currData = nes.toJSON();
+    var saveData = JSON.stringify(currData);
+    try{
+        localStorage.setItem(calcMD5(rompath), saveData);
+    }catch(oException){
+        if(oException.name == 'QuotaExceededError'){
+            console.log('超出本地存储限额！');
+            //如果历史信息不重要了，可清空后再设置
+            localStorage.clear();
+            localStorage.setItem(calcMD5(rompath), saveData);
+        }
+    }
+
+};
+
+document.getElementById('button_load').onclick = function() {
+    var rompath = escape(GameName);
+    console.log("loading " + rompath);
+
+    var saveData = localStorage.getItem(calcMD5(rompath));
+    if( saveData == null ) {
+        console.log("nothing to load");
+        alert("You must save before loading.");
+        return;
+    }
+    var decodedData = JSON.parse(saveData);
+    console.log(saveData.length);
+    // console.log(strlen(decodedData));
+    console.log(decodedData);
+    nes.fromJSON(decodedData);
+    nes.start();
 };
