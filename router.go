@@ -61,6 +61,10 @@ func p2pnewHandler(w http.ResponseWriter, r *http.Request) {
 	args := map[string]string{"Host1": r.Host, "version": version}
 	renderHTML(w, "p2p.new.html", args)
 }
+func nesHandler(w http.ResponseWriter, r *http.Request) {
+	args := map[string]string{"Host1": r.Host, "version": version}
+	renderHTML(w, "nes.html", args)
+}
 func csHandler(w http.ResponseWriter, r *http.Request) {
 	args := map[string]string{"Host1": r.Host, "version": version}
 	renderHTML(w, "cs.html", args)
@@ -131,5 +135,6 @@ func routerInit() {
 	http.HandleFunc("/p2p", p2pHandler)
 	http.HandleFunc("/p2p.m", p2pmHandler)
 	http.HandleFunc("/p2p.new", p2pnewHandler)
+	http.HandleFunc("/nes", nesHandler)
 	http.HandleFunc("/ws", wsHandler)
 }

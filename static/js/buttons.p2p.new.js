@@ -365,12 +365,12 @@ function uploadRom (modalID, id, network) {
     for ( var i = 0; i < fileList.length; i++) {
 　　　   var reader = new FileReader();
         reader.readAsBinaryString(fileList[i]);
-        GameName = fileList[i].name;
+        GameName = fileList[i].name.split(".")[0];
         if (network)
-            createDoubleRoom(fileList[i].name);
+            createDoubleRoom(GameName);
         reader.onload = function loaded(evt) {
             var binaryString = evt.target.result;
-            nes.loadRom(binaryString)
+            nes.loadRom(binaryString, GameName);
             nes.start();
             // appendChat("upload file"+i);
             // appendChat(binaryString);
@@ -387,35 +387,48 @@ function uploadRom (modalID, id, network) {
 };
 
 document.getElementById('button_save').onclick = function() {
-    var rompath = escape(GameName);
-    console.log("saving " + rompath);
+    console.log("saving " + GameName);
     var currData = nes.toJSON();
     var saveData = JSON.stringify(currData);
+
+    var temp = JSON.stringify(currData.cpu);
+    console.log("cpu: "+temp.length);
+    temp = JSON.stringify(currData.cpu.mem);
+    console.log("cpu.mem: "+temp.length);
+    temp = JSON.stringify(currData.mmap);
+    console.log("mmap: "+temp.length);
+    temp = JSON.stringify(currData.ppu);
+    console.log("ppu: "+temp.length);
+    temp = JSON.stringify(currData.romData);
+    console.log("romData: "+temp.length);
+    console.log("total: "+saveData.length);
+    console.log(currData);
     try{
-        localStorage.setItem(calcMD5(rompath), saveData);
+        localStorage.setItem(GameName, saveData);
+        for(var i=localStorage.length - 1 ; i >=0; i--){
+	console.log('第'+ (i+1) +'条数据的键值为：' + localStorage.key(i));
+}
     }catch(oException){
         if(oException.name == 'QuotaExceededError'){
             console.log('超出本地存储限额！');
             //如果历史信息不重要了，可清空后再设置
             localStorage.clear();
-            localStorage.setItem(calcMD5(rompath), saveData);
+            localStorage.setItem(GameName, saveData);
         }
     }
 
 };
 
 document.getElementById('button_load').onclick = function() {
-    var rompath = escape(GameName);
-    console.log("loading " + rompath);
+    console.log("loading " + GameName);
 
-    var saveData = localStorage.getItem(calcMD5(rompath));
+    var saveData = localStorage.getItem(GameName);
     if( saveData == null ) {
         console.log("nothing to load");
         alert("You must save before loading.");
         return;
     }
     var decodedData = JSON.parse(saveData);
-    console.log(saveData.length);
     // console.log(strlen(decodedData));
     console.log(decodedData);
     nes.fromJSON(decodedData);

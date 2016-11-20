@@ -101,6 +101,7 @@ JSNES.CPU.prototype = {
         var opinf = this.op[nes.mmap.load(this.reg.PC+1)];
         var opcode = opinf & 0xFF;
         var addrMode = (opinf >> 8) & 0xFF;
+        this.reg.PC += ((opinf >> 16) & 0xFF); // PC 加上指令长度
         var cycleCount = (opinf>>24);
         var cycleAdd = 0;
 
@@ -632,7 +633,7 @@ JSNES.CPU.prototype = {
                 break;
 
         }// end of switch
-        this.reg.PC += ((opinf >> 16) & 0xFF); // PC 加上指令长度
+
         return cycleCount;
     },
 

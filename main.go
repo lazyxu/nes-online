@@ -58,8 +58,8 @@ func gerRomList(dirPath string, suffix string) {
 			if len(result) > 1 {
 				name = result[1]
 			}
-			networkRomlist += "<button class='rom-button' data-dismiss='modal' aria-hidden='true'  id='rom-" + strconv.Itoa(i) + "' data-dismiss=\"modal\" onclick=\"loadRom('" + path + "');createDoubleRoom('" + path + "','" + name + "');\">" + name + "</button><br>"
-			localRomlist += "<button class='rom-button' data-dismiss='modal' aria-hidden='true'  onclick=\"loadRom('" + path + "');\">" + name + "</button><br>"
+			networkRomlist += "<button class='rom-button' data-dismiss='modal' aria-hidden='true'  id='rom-" + strconv.Itoa(i) + "' data-dismiss=\"modal\" onclick=\"loadRom('" + path + "', '" + name + "');createDoubleRoom('" + name + "');\">" + name + "</button><br>"
+			localRomlist += "<button class='rom-button' data-dismiss='modal' aria-hidden='true'  onclick=\"loadRom('" + path + "', '" + name + "');\">" + name + "</button><br>"
 			gamePathList += "<div id='" + strconv.Itoa(i) + "' hidden>" + path + "</div>"
 			i++
 		}
@@ -78,6 +78,7 @@ func main() {
 	updateRomlistInHTML("static/template/cs.html", "static/views/cs.html", "network")
 	updateRomlistInHTML("static/template/p2p.html", "static/views/p2p.html", "network")
 	updateRomlistInHTML("static/template/p2p.new.html", "static/views/p2p.new.html", "both")
+	updateRomlistInHTML("static/template/nes.html", "static/views/nes.html", "both")
 	updateRomlistInHTML("static/template/alone.html", "static/views/alone.html", "local")
 
 	routerInit()

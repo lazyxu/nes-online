@@ -1,6 +1,25 @@
+/*
+JSNES, based on Jamie Sanders' vNES
+Copyright (C) 2010 Ben Firshman
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
 // Keyboard events are bound in the UI
-NES.Keyboard = function() {
+JSNES.Keyboard = function() {
+    var i;
+    
     this.keys = {
         KEY_A: 0,
         KEY_B: 1,
@@ -39,11 +58,11 @@ NES.Keyboard = function() {
     };
 
     this.state1 = new Array(8);
-    for (var i = 0; i < this.state1.length; i++) {
+    for (i = 0; i < this.state1.length; i++) {
         this.state1[i] = 0x40;
     }
     this.state2 = new Array(8);
-    for (var i = 0; i < this.state2.length; i++) {
+    for (i = 0; i < this.state2.length; i++) {
         this.state2[i] = 0x40;
     }
     var IntervalX1 = null;
@@ -52,7 +71,7 @@ NES.Keyboard = function() {
     var IntervalY2 = null;
 };
 
-NES.Keyboard.prototype = {
+JSNES.Keyboard.prototype = {
     setKey: function(key, value) {
         var ret = 0;
         switch (key) {
@@ -358,4 +377,20 @@ NES.Keyboard.prototype = {
             // evt.preventDefault();
         }
     },
+
+    keyDown2: function(evt) {
+        if (!this.setKey2(evt.keyCode, 0x41) && evt.preventDefault) {
+            // evt.preventDefault();
+        }
+    },
+    
+    keyUp2: function(evt) {
+        if (!this.setKey2(evt.keyCode, 0x40) && evt.preventDefault) {
+            // evt.preventDefault();
+        }
+    },
+    
+    keyPress: function(evt) {
+        // evt.preventDefault();
+    }
 };

@@ -13,7 +13,7 @@ var network = false;
 var button_x = false; //85
 var button_y = false; //73
 var chatPos = "Msg";
-function loadRom(url) {
+function loadRom(url, game) {
     $.ajax({
         url: url,
         xhr: function() {
@@ -38,7 +38,7 @@ function loadRom(url) {
             else {
                 data = xhr.responseText;
             }
-            GameName = url;
+            GameName = game;
             var ret = nes.loadRom(data);
             // document.getElementById("loaded").innerHTML = ret;
             // appendChat("ret: "+ret);
