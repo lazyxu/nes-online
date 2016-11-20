@@ -221,7 +221,7 @@ JSNES.CPU.prototype = {
                 // indexed, but with the high byte.
                 addr = this.load16bit(opaddr+2);
                 if((addr&0xFF00)!=((addr+this.REG_X)&0xFF00)){
-                    cycleAdd = 1;
+                    cycleAdd = 1; // Add one cycle if indexing crosses a page boundary
                 }
                 addr+=this.REG_X;
                 break;
@@ -1492,102 +1492,6 @@ JSNES.CPU.OpData = function() {
     
     // TYA:
     this.setOp(this.INS_TYA,0x98,this.ADDR_IMP,1,2);
-    
-    this.cycTable = new Array(
-    /*0x00*/ 7,6,2,8,3,3,5,5,3,2,2,2,4,4,6,6,
-    /*0x10*/ 2,5,2,8,4,4,6,6,2,4,2,7,4,4,7,7,
-    /*0x20*/ 6,6,2,8,3,3,5,5,4,2,2,2,4,4,6,6,
-    /*0x30*/ 2,5,2,8,4,4,6,6,2,4,2,7,4,4,7,7,
-    /*0x40*/ 6,6,2,8,3,3,5,5,3,2,2,2,3,4,6,6,
-    /*0x50*/ 2,5,2,8,4,4,6,6,2,4,2,7,4,4,7,7,
-    /*0x60*/ 6,6,2,8,3,3,5,5,4,2,2,2,5,4,6,6,
-    /*0x70*/ 2,5,2,8,4,4,6,6,2,4,2,7,4,4,7,7,
-    /*0x80*/ 2,6,2,6,3,3,3,3,2,2,2,2,4,4,4,4,
-    /*0x90*/ 2,6,2,6,4,4,4,4,2,5,2,5,5,5,5,5,
-    /*0xA0*/ 2,6,2,6,3,3,3,3,2,2,2,2,4,4,4,4,
-    /*0xB0*/ 2,5,2,5,4,4,4,4,2,4,2,4,4,4,4,4,
-    /*0xC0*/ 2,6,2,8,3,3,5,5,2,2,2,2,4,4,6,6,
-    /*0xD0*/ 2,5,2,8,4,4,6,6,2,4,2,7,4,4,7,7,
-    /*0xE0*/ 2,6,3,8,3,3,5,5,2,2,2,2,4,4,6,6,
-    /*0xF0*/ 2,5,2,8,4,4,6,6,2,4,2,7,4,4,7,7
-    );
-    
-    
-    this.instname = new Array(56);
-    
-    // Instruction Names:
-    this.instname[ 0] = "ADC";
-    this.instname[ 1] = "AND";
-    this.instname[ 2] = "ASL";
-    this.instname[ 3] = "BCC";
-    this.instname[ 4] = "BCS";
-    this.instname[ 5] = "BEQ";
-    this.instname[ 6] = "BIT";
-    this.instname[ 7] = "BMI";
-    this.instname[ 8] = "BNE";
-    this.instname[ 9] = "BPL";
-    this.instname[10] = "BRK";
-    this.instname[11] = "BVC";
-    this.instname[12] = "BVS";
-    this.instname[13] = "CLC";
-    this.instname[14] = "CLD";
-    this.instname[15] = "CLI";
-    this.instname[16] = "CLV";
-    this.instname[17] = "CMP";
-    this.instname[18] = "CPX";
-    this.instname[19] = "CPY";
-    this.instname[20] = "DEC";
-    this.instname[21] = "DEX";
-    this.instname[22] = "DEY";
-    this.instname[23] = "EOR";
-    this.instname[24] = "INC";
-    this.instname[25] = "INX";
-    this.instname[26] = "INY";
-    this.instname[27] = "JMP";
-    this.instname[28] = "JSR";
-    this.instname[29] = "LDA";
-    this.instname[30] = "LDX";
-    this.instname[31] = "LDY";
-    this.instname[32] = "LSR";
-    this.instname[33] = "NOP";
-    this.instname[34] = "ORA";
-    this.instname[35] = "PHA";
-    this.instname[36] = "PHP";
-    this.instname[37] = "PLA";
-    this.instname[38] = "PLP";
-    this.instname[39] = "ROL";
-    this.instname[40] = "ROR";
-    this.instname[41] = "RTI";
-    this.instname[42] = "RTS";
-    this.instname[43] = "SBC";
-    this.instname[44] = "SEC";
-    this.instname[45] = "SED";
-    this.instname[46] = "SEI";
-    this.instname[47] = "STA";
-    this.instname[48] = "STX";
-    this.instname[49] = "STY";
-    this.instname[50] = "TAX";
-    this.instname[51] = "TAY";
-    this.instname[52] = "TSX";
-    this.instname[53] = "TXA";
-    this.instname[54] = "TXS";
-    this.instname[55] = "TYA";
-    
-    this.addrDesc = new Array(
-        "Zero Page           ",
-        "Relative            ",
-        "Implied             ",
-        "Absolute            ",
-        "Accumulator         ",
-        "Immediate           ",
-        "Zero Page,X         ",
-        "Zero Page,Y         ",
-        "Absolute,X          ",
-        "Absolute,Y          ",
-        "Preindexed Indirect ",
-        "Postindexed Indirect",
-        "Indirect Absolute   "
-    );
 }
 
 JSNES.CPU.OpData.prototype = {

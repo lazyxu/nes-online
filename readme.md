@@ -12,6 +12,9 @@ localStorage & Gamepad: https://github.com/josephlewis42/jsnes
 UI: Nostalgia.NES  
 
 # logs 
+## about jsnes
+想读一下源码，并且根据自己的理解写一个类似的模拟器，不知道能不能坚持下去orz
+
 ## v1.5.2  
 加入了游戏状态本地存储功能...  
   

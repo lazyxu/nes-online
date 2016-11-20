@@ -13,7 +13,7 @@ import (
 var localRomlist string
 var networkRomlist string
 var gamePathList string
-var version = "NES Online v1.5.1"
+var version = "NES Online v1.5.2"
 
 func updateRomlistInHTML(src string, des string, opt string) {
 	data, _ := ioutil.ReadFile(src)
@@ -71,7 +71,7 @@ func main() {
 	localRomlist = ""
 	networkRomlist = ""
 	gamePathList = ""
-	gerRomList("upload/", ".nes")
+	// gerRomList("upload/", ".nes")
 	gerRomList("roms/CN/", ".nes")
 	gerRomList("roms/", ".nes")
 
@@ -86,7 +86,7 @@ func main() {
 	h.init()
 
 	// http
-	if err := http.ListenAndServe(":8081", nil); err != nil {
+	if err := http.ListenAndServe(":8080", nil); err != nil {
 		log.Fatal("ListenAndServe:", err)
 	}
 	// if err := http.ListenAndServeTLS(":8080", "server.pem", "server.key", nil); err != nil {
