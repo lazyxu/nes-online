@@ -94,6 +94,16 @@ JSNES.Mappers[0].prototype = {
         }
     },
 
+    load16bit: function(addr){
+        if (addr < 0x1FFF) {
+            return this.nes.cpu.mem[addr&0x7FF] 
+                | (this.nes.cpu.mem[(addr+1)&0x7FF]<<8);
+        }
+        else {
+            return this.nes.mmap.load(addr) | (this.nes.mmap.load(addr+1) << 8);
+        }
+    },
+
     regLoad: function(address) {
         switch (address >> 12) { // use fourth nibble (0xF000)
             case 0:
@@ -609,13 +619,11 @@ JSNES.Mappers[1].prototype.setReg = function(reg, value) {
                 this.mirroring = tmp;
                 if ((this.mirroring & 2) === 0) {
                     // SingleScreen mirroring overrides the other setting:
-                    this.nes.ppu.setMirroring(
-                        this.nes.rom.SINGLESCREEN_MIRRORING);
+                    this.nes.ppu.setMirroring(this.nes.rom.SINGLESCREEN_MIRRORING);
                 }
                 // Not overridden by SingleScreen mirroring.
                 else if ((this.mirroring & 1) !== 0) {
-                    this.nes.ppu.setMirroring(
-                        this.nes.rom.HORIZONTAL_MIRRORING
+                    this.nes.ppu.setMirroring(this.nes.rom.HORIZONTAL_MIRRORING
                     );
                 }
                 else {
@@ -908,9 +916,7 @@ JSNES.Mappers[4].prototype.write = function(address, value) {
         case 0xA000:        
             // Mirroring select
             if ((value & 1) !== 0) {
-                this.nes.ppu.setMirroring(
-                    this.nes.rom.HORIZONTAL_MIRRORING
-                );
+                this.nes.ppu.setMirroring(this.nes.rom.HORIZONTAL_MIRRORING);
             }
             else {
                 this.nes.ppu.setMirroring(this.nes.rom.VERTICAL_MIRRORING);

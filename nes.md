@@ -118,49 +118,14 @@ C  =  CARRY. Set if the add produced a carry, or if the subtraction
 ### 主内存
 NES 主内存布局（cpu内部）查看附录
 
-## mappers.js
+## ppu.js
+### Name Tables
+--------------
+NES使用马赛克矩阵进行图形显示; 
+这样的格子被叫做 Name Table. 马赛克是 8x8像素 [pixels].
+完整的 Name Table 有 32*30 个马赛克 (256*240 像素). 
 
-### Mappers[0]
-#### [0, 0x2000) RAM (mirrored)
-mem[address & 0x7FF]
-0x01FF REG_SP
-
-#### (0x4017, 0x8000] ROM
-
-[0x6000, 0x8000) Write to SaveRAM. Store in file
-
-#### [0x8000, 0xFFFF] ROM
-REG_PC 0x8000 - 1
-
-'mem', 'cyclesToHalt', 'irqRequested', 'irqType',
-// Registers
-'REG_ACC', 'REG_X', 'REG_Y', 'REG_SP', 'REG_PC', 'REG_PC_NEW',
-'REG_STATUS',
-// Status
-'F_CARRY', 'F_DECIMAL', 'F_INTERRUPT', 'F_INTERRUPT_NEW', 'F_OVERFLOW', 
-'F_SIGN', 'F_ZERO', 'F_NOTUSED', 'F_NOTUSED_NEW', 'F_BRK', 'F_BRK_NEW'
-
-#### [0x2000, 0x4017] I/O Ports
-		
-##### 0x2000, 0x3000 PPU Registers
-0x2000 PPU Control Register 1
-0x2001 PPU Control Register 2
-0x2002 PPU Status Register
-0x2003 Sprite RAM address
-0x2004 Sprite RAM
-0x2005 Screen Scroll offsets
-0x2006 VRAM address
-0x2007 VRAM
-
-##### (0x2000, 0x4000) Sound registers
-
-##### 0x4000 Sound+Joypad registers
-0x4014 Sprite Memory DMA Access
-0x4015 Sound channel Switch, DMC Status
-0x4016 Joystick 1 + Strobe
-0x4017 Joystick 2 + Strobe Sound channel frame sequencer
-
-### Mappers[1]
+Name Tables 之中的马赛克的资料被保存在 Pattern Table 之中 (continue on).
 
 
 ## 附录

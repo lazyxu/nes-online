@@ -15,13 +15,15 @@ if ( u.indexOf('Android') > -1 || u.indexOf('iPhone') > -1 || u.indexOf('iPad') 
 }
 if (check) {
     if (dest == "mobile") {
+        // showBrowserFps();
         window.location.href = "p2p.new";
     } else if (dest == "PC") {
+        // showBrowserFps();
         window.location.href = "p2p.new";
     }
 } else {
     document.writeln("什么，你还在使用这么腊鸡的浏览器，还不快去下载 chrome / firefox 浏览器<br>");
-    document.writeln("如果你想要做一个吃瓜群众，点击<a href='p2p.new'>这里</a>吧，不过要注意你不能进行网络游戏哦<br>");
+    document.writeln("如果你只是想玩玩单机游戏，点击<a href='p2p.new'>这里</a>吧，不过要注意你不能进行网络游戏哦<br>");
 }
 
 function checkGetUserMedia(){
@@ -85,4 +87,19 @@ function checkVideo() {
         document.writeln("Not support HTML5 Video, please try Chrome or Firefox.<br>");
         return false;  
     }  
+}
+var fps;
+var t1 = 0, t2 = 0;
+var ccc = 0;
+
+function showBrowserFps() { 
+        requestAnimationFrame(showBrowserFps);
+        if (t1==0)
+            t1= +new Date();
+        else {
+            t2 = t1;
+            t1 = +new Date();
+            document.writeln("fps: "+1000/(t1-t2)+"<br>");
+        }
+        // ... Code for Drawing the Frame ... 
 }

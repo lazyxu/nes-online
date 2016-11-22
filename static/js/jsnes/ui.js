@@ -138,23 +138,33 @@ if (typeof jQuery !== 'undefined') {
                     return this.dynamicaudio.writeInt(samples);
                 },
             
-                writeFrame: function(buffer, prevBuffer) {
+                writeFrame: function(buffer) {
                     var imageData = this.canvasImageData.data;
                     var pixel, i, j;
-
-                    for (i=0; i<256*240; i++) {
-                        pixel = buffer[i];
-
-                        if (pixel != prevBuffer[i]) {
-                            j = i*4;
-                            imageData[j] = pixel & 0xFF;
-                            imageData[j+1] = (pixel >> 8) & 0xFF;
-                            imageData[j+2] = (pixel >> 16) & 0xFF;
-                            prevBuffer[i] = pixel;
+                    for (i=8;i<232;i++)
+                        for(j=8;j<248;j++) {
+                            var index = (i<<8)+j;
+                            pixel = buffer[index];
+                            index = index<<2;
+                            imageData[index] = pixel & 0xFF; // r
+                            imageData[index+1] = (pixel >> 8) & 0xFF; // g
+                            imageData[index+2] = (pixel >> 16) & 0xFF; // b
                         }
-                    }
                     this.canvasContext.putImageData(this.canvasImageData, 0, 0);
-                }
+                },
+                // writeScanline: function(buffer, y) {
+                //     var imageData = this.canvasImageData.data;
+                //     var pixel, i, j, start;
+                //     start = 256*y;
+                //     for (i=0; i<256; i++) {
+                //         pixel = buffer[i+start];
+                //         j = i*4;
+                //         imageData[j] = pixel & 0xFF;
+                //         imageData[j+1] = (pixel >> 8) & 0xFF;
+                //         imageData[j+2] = (pixel >> 16) & 0xFF;
+                //     }
+                //     this.canvasContext.putImageData(this.canvasImageData, 0, 0);
+                // }
             };
         
             return UI;

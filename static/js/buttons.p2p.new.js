@@ -399,6 +399,8 @@ document.getElementById('button_save').onclick = function() {
     console.log("mmap: "+temp.length);
     temp = JSON.stringify(currData.ppu);
     console.log("ppu: "+temp.length);
+    temp = JSON.stringify(currData.ppu.ptTile);
+    console.log("ppu.ptTile: "+temp.length);
     temp = JSON.stringify(currData.romData);
     console.log("romData: "+temp.length);
     console.log("total: "+saveData.length);

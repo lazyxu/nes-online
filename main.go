@@ -13,7 +13,7 @@ import (
 var localRomlist string
 var networkRomlist string
 var gamePathList string
-var version = "NES Online v1.5.2"
+var version = "NES Online v1.5.3"
 
 func updateRomlistInHTML(src string, des string, opt string) {
 	data, _ := ioutil.ReadFile(src)

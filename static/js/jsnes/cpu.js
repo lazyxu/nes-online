@@ -152,12 +152,12 @@ JSNES.CPU.prototype = {
             case 0:
                 // Zero Page mode. Use the address given after the opcode, 
                 // but without high byte.
-                addr = this.load(opaddr+2);
+                addr = this.nes.mmap.load(opaddr+2);
                 break;
 
             case 1:
                 // Relative mode.
-                addr = this.load(opaddr+2);
+                addr = this.nes.mmap.load(opaddr+2);
                 if(addr<0x80){
                     addr += this.reg.PC;
                 }else{
@@ -170,7 +170,7 @@ JSNES.CPU.prototype = {
             case 3:
                 // Absolute mode. Use the two bytes following the opcode as 
                 // an address.
-                addr = this.load16bit(opaddr+2);
+                addr = this.nes.mmap.load16bit(opaddr+2);
                 break;
             case 4:
                 // Accumulator mode. The address is in the accumulator 
@@ -185,19 +185,19 @@ JSNES.CPU.prototype = {
                 // Zero Page Indexed mode, X as index. Use the address given 
                 // after the opcode, then add the
                 // X register to it to get the final address.
-                addr = (this.load(opaddr+2)+this.reg.X)&0xFF;
+                addr = (this.nes.mmap.load(opaddr+2)+this.reg.X)&0xFF;
                 break;
             case 7:
                 // Zero Page Indexed mode, Y as index. Use the address given 
                 // after the opcode, then add the
                 // Y register to it to get the final address.
-                addr = (this.load(opaddr+2)+this.reg.Y)&0xFF;
+                addr = (this.nes.mmap.load(opaddr+2)+this.reg.Y)&0xFF;
                 break;
             case 8:
                 // Absolute Indexed Mode, X as index. Same as zero page 
                 // indexed, but with the high byte.
-                addr = this.load16bit(opaddr+2);
-                if((addr&0xFF00)!=((addr+this.reg.X)&0xFF00)){
+                addr = this.nes.mmap.load16bit(opaddr+2);
+                if( this.pageCrossed(addr, addr+this.reg.X) ){
                     cycleAdd = 1; // Add one cycle if indexing crosses a page boundary
                 }
                 addr+=this.reg.X;
@@ -205,8 +205,8 @@ JSNES.CPU.prototype = {
             case 9:
                 // Absolute Indexed Mode, Y as index. Same as zero page 
                 // indexed, but with the high byte.
-                addr = this.load16bit(opaddr+2);
-                if((addr&0xFF00)!=((addr+this.reg.Y)&0xFF00)){
+                addr = this.nes.mmap.load16bit(opaddr+2);
+                if( this.pageCrossed(addr, addr+this.reg.Y) ){
                     cycleAdd = 1;
                 }
                 addr+=this.reg.Y;
@@ -216,13 +216,13 @@ JSNES.CPU.prototype = {
                 // starting at the given location plus
                 // the current X register. The value is the contents of that 
                 // address.
-                addr = this.load(opaddr+2);
-                if((addr&0xFF00)!=((addr+this.reg.X)&0xFF00)){
+                addr = this.nes.mmap.load(opaddr+2);
+                if( this.pageCrossed(addr, addr+this.reg.X) ){
                     cycleAdd = 1;
                 }
                 addr+=this.reg.X;
                 addr&=0xFF;
-                addr = this.load16bit(addr);
+                addr = this.nes.mmap.load16bit(addr);
                 break;
             case 11:
                 // Post-indexed Indirect mode. Find the 16-bit address 
@@ -230,8 +230,8 @@ JSNES.CPU.prototype = {
                 // (and the one following). Add to that address the contents 
                 // of the Y register. Fetch the value
                 // stored at that adress.
-                addr = this.load16bit(this.load(opaddr+2));
-                if((addr&0xFF00)!=((addr+this.reg.Y)&0xFF00)){
+                addr = this.nes.mmap.load16bit(this.nes.mmap.load(opaddr+2));
+                if( this.pageCrossed(addr, addr+this.reg.Y) ){
                     cycleAdd = 1;
                 }
                 addr+=this.reg.Y;
@@ -239,7 +239,7 @@ JSNES.CPU.prototype = {
             case 12:
                 // Indirect Absolute mode. Find the 16-bit address contained 
                 // at the given location.
-                addr = this.load16bit(opaddr+2);// Find op
+                addr = this.nes.mmap.load16bit(opaddr+2);// Find op
                 if(addr < 0x1FFF) {
                     addr = this.mem[addr] + (this.mem[(addr & 0xFF00) | (((addr & 0xFF) + 1) & 0xFF)] << 8);// Read from address given in op
                 }
@@ -263,8 +263,8 @@ JSNES.CPU.prototype = {
                 // *******
 
                 // Add with carry.
-                temp = this.reg.A + this.load(addr) + this.reg.flag.Canny;
-                this.reg.flag.Overflow = ((!(((this.reg.A ^ this.load(addr)) & 0x80)!=0) && (((this.reg.A ^ temp) & 0x80))!=0)?1:0);
+                temp = this.reg.A + this.nes.mmap.load(addr) + this.reg.flag.Canny;
+                this.reg.flag.Overflow = ((!(((this.reg.A ^ this.nes.mmap.load(addr)) & 0x80)!=0) && (((this.reg.A ^ temp) & 0x80))!=0)?1:0);
                 this.reg.flag.Canny = (temp>255?1:0);
                 this.reg.flag.Sign = (temp>>7)&1;
                 this.reg.flag.Zero = temp&0xFF;
@@ -278,7 +278,7 @@ JSNES.CPU.prototype = {
                 // *******
 
                 // AND memory with accumulator.
-                this.reg.A = this.reg.A & this.load(addr);
+                this.reg.A = this.reg.A & this.nes.mmap.load(addr);
                 this.reg.flag.Sign = (this.reg.A>>7)&1;
                 this.reg.flag.Zero = this.reg.A;
                 //this.reg.A = temp;
@@ -299,12 +299,12 @@ JSNES.CPU.prototype = {
 
                 }else{
 
-                    temp = this.load(addr);
+                    temp = this.nes.mmap.load(addr);
                     this.reg.flag.Canny = (temp>>7)&1;
                     temp = (temp<<1)&255;
                     this.reg.flag.Sign = (temp>>7)&1;
                     this.reg.flag.Zero = temp;
-                    this.write(addr, temp);
+                    this.nes.mmap.write(addr, temp);
 
                 }
                 break;
@@ -354,7 +354,7 @@ JSNES.CPU.prototype = {
                 // * BIT *
                 // *******
 
-                temp = this.load(addr);
+                temp = this.nes.mmap.load(addr);
                 this.reg.flag.Sign = (temp>>7)&1;
                 this.reg.flag.Overflow = (temp>>6)&1;
                 temp &= this.reg.A;
@@ -424,7 +424,7 @@ JSNES.CPU.prototype = {
 
                 this.reg.flag.IRQDisable = 1;
                 //this.reg.PC = load(0xFFFE) | (load(0xFFFF) << 8);
-                this.reg.PC = this.load16bit(0xFFFE);
+                this.reg.PC = this.nes.mmap.load16bit(0xFFFE);
                 this.reg.PC--;
                 break;
 
@@ -501,7 +501,7 @@ JSNES.CPU.prototype = {
                 // *******
 
                 // Compare memory and accumulator:
-                temp = this.reg.A - this.load(addr);
+                temp = this.reg.A - this.nes.mmap.load(addr);
                 this.reg.flag.Canny = (temp>=0?1:0);
                 this.reg.flag.Sign = (temp>>7)&1;
                 this.reg.flag.Zero = temp&0xFF;
@@ -515,7 +515,7 @@ JSNES.CPU.prototype = {
                 // *******
 
                 // Compare memory and index X:
-                temp = this.reg.X - this.load(addr);
+                temp = this.reg.X - this.nes.mmap.load(addr);
                 this.reg.flag.Canny = (temp>=0?1:0);
                 this.reg.flag.Sign = (temp>>7)&1;
                 this.reg.flag.Zero = temp&0xFF;
@@ -528,7 +528,7 @@ JSNES.CPU.prototype = {
                 // *******
 
                 // Compare memory and index Y:
-                temp = this.reg.Y - this.load(addr);
+                temp = this.reg.Y - this.nes.mmap.load(addr);
                 this.reg.flag.Canny = (temp>=0?1:0);
                 this.reg.flag.Sign = (temp>>7)&1;
                 this.reg.flag.Zero = temp&0xFF;
@@ -541,10 +541,10 @@ JSNES.CPU.prototype = {
                 // *******
 
                 // Decrement memory by one:
-                temp = (this.load(addr)-1)&0xFF;
+                temp = (this.nes.mmap.load(addr)-1)&0xFF;
                 this.reg.flag.Sign = (temp>>7)&1;
                 this.reg.flag.Zero = temp;
-                this.write(addr, temp);
+                this.nes.mmap.write(addr, temp);
                 break;
 
             case 21:
@@ -578,7 +578,7 @@ JSNES.CPU.prototype = {
                 // *******
 
                 // XOR Memory with accumulator, store in accumulator:
-                this.reg.A = (this.load(addr)^this.reg.A)&0xFF;
+                this.reg.A = (this.nes.mmap.load(addr)^this.reg.A)&0xFF;
                 this.reg.flag.Sign = (this.reg.A>>7)&1;
                 this.reg.flag.Zero = this.reg.A;
                 cycleCount+=cycleAdd;
@@ -591,10 +591,10 @@ JSNES.CPU.prototype = {
                 // *******
 
                 // Increment memory by one:
-                temp = (this.load(addr)+1)&0xFF;
+                temp = (this.nes.mmap.load(addr)+1)&0xFF;
                 this.reg.flag.Sign = (temp>>7)&1;
                 this.reg.flag.Zero = temp;
-                this.write(addr, temp&0xFF);
+                this.nes.mmap.write(addr, temp&0xFF);
                 break;
 
             case 25:
@@ -652,7 +652,7 @@ JSNES.CPU.prototype = {
                 // *******
 
                 // Load accumulator with memory:
-                this.reg.A = this.load(addr);
+                this.reg.A = this.nes.mmap.load(addr);
                 this.reg.flag.Sign = (this.reg.A>>7)&1;
                 this.reg.flag.Zero = this.reg.A;
                 cycleCount+=cycleAdd;
@@ -665,7 +665,7 @@ JSNES.CPU.prototype = {
                 // *******
 
                 // Load index X with memory:
-                this.reg.X = this.load(addr);
+                this.reg.X = this.nes.mmap.load(addr);
                 this.reg.flag.Sign = (this.reg.X>>7)&1;
                 this.reg.flag.Zero = this.reg.X;
                 cycleCount+=cycleAdd;
@@ -678,7 +678,7 @@ JSNES.CPU.prototype = {
                 // *******
 
                 // Load index Y with memory:
-                this.reg.Y = this.load(addr);
+                this.reg.Y = this.nes.mmap.load(addr);
                 this.reg.flag.Sign = (this.reg.Y>>7)&1;
                 this.reg.flag.Zero = this.reg.Y;
                 cycleCount+=cycleAdd;
@@ -700,10 +700,10 @@ JSNES.CPU.prototype = {
 
                 }else{
 
-                    temp = this.load(addr) & 0xFF;
+                    temp = this.nes.mmap.load(addr) & 0xFF;
                     this.reg.flag.Canny = temp&1;
                     temp >>= 1;
-                    this.write(addr, temp);
+                    this.nes.mmap.write(addr, temp);
 
                 }
                 this.reg.flag.Sign = 0;
@@ -727,7 +727,7 @@ JSNES.CPU.prototype = {
                 // *******
 
                 // OR memory with accumulator, store in accumulator.
-                temp = (this.load(addr)|this.reg.A)&255;
+                temp = (this.nes.mmap.load(addr)|this.reg.A)&255;
                 this.reg.flag.Sign = (temp>>7)&1;
                 this.reg.flag.Zero = temp;
                 this.reg.A = temp;
@@ -813,11 +813,11 @@ JSNES.CPU.prototype = {
 
                 }else{
 
-                    temp = this.load(addr);
+                    temp = this.nes.mmap.load(addr);
                     add = this.reg.flag.Canny;
                     this.reg.flag.Canny = (temp>>7)&1;
                     temp = ((temp<<1)&0xFF)+add;    
-                    this.write(addr, temp);
+                    this.nes.mmap.write(addr, temp);
 
                 }
                 this.reg.flag.Sign = (temp>>7)&1;
@@ -840,11 +840,11 @@ JSNES.CPU.prototype = {
 
                 }else{
 
-                    temp = this.load(addr);
+                    temp = this.nes.mmap.load(addr);
                     add = this.reg.flag.Canny<<7;
                     this.reg.flag.Canny = temp&1;
                     temp = (temp>>1)+add;
-                    this.write(addr, temp);
+                    this.nes.mmap.write(addr, temp);
 
                 }
                 this.reg.flag.Sign = (temp>>7)&1;
@@ -900,10 +900,10 @@ JSNES.CPU.prototype = {
                 // * SBC *
                 // *******
 
-                temp = this.reg.A-this.load(addr)-(1-this.reg.flag.Canny);
+                temp = this.reg.A-this.nes.mmap.load(addr)-(1-this.reg.flag.Canny);
                 this.reg.flag.Sign = (temp>>7)&1;
                 this.reg.flag.Zero = temp&0xFF;
-                this.reg.flag.Overflow = ((((this.reg.A^temp)&0x80)!=0 && ((this.reg.A^this.load(addr))&0x80)!=0)?1:0);
+                this.reg.flag.Overflow = ((((this.reg.A^temp)&0x80)!=0 && ((this.reg.A^this.nes.mmap.load(addr))&0x80)!=0)?1:0);
                 this.reg.flag.Canny = (temp<0?0:1);
                 this.reg.A = (temp&0xFF);
                 if(addrMode!=11)cycleCount+=cycleAdd; // PostIdxInd = 11
@@ -946,7 +946,7 @@ JSNES.CPU.prototype = {
                 // *******
 
                 // Store accumulator in memory
-                this.write(addr, this.reg.A);
+                this.nes.mmap.write(addr, this.reg.A);
                 break;
 
             case 48:
@@ -956,7 +956,7 @@ JSNES.CPU.prototype = {
                 // *******
 
                 // Store index X in memory
-                this.write(addr, this.reg.X);
+                this.nes.mmap.write(addr, this.reg.X);
                 break;
 
             case 49:
@@ -966,7 +966,7 @@ JSNES.CPU.prototype = {
                 // *******
 
                 // Store index Y in memory:
-                this.write(addr, this.reg.Y);
+                this.nes.mmap.write(addr, this.reg.Y);
                 break;
 
             case 50:
@@ -1025,7 +1025,7 @@ JSNES.CPU.prototype = {
 
                 // Transfer index X to stack pointer:
                 this.reg.SP = (this.reg.X+0x0100);
-                this.stackWrap();
+                this.reg.SP = 0x0100 | (this.reg.SP&0xFF);
                 break;
 
             case 55:
@@ -1056,34 +1056,6 @@ JSNES.CPU.prototype = {
         return cycleCount;
 
     },
-    
-    load: function(addr){
-        if (addr < 0x2000) {
-            return this.mem[addr & 0x7FF];
-        }
-        else {
-            return this.nes.mmap.load(addr);
-        }
-    },
-    
-    load16bit: function(addr){
-        if (addr < 0x1FFF) {
-            return this.mem[addr&0x7FF] 
-                | (this.mem[(addr+1)&0x7FF]<<8);
-        }
-        else {
-            return this.nes.mmap.load(addr) | (this.nes.mmap.load(addr+1) << 8);
-        }
-    },
-    
-    write: function(addr, val){
-        if(addr < 0x2000) {
-            this.mem[addr&0x7FF] = val;
-        }
-        else {
-            this.nes.mmap.write(addr,val);
-        }
-    },
 
     requestIrq: function(type){
         if(this.irqRequested){
@@ -1099,10 +1071,6 @@ JSNES.CPU.prototype = {
     push: function(value){
         this.nes.mmap.write(this.reg.SP, value);
         this.reg.SP--;
-        this.reg.SP = 0x0100 | (this.reg.SP&0xFF);
-    },
-
-    stackWrap: function(){
         this.reg.SP = 0x0100 | (this.reg.SP&0xFF);
     },
 
@@ -1149,17 +1117,6 @@ JSNES.CPU.prototype = {
 
         this.reg.PC = this.nes.mmap.load(0xFFFE) | (this.nes.mmap.load(0xFFFF) << 8);
         this.reg.PC--;
-    },
-
-    getStatus: function(){
-        return (this.reg.flag.Canny)
-                |(this.reg.flag.Zero<<1)
-                |(this.reg.flag.IRQDisable<<2)
-                |(this.reg.flag.Decimal<<3)
-                |(this.reg.flag.BreakFlag<<4)
-                |(this.reg.flag.NotUsed<<5)
-                |(this.reg.flag.Overflow<<6)
-                |(this.reg.flag.Sign<<7);
     },
     
     JSON_PROPERTIES: [

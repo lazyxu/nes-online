@@ -20,7 +20,7 @@ function init_size(){
         video.style.width = ( (height+32) / 240 * 256) + "px";
         video.style.height = (height+32) + "px";
         var sysInfo = $("<div>"
-        +"<span style='color: red'>[系统]</span>: Thanks to <a target='blank' href='https://github.com/bfirsh/jsnes'>bfirsh's JSNES</a> and <a target='blank' href='https://github.com/Inszva'>Inszva</a> <br>"
+        +"<span style='color: red'>[系统]</span>: Thanks to <a target='blank' href='https://github.com/bfirsh/jsnes'>bfirsh's JSNES</a> and <a target='blank' href='https://github.com/InsZVA'>InsZVA</a> <br>"
         +"<span style='color: red'>[系统]</span>: My github is <a target='blank' href='https://github.com/MeteorKL'>https://github.com/MeteorKL</a> <br>"
         +"<span style='color: red'>[系统]</span>: 按键设置默认为 <br>"
         +"<span style='color: red'>[系统]</span>: 上下左右(<span style='color: red'>W S A D</span>) <br>"

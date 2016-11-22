@@ -83,6 +83,9 @@ JSNES.prototype = {
                 this.frameInterval = setInterval(function() {
                     self.frame();
                 }, this.frameTime);
+                // this.frameInterval = setInterval(function() {
+                //     this.nes.ui.writeFrame(this.nes.ppu.buffer);
+                // }, 1000/60);
                 this.resetFps();
                 this.printFps();
                 this.fpsInterval = setInterval(function() {
@@ -106,29 +109,31 @@ JSNES.prototype = {
             if (cpu.cyclesToHalt === 0) {
                 // Execute a CPU instruction
                 cycles = cpu.emulate();
-                if (emulateSound) {
-                    papu.clockFrameCounter(cycles);
-                }
-                cycles *= 3;
+                // if (emulateSound) {
+                //     papu.clockFrameCounter(cycles);
+                // }
+                cycles *= 3;  // ppu 的时钟周期是 cpu 的 3 倍
             }
             else {
                 if (cpu.cyclesToHalt > 8) {
                     cycles = 24;
-                    if (emulateSound) {
-                        papu.clockFrameCounter(8);
-                    }
+                    // if (emulateSound) {
+                    //     papu.clockFrameCounter(8);
+                    // }
                     cpu.cyclesToHalt -= 8;
                 }
                 else {
                     cycles = cpu.cyclesToHalt * 3;
-                    if (emulateSound) {
-                        papu.clockFrameCounter(cpu.cyclesToHalt);
-                    }
+                    // if (emulateSound) {
+                    //     papu.clockFrameCounter(cpu.cyclesToHalt);
+                    // }
                     cpu.cyclesToHalt = 0;
                 }
             }
             
             for (; cycles > 0; cycles--) {
+
+                // 这时候应该画spirt了
                 if(ppu.curX === ppu.spr0HitX &&
                         ppu.f_spVisibility === 1 &&
                         ppu.scanline - 21 === ppu.spr0HitY) {
@@ -146,7 +151,9 @@ JSNES.prototype = {
                 }
 
                 ppu.curX++;
-                if (ppu.curX === 341) {
+                // 一行画完的时候
+                if (ppu.curX === 341) { // 为什么是341
+                    // this.ui.writeScanline(ppu.buffer, ppu.scanline);
                     ppu.curX = 0;
                     ppu.endScanline();
                 }
@@ -210,6 +217,7 @@ JSNES.prototype = {
             this.reset();
             this.mmap = this.rom.createMapper();
             if (!this.mmap) {
+                this.ui.updateStatus("Mapper error.");
                 return;
             }
             this.mmap.loadROM();
