@@ -408,8 +408,8 @@ document.getElementById('button_save').onclick = function() {
     try{
         localStorage.setItem(GameName, saveData);
         for(var i=localStorage.length - 1 ; i >=0; i--){
-	console.log('第'+ (i+1) +'条数据的键值为：' + localStorage.key(i));
-}
+            console.log('第'+ (i+1) +'条数据的键值为：' + localStorage.key(i));
+        }
     }catch(oException){
         if(oException.name == 'QuotaExceededError'){
             console.log('超出本地存储限额！');

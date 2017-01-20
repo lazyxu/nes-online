@@ -1,0 +1,9 @@
+/bin/*
+/pkg/*
+/roms/*
+/upload/*
+/static/views/*
+/static/js/nes/*
+/jsnes原版/*
+server.key
+server.pem

@@ -109,24 +109,24 @@ JSNES.prototype = {
             if (cpu.cyclesToHalt === 0) {
                 // Execute a CPU instruction
                 cycles = cpu.emulate();
-                // if (emulateSound) {
-                //     papu.clockFrameCounter(cycles);
-                // }
+                if (emulateSound) {
+                    papu.clockFrameCounter(cycles);
+                }
                 cycles *= 3;  // ppu 的时钟周期是 cpu 的 3 倍
             }
             else {
                 if (cpu.cyclesToHalt > 8) {
                     cycles = 24;
-                    // if (emulateSound) {
-                    //     papu.clockFrameCounter(8);
-                    // }
+                    if (emulateSound) {
+                        papu.clockFrameCounter(8);
+                    }
                     cpu.cyclesToHalt -= 8;
                 }
                 else {
                     cycles = cpu.cyclesToHalt * 3;
-                    // if (emulateSound) {
-                    //     papu.clockFrameCounter(cpu.cyclesToHalt);
-                    // }
+                    if (emulateSound) {
+                        papu.clockFrameCounter(cpu.cyclesToHalt);
+                    }
                     cpu.cyclesToHalt = 0;
                 }
             }
