@@ -1,5 +1,5 @@
 # Nes Online
-<img src="images/screenshot.png)" width="100%"/>
+<img src="images/screenshot.png" width="100%"/>
 
 # logs 
 * 以前的logs位于old_logs.md

@@ -6,7 +6,7 @@ FDS     - Famicom磁盘系统: 安装在Famicom顶部，支持3"双面游戏软�
 
 ## some materials
 http://www.it165.net/embed/html/201312/2367.html
-<img src="images/memoryMap.png)" width="100%"/>
+<img src="images/memoryMap.png" width="100%"/>
 CPU：6502 NMOS 芯片。 
     直接寻址能力为 64KB，数据处理能力为 8位。
     内建一块特殊的音频处理器。 

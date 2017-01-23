@@ -1,4 +1,3 @@
-.gitignore
 /go/server.key
 /go/server.pem
 /old/static/views/*
