@@ -1,9 +1,7 @@
-/bin/*
-/pkg/*
-/roms/*
-/upload/*
-/static/views/*
-/static/js/nes/*
-/jsnes原版/*
-server.key
-server.pem
+.gitignore
+/go/server.key
+/go/server.pem
+/old/static/views/*
+/old/roms/*
+/old/static/xjsnes/*
+/react/node_modules/*
