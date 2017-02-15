@@ -1,6 +1,6 @@
-/go/server.key
-/go/server.pem
-/old/static/views/*
-/old/roms/*
-/old/static/xjsnes/*
+/old/*
+
 /react/node_modules/*
+/react/build/rom/*
+
+/main/*.json

@@ -1,32 +1,50 @@
-    
+import config from './config'
+
 var ws = null;
-var open = false;
+var wsHandler={};
+exports.createWS = (user) => {
+  if (window["WebSocket"]) {
+    ws = new WebSocket(config.wsServer);
 
-exports.createWS = function () {
-    if (window["WebSocket"]) {
-        ws = new WebSocket('ws://localhost:8080/ws');
-        ws.onopen = () => {
-            open = true;
-            ws.send(JSON.stringify({
-                "Handle": "Msg",
-                "Msg": "open"
-            }));
-        };
+    ws.onopen = () => {
+      console.log("WebSocket已经打开...");
+      ws.send(JSON.stringify({
+        "type": "in",
+        "user": user
+      }));
+    };
 
-        ws.onmessage = (e) => {
-        console.log(e.data);
-        };
+    ws.onmessage = (e) => {
+      var json=JSON.parse(e.data);
+      console.log(json);
+      for (var type in wsHandler) {
+        if (json.type==type)
+          wsHandler[type](json);
+      }
+    };
 
-        ws.onerror = (e) => {
-        console.log(e.message);
-        };
+    ws.onerror = (e) => {
+      console.log(e.message);
+    };
 
-        ws.onclose = (e) => {
-        console.log(e.code, e.reason);
-        };
-    }
+    ws.onclose = (e) => {
+      console.log(e.code, e.reason);
+    };
+  }
 }
 
-exports.send = function (msg) {
-    ws.send(JSON.stringify(msg));
+exports.on = (type, callback) => {
+  console.log('on ' + type);
+  wsHandler[type] = callback;
+}
+
+exports.send = (content) => {
+  ws.send(JSON.stringify(content));
+}
+
+exports.sendRoomMsg = (msg) => {
+  ws.send(JSON.stringify({
+    "type": "roomMsg",
+    "msg": msg
+  }));
 }

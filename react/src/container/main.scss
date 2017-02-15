@@ -1,0 +1,63 @@
+.scrollDiv { 
+  width: 10px;
+  position:absolute; 
+  top:0; 
+  bottom: 0;
+  background: #666666;
+  border-radius:10px;
+}
+.scrollDiv:hover {
+  background: #444444;
+}
+.Header {
+  position: fixed; 
+  top: 0; 
+  left: 0;
+  height: 16px; 
+  width: 100%;
+  background: linear-gradient(#1c1c1c, #2c2c2c);
+}
+.Header > .title {
+  background: url(/img/logo@16.png) no-repeat 3px 0px;
+  outline: none;
+  border: 0;
+  color: #fff;
+  font-size: 12px;
+  padding: 0px 24px;
+}
+.Account {
+  position: fixed; 
+  top: 16px; 
+  left: 0;
+  height: 32px; 
+  width: 100%; 
+  background: linear-gradient(#2c2c2c, #4c4c4c); 
+}
+.Account > .user {
+  position: absolute;
+  right: 200px;
+  top: 0;
+}
+.Account > .user > img {
+  height: 32px;
+  width: 32px;
+}
+.Account > .user > input {
+  position: absolute;
+  top: 0;
+  left: 40px;
+  width: 100px;
+  outline: none;
+  border: none;
+  background: none;
+  color: #fff;
+  font-size: 16px;
+}
+.Footer {
+  position: fixed; 
+  bottom: 0; 
+  left: 0;
+  height: 32px;
+  width: 100%; 
+  background: #5c5c5c;
+}

@@ -1,0 +1,78 @@
+.GameTab {
+  position: fixed;
+  top: 48px; 
+  bottom: 32px;
+  left: 0; 
+  right: 0;
+}
+
+.GameTab > .Tab {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 32px;
+  width: 100%;
+  background: linear-gradient(#4c4c4c,#6c6c6c);
+  line-height: 32px; 
+}
+.GameTab > .List {
+  position: absolute; 
+  top: 32px; 
+  left: 0; 
+  bottom: 0; 
+  width: 100%;
+  background: #6c6c6c;
+}
+
+.GameTab > .Tab > .Setting {
+  position: absolute;
+  right: 0;
+  background: url(/img/settings.png) no-repeat 0px 8px;
+  outline: none;
+  border: 0;
+  color: #cfcfcf;
+  font-size: 13px;
+  padding: 7px 20px;
+}
+.GameTab > .Tab > .partition {
+  position: absolute;
+  right: 100px;
+  color: #707070;
+}
+.GameTab > .Tab > .Show,
+.GameTab > .Tab > .Hide {
+  font-size: 13px;
+  background: none;
+  padding: 8px 20px 4px;
+  outline: none;
+}
+
+.GameTab > .Tab > .Show {
+  float: left;
+  color: #ffffff;
+  border: 0;
+  border-bottom: 2px solid #ffffff;
+}
+.GameTab > .Tab > .Hide {
+  float: left;
+  color: #cfcfcf;
+  border: 0;
+  border-bottom: 2px;
+}
+
+.GameTab > .Tab > .room-hide,
+.GameTab > .Tab > .room-show {
+  position: absolute;
+  right: 108px;
+  border: 1px solid #738BAF;
+  border-radius: 5px;
+  color: #cfcfcf;
+  font-size: 14px;
+  background: none;
+  padding: 0px 14px;
+  outline: none;
+  margin: 5px;
+}
+.GameTab > .Tab > .room-show {
+  color: #ffffff;
+}
