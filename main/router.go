@@ -10,7 +10,7 @@ func routerInit() {
 	http.Handle("/rom/", http.StripPrefix("/rom/", http.FileServer(http.Dir("../react/build/rom"))))
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("../react/build"))))
 	http.Handle("/src/", http.StripPrefix("/src/", http.FileServer(http.Dir("../react/src"))))
-	http.Handle("/js/", http.StripPrefix("/js/", http.FileServer(http.Dir("../react/src/js"))))
+	http.Handle("/js/", http.StripPrefix("/js/", http.FileServer(http.Dir("../react/build/js"))))
 
 	koala.RenderPath = "../react/build/"
 	koala.Get("/", func(k *koala.Params, w http.ResponseWriter, r *http.Request) {

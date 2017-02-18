@@ -6,8 +6,8 @@ import { connect } from 'react-redux'
 import './main.scss'
 
 import utils from './utils'
-import api from '../../api/account/login'
-import actions from '../../actions/actions'
+import api from '../../api/user/login'
+import {userSet} from '../../actions/actions'
 import ws from '../../utils/websocket.js'
 
 class Login extends React.Component {
@@ -28,12 +28,17 @@ class Login extends React.Component {
         return
       }
       utils.msgOK(id, data.msg);
-      this.props.setUser(data.user);
+      this.props.userSet(data.user);
       ws.createWS(data.user);
-      this.setState({mask: ""})
+      this.setState({mask: ""});
     });
   }
   
+  enter(e) {
+    if(e.keyCode == 13)
+      this.login();
+  }
+
   render() {
     if (this.state.mask==""){
       return (<div />)
@@ -43,7 +48,7 @@ class Login extends React.Component {
         <div className='Form'>
           <h1>登录</h1>
           <input type='text' placeholder='用户名/邮箱' name='account' autoComplete="off" autoFocus/>
-          <input type='password' placeholder='密码' name='password' autoComplete="off"/>
+          <input type='password' placeholder='密码' name='password' autoComplete="off" onKeyUp={this.enter.bind(this)}/>
           <div className='link'>
             <Link to="/register" className='leftLink'>没有帐号？</Link>
             <Link to="/forgetPassword" className='rightLink'>忘记密码？</Link>
@@ -59,10 +64,4 @@ class Login extends React.Component {
   }
 }
 
-function mapStateToProps(state) {
-    return {
-    }
-}
-
-// 将state的指定值映射在props上，将action的所有方法映射在props上
-export default connect(mapStateToProps, actions)(Login);
+export default connect(null, {userSet})(Login);

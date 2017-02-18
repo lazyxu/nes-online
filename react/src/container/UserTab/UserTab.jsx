@@ -12,7 +12,6 @@ export default class UserTab extends React.Component {
     this.state = {
       users: new Object(),
       hidden: false,
-      scrollUpdate: 0,
     };
   }
 
@@ -23,25 +22,20 @@ export default class UserTab extends React.Component {
       } else {
         this.setState({users: data.users});
       }
-      this.setState({scrollUpdate: this.state.scrollUpdate+1});
     })
     ws.on('in', (data) => {
       this.state.users[data.user.name] = data.user;
       this.setState({users: this.state.users});
-      this.setState({scrollUpdate: this.state.scrollUpdate+1});
     })
     ws.on('out', (data) => {
       delete this.state.users[data.userName];
       this.setState({users: this.state.users});
-      this.setState({scrollUpdate: this.state.scrollUpdate+1});
     })
   }
 
   render() {
     var list=[];
-    var count=0;
     for (var name in this.state.users) {
-      count++;
       list.push(
         <div className='Block' key={name}>
           <img src={this.state.users[name].avatar}/>
@@ -55,7 +49,7 @@ export default class UserTab extends React.Component {
     return (
       <div>
         <button className='friends' onClick={()=>{this.setState({hidden: !this.state.hidden})}}>
-          {count}
+          {list.length}
         </button>
         <div className='UserTab' id='UserTab' hidden={this.state.hidden}>
           <div className='UserListBox' id='UserListBox' >
@@ -67,11 +61,8 @@ export default class UserTab extends React.Component {
             </div>
             <Scroll 
               mainBoxID='UserListBox' 
-              contentID='UserList' 
-              scrollID='scrollDivUserList'
-              scrollBackgroundStyle='defaultScrollBackground' 
-              scrollStyle='defaultScroll'
-              scrollUpdate={this.state.scrollUpdate}
+              contentID='UserList'
+              scrollUpdate={list.length}
             />
           </div>
         </div>

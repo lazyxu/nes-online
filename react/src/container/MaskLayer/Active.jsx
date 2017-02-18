@@ -4,7 +4,7 @@ import { browserHistory } from 'react-router'
 
 import './main.scss'
 import utils from './utils'
-import api from '../../api/account/active.js'
+import api from '../../api/user/active.js'
 
 export default class Active extends React.Component {
   constructor(props) {
@@ -20,7 +20,7 @@ export default class Active extends React.Component {
         return
       }
       utils.msgOK(id, data.msg);
-      browserHistory.push("/#/login");
+      browserHistory.push("/");
     });
   }
   

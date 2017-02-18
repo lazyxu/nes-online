@@ -5,20 +5,13 @@ import { hashHistory } from 'react-router'
 import './main.scss'
 import GameTab from './GameTab/GameTab'
 import UserTab from './UserTab/UserTab'
-
 import ws from '../utils/websocket'
-import actions from '../actions/actions'
-import config from '../config'
-import ajax from '../utils/ajax'
-import api from '../api/account/login.js'
+import Game from './GameTab/Game.jsx'
 
 class App extends React.Component {
 
   constructor(props) {
     super(props);
-  }
-
-  componentDidMount() {
   }
 
   render() {
@@ -47,6 +40,7 @@ class App extends React.Component {
     return (
       <div >
         {this.props.children}
+        {this.props.tab=='Game'?<Game/>:<div/>}
         {Header}
         {Account}
         <GameTab />
@@ -59,9 +53,9 @@ class App extends React.Component {
 
 function mapStateToProps(state) {
     return {
-      user: state.user
+      user: state.user,
+      tab: state.tab,
     }
 }
 
-// 将state的指定值映射在props上，将action的所有方法映射在props上
-export default connect(mapStateToProps, actions)(App);
+export default connect(mapStateToProps, null)(App);

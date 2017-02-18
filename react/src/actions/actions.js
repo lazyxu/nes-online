@@ -1,31 +1,80 @@
-//定义一个change方法，将来把它绑定到props上
-exports.setGame = (game) => {
+import store from '../store.js'
+import keyboardAPI from '../api/user/keyboard.js'
+exports.gameSet = game => {
   return {
-    type: "setGame",
+    type: "gameSet",
     game: game
   }
 }
-exports.setRoom = (room) => {
+exports.roomSet = room => {
   return {
-    type: "setRoom",
+    type: "roomSet",
     room: room
   }
 }
-exports.setUser = (user) => {
+exports.nesSet = nes => {
   return {
-    type: "setUser",
+    type: "nesSet",
+    nes: nes
+  }
+}
+exports.msgSet = msg => {
+  return {
+    type: "msgSet",
+    msg: msg
+  }
+}
+exports.msgAdd = msg => {
+  return {
+    type: "msgAdd",
+    msg: msg
+  }
+}
+exports.roomlistSet = roomlist => {
+  return {
+    type: "roomlistSet",
+    roomlist: roomlist
+  }
+}
+exports.roomlistUpdate = room => {
+  return {
+    type: "roomlistUpdate",
+    room: room
+  }
+}
+exports.roomlistRemove = roomID => {
+  return {
+    type: "roomlistRemove",
+    roomID: roomID
+  }
+}
+
+exports.userSet = user => {
+  return {
+    type: "userSet",
     user: user
   }
 }
-exports.setGameTab = (gameTab) => {
+exports.gameTabSet = gameTab => {
   return {
-    type: "setGameTab",
+    type: "gameTabSet",
     gameTab: gameTab
   }
 }
-exports.setNES = (nes) => {
+exports.tabSet = (tab, force = false) => {
+  if (!force && store.getState().tab=="Room") {
+    alert("你在房间中，请退出房间后再进行操作！");
+    return {
+      type: "inRoom",
+    }
+  }
+  if (!force && store.getState().tab=="Game") {
+    return {
+      type: "inGame",
+    }
+  }
   return {
-    type: "setNES",
-    nes: nes
+    type: "tabSet",
+    tab: tab
   }
 }

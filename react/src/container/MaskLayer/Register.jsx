@@ -3,7 +3,7 @@ import { Link } from 'react-router'
 
 import './main.scss'
 import utils from './utils'
-import api from '../../api/account/register'
+import api from '../../api/user/register'
 
 export default class Register extends React.Component {
   constructor(props) {
@@ -135,7 +135,7 @@ export default class Register extends React.Component {
           <input type='password' placeholder='再次输入密码' name='password' onBlur={this.checkPassword}/>
           <div id='checkPassword' className='msg'></div>
           <div className='link'>
-            <Link to="/login" className='rightLink'>已有帐号？登录</Link>
+            <Link to="/" className='rightLink'>已有帐号？登录</Link>
           </div>
           <button type='button' id='register' className='disableButton' onClick={this.register}>发送注册邮件</button>
           <div id='checkRegister' className='msg'></div>

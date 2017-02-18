@@ -3,7 +3,7 @@ import { Link } from 'react-router'
 
 import './main.scss'
 import utils from './utils'
-import api from '../../api/account/forgetPassword'
+import api from '../../api/user/forgetPassword'
 
 export default class ForgetPasswordReset extends React.Component {
   constructor(props) {
@@ -57,7 +57,7 @@ export default class ForgetPasswordReset extends React.Component {
           <input type='password' placeholder='再次输入密码' name='password' onBlur={this.checkPassword}/>
           <div id='checkPassword' className='msg'></div>
           <div className='link'>
-            <Link to="/login" className='leftLink'>想起密码了？登录吧</Link>
+            <Link to="/" className='leftLink'>想起密码了？登录吧</Link>
           </div>
           <button type='button' className='enableButton' id="reset" onClick={this.forgetPasswordReset}>确认</button>
           <div id='check' className='msg'></div>

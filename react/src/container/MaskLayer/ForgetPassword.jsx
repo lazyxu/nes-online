@@ -3,7 +3,7 @@ import { Link } from 'react-router'
 
 import './main.scss'
 import utils from './utils'
-import api from '../../api/account/forgetPassword'
+import api from '../../api/user/forgetPassword'
 
 export default class ForgetPassword extends React.Component {
   constructor(props) {
@@ -30,7 +30,7 @@ export default class ForgetPassword extends React.Component {
           <h1>忘记密码</h1>
           <input type='text' placeholder='邮箱' name='mail' />
           <div className='link'>
-            <Link to="/login" className='leftLink'>想起密码了？登录吧</Link>
+            <Link to="/" className='leftLink'>想起密码了？登录吧</Link>
           </div>
           <button type='button' className='enableButton' onClick={this.forgetPassword}>发送验证邮件</button>
           <div id='check' className='msg'></div>

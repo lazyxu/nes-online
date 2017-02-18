@@ -15,12 +15,22 @@ func (u *User) reader() {
 		if err != nil {
 			break
 		}
-		log.Println("reader: ", m)
+		log.Println(m["type"], ": ", m)
 		switch m["type"] {
 		case "in":
 			u.register(m)
 		case "createRoom":
 			u.createRoom(m)
+		case "leaveRoom":
+			u.leaveRoom()
+		case "enterRoom":
+			u.enterRoom(m)
+		case "ready":
+			u.ready()
+		case "unready":
+			u.unready()
+		case "start":
+			u.start()
 		case "roomMsg":
 			u.sendRoomMsg(m)
 		default:
@@ -55,18 +65,8 @@ func wsHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	defer func() {
 		u.unregister()
+		close(u.msg)
 	}()
-	users := map[string]interface{}{}
-	for _, user := range h.users {
-		users[user.name] = map[string]interface{}{
-			"name":   user.name,
-			"avatar": user.avatar,
-		}
-	}
-	u.ws.WriteJSON(map[string]interface{}{
-		"type":  "userlist",
-		"users": users,
-	})
 	go u.writer()
 	u.reader()
 }

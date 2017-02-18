@@ -2,6 +2,15 @@ import React from 'react'
 
 import './Scroll.scss'
 
+/*
+    <Scroll 
+      mainBoxID='UserListBox' 
+      contentID='UserList' 
+      scrollBackgroundStyle='defaultScrollBackground' 
+      scrollStyle='defaultScroll'
+      scrollUpdate={list.length}
+    />
+*/
 export default class Scroll extends React.Component {
 
   constructor(props) {
@@ -10,6 +19,9 @@ export default class Scroll extends React.Component {
     this.state = {
       scrollDynamicStyle: {height: "0"},
     };
+    this.resizeHandler = () => {
+      this.updateScroll();
+    }
   }
   
   static get defaultProps() {
@@ -29,34 +41,34 @@ export default class Scroll extends React.Component {
     }
   }
 
-mouseWheel(node, handler) {
-  this.bind(node, 'mousewheel', function(event){
-    var data = -getWheelData(event);
-    handler(data);
-    if(document.all){
-      window.event.returnValue = false;
-    }else{
+  mouseWheel(node, handler) {
+    this.bind(node, 'mousewheel', function(event){
+      var data = -getWheelData(event);
+      handler(data);
+      if(document.all){
+        window.event.returnValue = false;
+      }else{
+        event.preventDefault();
+      }
+    });
+    // firefox
+    this.bind(node, 'DOMMouseScroll', function(event){
+      var data = getWheelData(event);
+      handler(data);
       event.preventDefault();
+    });
+    function getWheelData(event){
+      var e = event || window.event;
+      return e.wheelDelta ? e.wheelDelta : e.detail*40;
     }
-  });
-  // firefox
-  this.bind(node, 'DOMMouseScroll', function(event){
-    var data = getWheelData(event);
-    handler(data);
-    event.preventDefault();
-  });
-  function getWheelData(event){
-    var e = event || window.event;
-    return e.wheelDelta ? e.wheelDelta : e.detail*40;
   }
-}
 
   componentWillReceiveProps(nextProps) {
     if (typeof(nextProps.scrollUpdate)!=="undefined") {
       this.updateScroll();
     }
   }
-  
+
   updateScroll() {
     var contentHeight = document.getElementById(this.props.contentID).offsetHeight;
     var clientHeight = document.getElementById(this.props.mainBoxID).offsetHeight;
@@ -123,18 +135,21 @@ mouseWheel(node, handler) {
   componentDidMount() {
     var mainBox = document.getElementById(this.props.mainBoxID);
     var content = document.getElementById(this.props.contentID);
-    var scroll = document.getElementById(this.props.scrollID);
+    var scroll = document.getElementById(this.props.mainBoxID+'-scroll');
+    this.updateScroll();
     this.tragScroll(mainBox, content, scroll);
     this.wheelChange(mainBox, content, scroll);
-    window.addEventListener("resize", () => {
-      this.updateScroll();
-    });
+    window.addEventListener("resize", this.resizeHandler);
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener("resize", this.resizeHandler);
   }
 
   render() {
     return (
       <div className={this.props.scrollBackgroundStyle}>
-        <div className={this.props.scrollStyle} id={this.props.scrollID} style={this.state.scrollDynamicStyle}>
+        <div className={this.props.scrollStyle} id={this.props.mainBoxID+'-scroll'} style={this.state.scrollDynamicStyle}>
         </div>
       </div>
     )

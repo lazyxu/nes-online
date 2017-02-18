@@ -1,8 +1,67 @@
 import config from './config'
+import store from '../store.js'
+import actions from '../actions/actions.js'
 
 var ws = null;
 var wsHandler={};
-exports.createWS = (user) => {
+
+wsHandler['roomlist'] = data => {
+  if (data.rooms == null) {
+    store.dispatch(actions.roomlistSet(new Object()));
+  } else {
+    store.dispatch(actions.roomlistSet(data.rooms));
+  }
+}
+wsHandler['createRoom'] = data => {
+  store.dispatch(actions.roomlistUpdate(data.roomlist));
+  if (data.from == store.getState().user.name) {
+    store.dispatch(actions.roomSet(data.room));
+    store.dispatch(actions.tabSet('Room'));
+  }
+}
+wsHandler["leaveRoom"] = data => {
+  if (data.roomlist == "empty") {
+    store.dispatch(actions.roomlistRemove(data.roomID));
+  } else {
+    store.dispatch(actions.roomlistUpdate(data.roomlist));
+  }
+  if (data.from == store.getState().user.name) {
+    store.dispatch(actions.tabSet('RoomList', true));
+    store.dispatch(actions.roomSet(null));
+  } else {
+    if (data.room != null && store.getState().room != null && data.room.id == store.getState().room.id) {
+      store.dispatch(actions.roomSet(data.room));
+    }
+  }
+}
+wsHandler['enterRoom'] = data => {
+  store.dispatch(actions.roomlistUpdate(data.roomlist));
+  if (store.getState().room==null) {
+    if (data.from==store.getState().user.name) {
+      store.dispatch(actions.roomSet(data.room));
+      store.dispatch(actions.tabSet('Room'));
+    }
+  } else {
+    if (data.room.id==store.getState().room.id) {
+      store.dispatch(actions.roomSet(data.room));
+    }
+  }
+}
+wsHandler['updateRoom'] = data => {
+  store.dispatch(actions.roomlistUpdate(data.roomlist));
+  if (data.room != null && store.getState().room != null && data.room.id == store.getState().room.id) {
+    store.dispatch(actions.roomSet(data.room));
+  }
+}
+wsHandler["start"] = data => {
+  store.dispatch(actions.tabSet("Game", true));
+}
+wsHandler["relogin"] = data => {
+  alert("你的账号在异地登录，如果不是你本人操作，请及时修改密码");
+  location.reload(true);
+}
+
+exports.createWS = user => {
   if (window["WebSocket"]) {
     ws = new WebSocket(config.wsServer);
 
@@ -38,11 +97,11 @@ exports.on = (type, callback) => {
   wsHandler[type] = callback;
 }
 
-exports.send = (content) => {
+exports.send = content => {
   ws.send(JSON.stringify(content));
 }
 
-exports.sendRoomMsg = (msg) => {
+exports.sendRoomMsg = msg => {
   ws.send(JSON.stringify({
     "type": "roomMsg",
     "msg": msg
