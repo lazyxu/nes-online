@@ -19,7 +19,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 var JSNES = function(opts) {
     this.opts = {
         ui: JSNES.DummyUI,
-        statusID: "",
         swfPath: 'lib/',
         
         preferredFrameRate: 60,
@@ -69,6 +68,11 @@ JSNES.prototype = {
         this.cpu.reset();
         this.ppu.reset();
         this.papu.reset();
+        this.frameCount = 0;
+        this.keyboardLog = [];
+        this.keyboardAction = [];
+        this.keyboardActionReceived = 0;
+        this.frameDelay = 5;
     },
     
     start: function() {
@@ -77,9 +81,60 @@ JSNES.prototype = {
         if (this.rom !== null && this.rom.valid) {
             if (!this.isRunning) {
                 this.isRunning = true;
-                
-                this.frameInterval = setInterval(function() {
+                var waitCount = 0;
+                var oldFrameCount = 0;
+                this.frameInterval = setInterval( ()=> {
+                    if (this.frameCount>this.frameDelay) {
+                        var players = window.store.getState().room.players;
+                        var playerNUM = 0;
+                        for (i in players) {
+                            if (players[i]!=null) 
+                                playerNUM++;
+                        }
+                        if(this.keyboardAction[this.frameCount].length!=playerNUM) {
+                            // console.log(this.keyboardAction[this.frameCount].length);
+                            if (waitCount==0) {
+                                if (this.frameCount - oldFrameCount >= 60) {
+                                    this.ui.updatePing((this.frameDelay+this.frameCount-(this.keyboardAction.length-this.frameDelay))/60*1000);
+                                    oldFrameCount = this.frameCount;
+                                }
+                            }
+                            waitCount++;
+                            return
+                        } else {
+                            if (waitCount==0) {
+                                if (this.frameCount - oldFrameCount >= 60) {
+                                    this.ui.updatePing((this.frameDelay+this.frameCount-(this.keyboardAction.length-this.frameDelay))/60*1000);
+                                    oldFrameCount = this.frameCount;
+                                }
+                            }
+                        }
+                        waitCount = 0;
+                        // console.log(this.frameCount);
+                        // console.log(this.keyboardAction[this.frameCount]);
+                        for (var player=0;player<this.keyboardAction[this.frameCount].length;player++)
+                            for (var i=0;i<this.keyboardAction[this.frameCount][player].length;i++) {
+                                console.log(this.keyboardAction[this.frameCount][player]);
+                                console.log(this.keyboardAction[this.frameCount][player][i].key+":"+this.keyboardAction[this.frameCount][player][i].value);
+                                console.log(this.keyboard.setKey(
+                                    this.keyboardAction[this.frameCount][player][i].key,
+                                    this.keyboardAction[this.frameCount][player][i].value
+                                ));
+                            }
+                    }
                     self.frame();
+                    if ((this.frameCount+1)%this.frameDelay==0) {
+                        var keyboard = this.keyboardLog.slice(this.frameCount-(this.frameDelay-1),this.frameCount+1);
+                        window.ws.send(JSON.stringify({
+                            "type": "keyboard",
+                            "frameID": this.frameCount+1,
+                            "keyboard": keyboard,
+                        }));
+                    }
+                    // this.keyboardLog.shift();
+                    this.frameCount++;
+                    this.ui.updateFrameCount(this.frameCount);
+                    this.keyboardLog[this.frameCount] = [];
                 }, this.frameTime);
                 this.resetFps();
                 this.printFps();

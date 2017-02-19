@@ -65,6 +65,13 @@
   color: white;
   z-index: 1;
 }
+.Game > .window > .frame {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  color: white;
+  z-index: 1;
+}
 .Game > .window > .emulator {
   position: absolute;
   top: 0;

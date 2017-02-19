@@ -11,10 +11,11 @@
 
 ## todo
 * 保存游戏至服务器，装载游戏
-* 显示当前游戏运行回合数
-* 本地延迟一定回合数，在指定回合输入指令
 * 测试联机效果
 * 允许创建本地rom
+
+## v0.2.0
+* 本地完全同步666
 
 ## v0.1.2
 * 界面做的差不多了，单人模式可以玩了，按键设置可以同步到服务器了
@@ -34,6 +35,7 @@
 * JSNES: https://github.com/bfirsh/jsnes
 * webRTC: http://blog.csdn.net/inszva/article/details/52840393
 * localStorage & Gamepad: https://github.com/josephlewis42/jsnes
+* Gamepad: https://github.com/alaingilbert/GamepadJs
 * UI: Nostalgia.NES
 
 # contact me

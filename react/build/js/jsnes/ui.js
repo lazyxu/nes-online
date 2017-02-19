@@ -41,13 +41,10 @@ if (typeof jQuery !== 'undefined') {
                     parent.html("Your browser doesn't support the <code>&lt;canvas&gt;</code> tag. Try Google Chrome, Safari, Opera or Firefox!");
                     return;
                 }
-                
-                // self.romContainer = $('<div class="nes-roms"></div>').appendTo(self.root);
-                if (this.nes.opts.statusID=="")
-                    self.status = $('<p class="nes-status" hidden>Booting up...</p>').appendTo(parent);
-                else 
-                    self.status = document.getElementById(this.nes.opts.statusID);
-                console.log(self.status)
+                self.status = $('<div style="position: absolute;top: 0;right: 0;color: white;z-index: 1;"></div>').appendTo(parent);
+                self.frame = $('<div style="position: absolute;bottom: 0;left: 0;color: white;z-index: 1;"></div>').appendTo(parent);
+                self.ping = $('<div style="position: absolute;top: 0;left: 0;color: green;z-index: 1;"></div>').appendTo(parent);
+
                 /*
                  * Canvas
                  */
@@ -72,13 +69,14 @@ if (typeof jQuery !== 'undefined') {
             UI.prototype = {
                 addKeyboard: function(div) {
                     var self = this;
-                    div.addEventListener('keydown', function(evt) {
-                        self.nes.keyboard.keyDown(evt); 
+                    div.addEventListener('keydown', (evt) => {
+                        console.log(this.nes.frameCount+'keydown');
+                        self.nes.keyboard.keyDown(evt);
                     });
-                    div.addEventListener('keyup', function(evt) {
+                    div.addEventListener('keyup', (evt) => {
                         self.nes.keyboard.keyUp(evt); 
                     });
-                    div.addEventListener('keypress', function(evt) {
+                    div.addEventListener('keypress', (evt) => {
                         self.nes.keyboard.keyPress(evt); 
                     });
                 },
@@ -157,8 +155,14 @@ if (typeof jQuery !== 'undefined') {
                     }
                 },
             
+                updatePing: function(ping) {
+                    this.ping.text(parseInt(ping)+"ms");
+                },
+                updateFrameCount: function(s) {
+                    this.frame.text(s);
+                },
                 updateStatus: function(s) {
-                    this.status.innerHTML = s;
+                    this.status.text(s);
                 },
             
                 writeAudio: function(samples) {

@@ -16,6 +16,7 @@ class GameList extends React.Component {
   }
 
   componentDidMount() {
+    console.log(navigator.getGamepads());
     api.listGame( games => {
       if (games==null) {
         this.setState({games: []});

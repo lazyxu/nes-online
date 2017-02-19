@@ -41,16 +41,15 @@ class Game extends React.Component {
         },
         1000
     );
-    keyboard.load(() => {
-      var msg = {
-        from: "系统",
-        msg: "按键设置加载成功",
-      }
-      this.msgAdd(msg);
-    });
+    // keyboard.load(() => {
+    //   var msg = {
+    //     from: "系统",
+    //     msg: "按键设置加载成功",
+    //   }
+    //   this.msgAdd(msg);
+    // });
     window.nes = new JSNES({
         ui: $('#emulator').JSNESUI(),
-        statusID: 'status',
     });
     window.nes.ui.loadROM("/rom/"+this.props.room.game+".nes");
     window.nes.ui.resize();
@@ -122,7 +121,6 @@ class Game extends React.Component {
           <button onClick={() => {this.setState({chatHide: true}); this.props.gameTabSet("Chat")}}>聊天</button>
         </div>
         <div className='window'  id='window' tabIndex="0">
-          <div className='status' id='status'></div>
           <div id='emulator' className='emulator'>
           </div>
           <div id='chatHistory' className='chatHistory'>

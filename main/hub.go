@@ -28,7 +28,13 @@ type Room struct {
 	password string
 	state    string
 	players  []*User
+	// keyboardsLog [][][]Keyboard // 玩家id，
 }
+
+// type Keyboard struct {
+// 	key   int
+// 	value int
+// }
 
 var h = Hub{
 	users: make(map[string]*User),

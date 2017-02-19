@@ -31,6 +31,8 @@ func (u *User) reader() {
 			u.unready()
 		case "start":
 			u.start()
+		// case "keyboard":
+		// 	u.keyboard()
 		case "roomMsg":
 			u.sendRoomMsg(m)
 		default:

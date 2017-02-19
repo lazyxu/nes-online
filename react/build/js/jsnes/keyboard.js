@@ -75,7 +75,9 @@ JSNES.Keyboard.prototype = {
             case this.player1.down: this.state1[this.keys.down] = value; break;   // Down
             case this.player1.left: this.state1[this.keys.left] = value; break;   // Left
             case this.player1.right: this.state1[this.keys.right] = value; break;  // Right
-
+            default: return true;
+        }
+        switch (key) {
             case this.player2.A: this.state2[this.keys.A] = value; break;     // Num-7
             case this.player2.B: this.state2[this.keys.B] = value; break;     // Num-9
             case this.player2.select: this.state2[this.keys.select] = value; break; // Num-3
@@ -86,19 +88,30 @@ JSNES.Keyboard.prototype = {
             case this.player2.right: this.state2[this.keys.right] = value; break; // Num-6
             default: return true;
         }
+        console.log(this.state1);
         return false; // preventDefault
     },
 
     keyDown: function(evt) {
-        if (!this.setKey(evt.keyCode, 0x41) && evt.preventDefault) {
-            evt.preventDefault();
-        }
+        window.nes.keyboardLog[window.nes.frameCount].push({
+            'key': evt.keyCode,
+            'value': 0x41,
+        });
+        // if (!this.setKey(evt.keyCode, 0x41) && evt.preventDefault) {
+        //     evt.preventDefault();
+        // }
+        evt.preventDefault();
     },
     
     keyUp: function(evt) {
-        if (!this.setKey(evt.keyCode, 0x40) && evt.preventDefault) {
-            evt.preventDefault();
-        }
+        window.nes.keyboardLog[window.nes.frameCount].push({
+            'key': evt.keyCode,
+            'value': 0x40,
+        });
+        // if (!this.setKey(evt.keyCode, 0x40) && evt.preventDefault) {
+        //     evt.preventDefault();
+        // }
+        evt.preventDefault();
     },
     
     keyPress: function(evt) {

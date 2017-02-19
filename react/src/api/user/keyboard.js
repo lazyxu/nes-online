@@ -9,7 +9,17 @@ exports.load = (callback) => {
       type: "keyboardSet",
       keyboard: keyboard
     });
-    window.nes.keyboard.player1 = keyboard;
+    var players = store.getState().room.players;
+    var playerNo = 0;
+    for (i in players) {
+        if (players[i].name==store.getState().user.name) 
+            playerNo = i
+    }
+    if (playerNo == 1) {
+      window.nes.keyboard.player1 = keyboard;
+    } else if(playerNo == 2){
+      window.nes.keyboard.player2 = keyboard;
+    }
     callback(keyboard);
   }).catch((error) => {
     console.error(error);

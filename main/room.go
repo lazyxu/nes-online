@@ -172,13 +172,28 @@ func (u *User) unready() {
 
 func (u *User) start() {
 	u.room.state = "游戏中"
+	var keyboard []interface{}
+	for _, p := range u.room.players {
+		keyboard = append(keyboard, getKeyboard(p.name))
+	}
 	u.broadcast(map[string]interface{}{
 		"type":     "start",
 		"room":     u.room.roomInfo(),
 		"roomlist": u.room.roomlistInfo(),
+		"keyboard": keyboard,
 	})
 }
 
+func (u *User) keyboard() {
+	index := 1
+	for _, user := range u.room.players {
+		if u == user {
+			break
+		}
+		index++
+	}
+
+}
 func (u *User) sendRoomMsg(m map[string]interface{}) {
 	m["from"] = u.name
 	for _, user := range u.room.players {

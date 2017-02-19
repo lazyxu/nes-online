@@ -2,7 +2,7 @@ import config from './config'
 import store from '../store.js'
 import actions from '../actions/actions.js'
 
-var ws = null;
+window.ws = null;
 var wsHandler={};
 
 wsHandler['roomlist'] = data => {
@@ -54,13 +54,28 @@ wsHandler['updateRoom'] = data => {
   }
 }
 wsHandler["start"] = data => {
-  store.dispatch(actions.tabSet("Game", true));
+  if (data.room != null && store.getState().room != null && data.room.id == store.getState().room.id) {
+    store.dispatch(actions.tabSet("Game", true));
+    if (typeof data.keyboard[0]!=="undefined") {
+      window.nes.keyboard.player1 = data.keyboard[0];
+    }
+    if (typeof data.keyboard[1]!=="undefined") {
+      window.nes.keyboard.player2 = data.keyboard[1];
+    }
+  }
 }
 wsHandler["relogin"] = data => {
   alert("你的账号在异地登录，如果不是你本人操作，请及时修改密码");
   location.reload(true);
 }
-
+wsHandler["keyboard"]= data => {
+  // window.nes.keyboardActionReceived++;
+  for (var i=0;i<window.nes.frameDelay;i++) {
+    if (typeof window.nes.keyboardAction[data.frameID+i] === "undefined")
+      window.nes.keyboardAction[data.frameID+i] = [];
+    window.nes.keyboardAction[data.frameID+i].push(data.keyboard[i]);
+  }
+}
 exports.createWS = user => {
   if (window["WebSocket"]) {
     ws = new WebSocket(config.wsServer);
@@ -75,7 +90,8 @@ exports.createWS = user => {
 
     ws.onmessage = (e) => {
       var json=JSON.parse(e.data);
-      console.log(json);
+      if (json.type!="keyboard")
+        console.log(json);
       for (var type in wsHandler) {
         if (json.type==type)
           wsHandler[type](json);
