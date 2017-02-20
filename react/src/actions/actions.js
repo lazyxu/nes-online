@@ -18,6 +18,13 @@ exports.nesSet = nes => {
     nes: nes
   }
 }
+exports.userUpdate = (key, value) => {
+  return {
+    type: "userUpdate",
+    key: key,
+    value: value
+  }
+}
 exports.msgSet = msg => {
   return {
     type: "msgSet",

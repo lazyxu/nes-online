@@ -69,9 +69,6 @@ JSNES.prototype = {
         this.ppu.reset();
         this.papu.reset();
         this.frameCount = 0;
-        this.keyboardLog = [];
-        this.keyboardAction = [];
-        this.keyboardActionReceived = 0;
         this.frameDelay = 5;
     },
     
@@ -83,58 +80,73 @@ JSNES.prototype = {
                 this.isRunning = true;
                 var waitCount = 0;
                 var oldFrameCount = 0;
-                this.frameInterval = setInterval( ()=> {
-                    if (this.frameCount>this.frameDelay) {
-                        var players = window.store.getState().room.players;
-                        var playerNUM = 0;
-                        for (i in players) {
-                            if (players[i]!=null) 
-                                playerNUM++;
+                var players = window.store.getState().room.players;
+                this.keyboardActionReceived = new Array(players.length);
+                this.keyboardActionReceivedFlag = new Array(players.length);
+                this.keyboardActionInUse = new Array(players.length);
+                for (var i in players) {
+                    if (players[i]!=null) {
+                        this.keyboardActionReceived[i] = new Array(this.frameDelay);
+                        this.keyboardActionInUse[i] = new Array(this.frameDelay);
+                        for (var j=0;j<this.frameDelay;j++){
+                            this.keyboardActionReceived[i][j]= [];
+                            this.keyboardActionInUse[i][j]= [];
                         }
-                        if(this.keyboardAction[this.frameCount].length!=playerNUM) {
-                            // console.log(this.keyboardAction[this.frameCount].length);
-                            if (waitCount==0) {
-                                if (this.frameCount - oldFrameCount >= 60) {
-                                    this.ui.updatePing((this.frameDelay+this.frameCount-(this.keyboardAction.length-this.frameDelay))/60*1000);
-                                    oldFrameCount = this.frameCount;
+                        this.keyboardActionReceivedFlag[i] = false;
+                    }
+                }
+                this.keyboardLog = [];
+                for (i=0; i<this.frameDelay; i++) 
+                    this.keyboardLog.push([]);
+                this.frameInterval = setInterval( ()=> {
+                    if (this.frameCount > this.frameDelay && this.frameCount%this.frameDelay==0) { // 如果是关键帧
+                        var players = window.store.getState().room.players;
+                        for (var i in players) {
+                            if (players[i]!=null) { // 等待玩家按键到达
+                                if (!this.keyboardActionReceivedFlag[i]) {
+                                    // window.store.dispatch({
+                                    //     type: "msgAdd",
+                                    //     msg: "等待玩家"+i,
+                                    // });
+                                    waitCount++;
+                                    return
                                 }
                             }
-                            waitCount++;
-                            return
-                        } else {
-                            if (waitCount==0) {
-                                if (this.frameCount - oldFrameCount >= 60) {
-                                    this.ui.updatePing((this.frameDelay+this.frameCount-(this.keyboardAction.length-this.frameDelay))/60*1000);
-                                    oldFrameCount = this.frameCount;
-                                }
-                            }
+                        }
+                        this.keyboardActionInUse = this.keyboardActionReceived.concat();
+                        if (this.frameCount - oldFrameCount >= 500/1000*60) { // 更新ping
+                            this.ui.updatePing((this.frameDelay+waitCount*this.frameTime)/60*1000);
+                            oldFrameCount = this.frameCount;
                         }
                         waitCount = 0;
-                        // console.log(this.frameCount);
-                        // console.log(this.keyboardAction[this.frameCount]);
-                        for (var player=0;player<this.keyboardAction[this.frameCount].length;player++)
-                            for (var i=0;i<this.keyboardAction[this.frameCount][player].length;i++) {
-                                console.log(this.keyboardAction[this.frameCount][player]);
-                                console.log(this.keyboardAction[this.frameCount][player][i].key+":"+this.keyboardAction[this.frameCount][player][i].value);
+                    }
+                    var players = window.store.getState().room.players;
+                    for (var i in players) {
+                        if (players[i]!=null) { // 触发玩家按键
+                            var action = this.keyboardActionInUse[i][this.frameCount%this.frameDelay];
+                            for (var j=0;j<action.length;j++) {
+                                console.log(action[j].key+":"+action[j].value);
                                 console.log(this.keyboard.setKey(
-                                    this.keyboardAction[this.frameCount][player][i].key,
-                                    this.keyboardAction[this.frameCount][player][i].value
+                                    i,
+                                    action[j].key,
+                                    action[j].value
                                 ));
                             }
+                        }
                     }
                     self.frame();
                     if ((this.frameCount+1)%this.frameDelay==0) {
-                        var keyboard = this.keyboardLog.slice(this.frameCount-(this.frameDelay-1),this.frameCount+1);
                         window.ws.send(JSON.stringify({
                             "type": "keyboard",
                             "frameID": this.frameCount+1,
-                            "keyboard": keyboard,
+                            "idInRoom": window.store.getState().user.idInRoom,
+                            "keyboard": this.keyboardLog,
                         }));
+
                     }
-                    // this.keyboardLog.shift();
                     this.frameCount++;
                     this.ui.updateFrameCount(this.frameCount);
-                    this.keyboardLog[this.frameCount] = [];
+                    this.keyboardLog[this.frameCount%this.frameDelay] = [];
                 }, this.frameTime);
                 this.resetFps();
                 this.printFps();

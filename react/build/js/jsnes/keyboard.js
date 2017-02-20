@@ -18,8 +18,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 // Keyboard events are bound in the UI
 JSNES.Keyboard = function() {
-    var i;
-    
     this.keys = {
         A: 0,
         B: 1,
@@ -30,7 +28,7 @@ JSNES.Keyboard = function() {
         left: 6,
         right: 7
     };
-    this.player1 = {
+    this.player = [{
         A: 74,
         B: 75,
         X: 85,
@@ -41,8 +39,8 @@ JSNES.Keyboard = function() {
         down: 83,
         left: 65,
         right: 68
-    };
-    this.player2 = {
+    },
+    {
         A: 50,
         B: 51,
         X: 53,
@@ -53,47 +51,35 @@ JSNES.Keyboard = function() {
         down: 40,
         left: 37,
         right: 39
-    };
-    this.state1 = new Array(8);
-    for (i = 0; i < this.state1.length; i++) {
-        this.state1[i] = 0x40;
-    }
-    this.state2 = new Array(8);
-    for (i = 0; i < this.state2.length; i++) {
-        this.state2[i] = 0x40;
+    }];
+
+    this.state = new Array(this.player.length);
+    for (var i=0; i<this.player.length;i++) {
+        this.state[i] = new Array(8);
+        for (j = 0; j < 8; j++) {
+            this.state[i][j] = 0x40;
+        }
     }
 };
 
 JSNES.Keyboard.prototype = {
-    setKey: function(key, value) {
+    setKey: function(i, key, value) {
         switch (key) {
-            case this.player1.A: this.state1[this.keys.A] = value; break;      // X
-            case this.player1.B: this.state1[this.keys.B] = value; break;      // Z
-            case this.player1.select: this.state1[this.keys.select] = value; break; // Right Ctrl
-            case this.player1.start: this.state1[this.keys.start] = value; break;  // Enter
-            case this.player1.up: this.state1[this.keys.up] = value; break;     // Up
-            case this.player1.down: this.state1[this.keys.down] = value; break;   // Down
-            case this.player1.left: this.state1[this.keys.left] = value; break;   // Left
-            case this.player1.right: this.state1[this.keys.right] = value; break;  // Right
+            case this.player[i].A: this.state[i][this.keys.A] = value; break;      // X
+            case this.player[i].B: this.state[i][this.keys.B] = value; break;      // Z
+            case this.player[i].select: this.state[i][this.keys.select] = value; break; // Right Ctrl
+            case this.player[i].start: this.state[i][this.keys.start] = value; break;  // Enter
+            case this.player[i].up: this.state[i][this.keys.up] = value; break;     // Up
+            case this.player[i].down: this.state[i][this.keys.down] = value; break;   // Down
+            case this.player[i].left: this.state[i][this.keys.left] = value; break;   // Left
+            case this.player[i].right: this.state[i][this.keys.right] = value; break;  // Right
             default: return true;
         }
-        switch (key) {
-            case this.player2.A: this.state2[this.keys.A] = value; break;     // Num-7
-            case this.player2.B: this.state2[this.keys.B] = value; break;     // Num-9
-            case this.player2.select: this.state2[this.keys.select] = value; break; // Num-3
-            case this.player2.start: this.state2[this.keys.start] = value; break;  // Num-1
-            case this.player2.up: this.state2[this.keys.up] = value; break;    // Num-8
-            case this.player2.down: this.state2[this.keys.down] = value; break;   // Num-2
-            case this.player2.left: this.state2[this.keys.left] = value; break;  // Num-4
-            case this.player2.right: this.state2[this.keys.right] = value; break; // Num-6
-            default: return true;
-        }
-        console.log(this.state1);
         return false; // preventDefault
     },
 
     keyDown: function(evt) {
-        window.nes.keyboardLog[window.nes.frameCount].push({
+        window.nes.keyboardLog[window.nes.frameCount%window.nes.frameDelay].push({
             'key': evt.keyCode,
             'value': 0x41,
         });
@@ -104,7 +90,7 @@ JSNES.Keyboard.prototype = {
     },
     
     keyUp: function(evt) {
-        window.nes.keyboardLog[window.nes.frameCount].push({
+        window.nes.keyboardLog[window.nes.frameCount%window.nes.frameDelay].push({
             'key': evt.keyCode,
             'value': 0x40,
         });

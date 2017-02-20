@@ -13,12 +13,13 @@ type Hub struct {
 }
 
 type User struct {
-	name   string
-	avatar string
-	room   *Room
-	ws     *websocket.Conn
-	msg    chan map[string]interface{}
-	state  string
+	name     string
+	avatar   string
+	room     *Room
+	ws       *websocket.Conn
+	msg      chan map[string]interface{}
+	state    string
+	idInRoom int
 }
 
 type Room struct {
@@ -118,7 +119,7 @@ func (u *User) unregister() {
 
 func (u *User) broadcast(m map[string]interface{}) {
 	m["from"] = u.name
-	log.Println("broadcast: ", m)
+	// log.Println("broadcast: ", m)
 	for _, user := range h.users {
 		if user.msg == nil {
 			log.Println("channel is nil")

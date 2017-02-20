@@ -87,8 +87,10 @@ func (u *User) createRoom(m map[string]interface{}) {
 	}
 	u.room = h.rooms[roomID]
 	u.state = "房主"
+	u.idInRoom = 0
 	u.broadcast(map[string]interface{}{
 		"type":     "createRoom",
+		"idInRoom": u.idInRoom,
 		"room":     h.rooms[roomID].roomInfo(),
 		"roomlist": h.rooms[roomID].roomlistInfo(),
 	})
@@ -98,11 +100,13 @@ func (u *User) enterRoom(m map[string]interface{}) {
 	roomID, _ := strconv.Atoi(m["roomID"].(string))
 	for index, user := range h.rooms[roomID].players {
 		if user == nil {
+			u.idInRoom = index
 			u.room = h.rooms[roomID]
 			u.state = ""
 			h.rooms[roomID].players[index] = u
 			u.broadcast(map[string]interface{}{
 				"type":     "enterRoom",
+				"idInRoom": u.idInRoom,
 				"room":     h.rooms[roomID].roomInfo(),
 				"roomlist": h.rooms[roomID].roomlistInfo(),
 			})

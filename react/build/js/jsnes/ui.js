@@ -70,14 +70,14 @@ if (typeof jQuery !== 'undefined') {
                 addKeyboard: function(div) {
                     var self = this;
                     div.addEventListener('keydown', (evt) => {
-                        console.log(this.nes.frameCount+'keydown');
+                        console.log('keydown: '+this.nes.frameCount);
                         self.nes.keyboard.keyDown(evt);
                     });
                     div.addEventListener('keyup', (evt) => {
                         self.nes.keyboard.keyUp(evt); 
                     });
                     div.addEventListener('keypress', (evt) => {
-                        self.nes.keyboard.keyPress(evt); 
+                        self.nes.keyboard.keyPress(evt);
                     });
                 },
 

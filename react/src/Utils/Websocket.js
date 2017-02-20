@@ -16,6 +16,7 @@ wsHandler['createRoom'] = data => {
   store.dispatch(actions.roomlistUpdate(data.roomlist));
   if (data.from == store.getState().user.name) {
     store.dispatch(actions.roomSet(data.room));
+    store.dispatch(actions.userUpdate("idInRoom", data.idInRoom));
     store.dispatch(actions.tabSet('Room'));
   }
 }
@@ -39,6 +40,7 @@ wsHandler['enterRoom'] = data => {
   if (store.getState().room==null) {
     if (data.from==store.getState().user.name) {
       store.dispatch(actions.roomSet(data.room));
+      store.dispatch(actions.userUpdate("idInRoom", data.idInRoom));
       store.dispatch(actions.tabSet('Room'));
     }
   } else {
@@ -57,10 +59,10 @@ wsHandler["start"] = data => {
   if (data.room != null && store.getState().room != null && data.room.id == store.getState().room.id) {
     store.dispatch(actions.tabSet("Game", true));
     if (typeof data.keyboard[0]!=="undefined") {
-      window.nes.keyboard.player1 = data.keyboard[0];
+      window.nes.keyboard.player[0] = data.keyboard[0];
     }
     if (typeof data.keyboard[1]!=="undefined") {
-      window.nes.keyboard.player2 = data.keyboard[1];
+      window.nes.keyboard.player[1] = data.keyboard[1];
     }
   }
 }
@@ -69,12 +71,13 @@ wsHandler["relogin"] = data => {
   location.reload(true);
 }
 wsHandler["keyboard"]= data => {
-  // window.nes.keyboardActionReceived++;
-  for (var i=0;i<window.nes.frameDelay;i++) {
-    if (typeof window.nes.keyboardAction[data.frameID+i] === "undefined")
-      window.nes.keyboardAction[data.frameID+i] = [];
-    window.nes.keyboardAction[data.frameID+i].push(data.keyboard[i]);
-  }
+  var len = 0;
+  for (var i=0; i<data.keyboard.length; i++)
+    len += data.keyboard[i].length;
+  if (len!=0)
+    console.log(window.nes.keyboardActionReceived[data.idInRoom]);
+  window.nes.keyboardActionReceived[data.idInRoom] = data.keyboard;
+  window.nes.keyboardActionReceivedFlag[data.idInRoom] = true;
 }
 exports.createWS = user => {
   if (window["WebSocket"]) {
