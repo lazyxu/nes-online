@@ -79,7 +79,7 @@ JSNES.Keyboard.prototype = {
     },
 
     keyDown: function(evt) {
-        window.nes.keyboardLog[window.nes.frameCount%window.nes.frameDelay].push({
+        window.nes.keyboardLog[window.nes.frameCount%window.nes.frameSend].push({
             'key': evt.keyCode,
             'value': 0x41,
         });
@@ -90,7 +90,7 @@ JSNES.Keyboard.prototype = {
     },
     
     keyUp: function(evt) {
-        window.nes.keyboardLog[window.nes.frameCount%window.nes.frameDelay].push({
+        window.nes.keyboardLog[window.nes.frameCount%window.nes.frameSend].push({
             'key': evt.keyCode,
             'value': 0x40,
         });

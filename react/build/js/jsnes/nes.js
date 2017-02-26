@@ -69,7 +69,8 @@ JSNES.prototype = {
         this.ppu.reset();
         this.papu.reset();
         this.frameCount = 0;
-        this.frameDelay = 5;
+        this.frameDelay = 6;
+        this.frameSend = 1;
     },
     
     start: function() {
@@ -78,80 +79,74 @@ JSNES.prototype = {
         if (this.rom !== null && this.rom.valid) {
             if (!this.isRunning) {
                 this.isRunning = true;
-                var waitCount = 0;
-                var oldFrameCount = 0;
-                var players = window.store.getState().room.players;
-                this.keyboardActionReceived = new Array(players.length);
-                this.keyboardActionReceivedFlag = new Array(players.length);
-                this.keyboardActionInUse = new Array(players.length);
-                for (var i in players) {
-                    if (players[i]!=null) {
-                        this.keyboardActionReceived[i] = new Array(this.frameDelay);
-                        this.keyboardActionInUse[i] = new Array(this.frameDelay);
-                        for (var j=0;j<this.frameDelay;j++){
-                            this.keyboardActionReceived[i][j]= [];
-                            this.keyboardActionInUse[i][j]= [];
-                        }
-                        this.keyboardActionReceivedFlag[i] = false;
-                    }
-                }
+                this.waitCount = 0;
                 this.keyboardLog = [];
-                for (i=0; i<this.frameDelay; i++) 
+                for (i=0; i<this.frameSend; i++)
                     this.keyboardLog.push([]);
                 this.frameInterval = setInterval( ()=> {
-                    if (this.frameCount > this.frameDelay && this.frameCount%this.frameDelay==0) { // 如果是关键帧
+                    if (this.frameCount%this.frameSend==0 && this.frameCount >= this.frameDelay) { // 如果是关键帧
                         var players = window.store.getState().room.players;
                         for (var i in players) {
                             if (players[i]!=null) { // 等待玩家按键到达
-                                if (!this.keyboardActionReceivedFlag[i]) {
+                                if (typeof window.keyboardAction[i][0]=="undefined") {
                                     // window.store.dispatch({
                                     //     type: "msgAdd",
                                     //     msg: "等待玩家"+i,
                                     // });
-                                    waitCount++;
+                                    console.log('wait:'+i);
+                                    this.waitCount++;
                                     return
                                 }
                             }
                         }
-                        this.keyboardActionInUse = this.keyboardActionReceived.concat();
-                        if (this.frameCount - oldFrameCount >= 500/1000*60) { // 更新ping
-                            this.ui.updatePing((this.frameDelay+waitCount*this.frameTime)/60*1000);
-                            oldFrameCount = this.frameCount;
+                        if (this.waitCount != 0) {
+                            console.log(this.frameCount+':'+this.waitCount);
                         }
-                        waitCount = 0;
+                        if (this.waitCount >= 10) { // 运行太快了，等待一下其他玩家
+                            console.log('运行太快了，等待一下其他玩家');
+                            this.waitCount = 0;
+                            return
+                        }
                     }
-                    var players = window.store.getState().room.players;
-                    for (var i in players) {
-                        if (players[i]!=null) { // 触发玩家按键
-                            var action = this.keyboardActionInUse[i][this.frameCount%this.frameDelay];
+                    if ((this.frameCount+1)%this.frameSend==0) {
+                        window.ws.send(JSON.stringify({
+                            "type": "keyboard",
+                            "frameID": this.frameCount+this.frameDelay,
+                            "idInRoom": window.store.getState().user.idInRoom,
+                            "keyboard": this.keyboardLog,
+                        }));
+                    }
+                    for (var i in players) { // 触发玩家按键
+                        if (players[i]!=null) {
+                            // console.log(this.frameCount);
+                            // console.log(window.keyboardAction);
+                            var action = window.keyboardAction[i][0];
                             for (var j=0;j<action.length;j++) {
-                                console.log(action[j].key+":"+action[j].value);
-                                console.log(this.keyboard.setKey(
+                                // console.log(action[j].key+":"+action[j].value);
+                                this.keyboard.setKey(
                                     i,
                                     action[j].key,
                                     action[j].value
-                                ));
+                                );
                             }
                         }
                     }
                     self.frame();
-                    if ((this.frameCount+1)%this.frameDelay==0) {
-                        window.ws.send(JSON.stringify({
-                            "type": "keyboard",
-                            "frameID": this.frameCount+1,
-                            "idInRoom": window.store.getState().user.idInRoom,
-                            "keyboard": this.keyboardLog,
-                        }));
-
-                    }
                     this.frameCount++;
                     this.ui.updateFrameCount(this.frameCount);
-                    this.keyboardLog[this.frameCount%this.frameDelay] = [];
+                    this.keyboardLog[this.frameCount%this.frameSend] = [];
+                    for (var i in players) {
+                        if (players[i]!=null) {
+                            window.keyboardAction[i].shift();
+                        }
+                    }
+                    this.waitCount = 0;
                 }, this.frameTime);
                 this.resetFps();
                 this.printFps();
-                this.fpsInterval = setInterval(function() {
+                this.fpsInterval = setInterval( () => {
                     self.printFps();
+                    this.ui.updatePing((this.frameDelay+this.waitCount*this.frameTime)/60*1000);
                 }, this.opts.fpsInterval);
             }
         }

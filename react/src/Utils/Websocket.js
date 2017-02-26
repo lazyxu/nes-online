@@ -64,6 +64,17 @@ wsHandler["start"] = data => {
     if (typeof data.keyboard[1]!=="undefined") {
       window.nes.keyboard.player[1] = data.keyboard[1];
     }
+    var players = window.store.getState().room.players;
+    window.keyboardAction = new Array(players.length);
+    var frameDelay = 6;
+    for (var i in players) {
+        if (players[i]!=null) {
+            window.keyboardAction[i] = new Array(frameDelay);
+            for (var j=0; j<frameDelay; j++) {
+                window.keyboardAction[i][j] = [];
+            }
+        }
+    }
   }
 }
 wsHandler["relogin"] = data => {
@@ -71,13 +82,16 @@ wsHandler["relogin"] = data => {
   location.reload(true);
 }
 wsHandler["keyboard"]= data => {
-  var len = 0;
+  // console.log(data);
+  var frameCount = 0;
+  if (typeof window.nes.frameCount=="undefined") {
+    frameCount = 0;
+  } else {
+    frameCount = window.nes.frameCount;
+  }
   for (var i=0; i<data.keyboard.length; i++)
-    len += data.keyboard[i].length;
-  if (len!=0)
-    console.log(window.nes.keyboardActionReceived[data.idInRoom]);
-  window.nes.keyboardActionReceived[data.idInRoom] = data.keyboard;
-  window.nes.keyboardActionReceivedFlag[data.idInRoom] = true;
+    window.keyboardAction[data.idInRoom][data.frameID+i-frameCount] = data.keyboard[i];
+  // console.log(window.keyboardAction);
 }
 exports.createWS = user => {
   if (window["WebSocket"]) {

@@ -15,9 +15,9 @@ func (u *User) reader() {
 		if err != nil {
 			break
 		}
-		if m["type"] != "keyboard" {
-			log.Println(m["type"], ": ", m)
-		}
+		// if m["type"] != "keyboard" {
+		log.Println(m["type"], ": ", m)
+		// }
 		switch m["type"] {
 		case "in":
 			u.register(m)

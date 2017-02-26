@@ -1,3 +1,4 @@
 module.exports = {
-  wsServer: 'ws://localhost:8080/ws'
+  wsServer: 'ws://nes.juanix.cn/ws'
+  // wsServer: 'ws://localhost:8080/ws'
 }
