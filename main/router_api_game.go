@@ -13,6 +13,15 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
+func getGameList() interface{} {
+	games, _ := queryInCollection("game", func(c *mgo.Collection) (interface{}, error) {
+		var games []interface{}
+		err := c.Find(nil).All(&games)
+		return games, err
+	})
+	return games
+}
+
 func listGame(k *koala.Params, w http.ResponseWriter, r *http.Request) {
 	games, _ := queryInCollection("game", func(c *mgo.Collection) (interface{}, error) {
 		var games []interface{}

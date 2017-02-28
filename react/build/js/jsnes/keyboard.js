@@ -52,6 +52,14 @@ JSNES.Keyboard = function() {
         left: 37,
         right: 39
     }];
+    this.interval = [{
+        X: null,
+        Y: null,
+    },
+    {
+        X: null,
+        Y: null,
+    }];
 
     this.state = new Array(this.player.length);
     for (var i=0; i<this.player.length;i++) {
@@ -65,14 +73,52 @@ JSNES.Keyboard = function() {
 JSNES.Keyboard.prototype = {
     setKey: function(i, key, value) {
         switch (key) {
-            case this.player[i].A: this.state[i][this.keys.A] = value; break;      // X
-            case this.player[i].B: this.state[i][this.keys.B] = value; break;      // Z
-            case this.player[i].select: this.state[i][this.keys.select] = value; break; // Right Ctrl
-            case this.player[i].start: this.state[i][this.keys.start] = value; break;  // Enter
-            case this.player[i].up: this.state[i][this.keys.up] = value; break;     // Up
-            case this.player[i].down: this.state[i][this.keys.down] = value; break;   // Down
-            case this.player[i].left: this.state[i][this.keys.left] = value; break;   // Left
-            case this.player[i].right: this.state[i][this.keys.right] = value; break;  // Right
+            case this.player[i].X:
+                if (value==0x41) {
+                    if (this.interval[i].X) {
+                        clearInterval(this.interval[i].X);
+                        this.interval[i].X = null;
+                    }
+                    this.interval[i].X = setInterval( () => {
+                        if (this.state[i][this.keys.A]==0x40)
+                            this.state[i][this.keys.A] = 0x41;
+                        else if (this.state[i][this.keys.A]==0x41)
+                            this.state[i][this.keys.A] = 0x40;
+                    }, 50);
+                }
+                else if (value==0x40) {
+                    clearInterval(this.interval[i].X);
+                    this.interval[i].X = null;
+                    this.state[i][this.keys.A] = 0x40;
+                }
+                break;
+            case this.player[i].Y:
+                if (value==0x41) {
+                    if (this.interval[i].Y) {
+                        clearInterval(this.interval[i].Y);
+                        this.interval[i].Y = null;
+                    }
+                    this.interval[i].Y = setInterval( () => {
+                        if (this.state[i][this.keys.B]==0x40)
+                            this.state[i][this.keys.B] = 0x41;
+                        else if (this.state[i][this.keys.B]==0x41)
+                            this.state[i][this.keys.B] = 0x40;
+                    }, 50);
+                }
+                else if (value==0x40) {
+                    clearInterval(this.interval[i].Y);
+                    this.interval[i].Y = null;
+                    this.state[i][this.keys.B] = 0x40;
+                }
+                break;
+            case this.player[i].A: this.state[i][this.keys.A] = value; break;
+            case this.player[i].B: this.state[i][this.keys.B] = value; break;
+            case this.player[i].select: this.state[i][this.keys.select] = value; break;
+            case this.player[i].start: this.state[i][this.keys.start] = value; break;
+            case this.player[i].up: this.state[i][this.keys.up] = value; break;
+            case this.player[i].down: this.state[i][this.keys.down] = value; break;
+            case this.player[i].left: this.state[i][this.keys.left] = value; break;
+            case this.player[i].right: this.state[i][this.keys.right] = value; break;
             default: return true;
         }
         return false; // preventDefault

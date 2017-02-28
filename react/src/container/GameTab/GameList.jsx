@@ -10,20 +10,6 @@ class GameList extends React.Component {
 
   constructor(props) {
     super(props);
-    this.state = {
-      games: [],
-    };
-  }
-
-  componentDidMount() {
-    console.log(navigator.getGamepads());
-    api.listGame( games => {
-      if (games==null) {
-        this.setState({games: []});
-      } else {
-        this.setState({games: games});
-      }
-    });
   }
 
   chooseGame(game) {
@@ -37,7 +23,7 @@ class GameList extends React.Component {
     return (
       <div className='GameListBox' id='GameListBox'>
         <div className="GameList" id='GameList'>
-          {this.state.games.map(game=>{
+          {this.props.gamelist.map(game=>{
             return (
               <div className="Block" id='Block' key={game.name} onClick={this.chooseGame.bind(this, game.name)}>
                 <img src={'/rom/'+game.name+'.jpg'}/>
@@ -51,11 +37,15 @@ class GameList extends React.Component {
         <Scroll 
           mainBoxID='GameListBox' 
           contentID='GameList' 
-          scrollUpdate={this.state.games.length}
+          scrollUpdate={this.props.gamelist.length}
         />
       </div>
     );
   }
 }
-
-export default connect(null, {gameSet, tabSet})(GameList);
+function mapStateToProps(state) {
+    return {
+      gamelist: state.gamelist,
+    }
+}
+export default connect(mapStateToProps, {gameSet, tabSet})(GameList);

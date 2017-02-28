@@ -16,6 +16,7 @@ export default class UserTab extends React.Component {
   }
 
   componentDidMount() {
+    this.setState({hidden: true});
     ws.on('userlist', (data) => {
       if (data.users==null) {
         this.setState({users: new Object()});

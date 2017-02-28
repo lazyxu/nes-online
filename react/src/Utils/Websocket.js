@@ -5,13 +5,12 @@ import actions from '../actions/actions.js'
 window.ws = null;
 var wsHandler={};
 
-wsHandler['roomlist'] = data => {
-  if (data.rooms == null) {
-    store.dispatch(actions.roomlistSet(new Object()));
-  } else {
-    store.dispatch(actions.roomlistSet(data.rooms));
-  }
+wsHandler['info'] = data => {
+  store.dispatch(actions.roomlistSet(data.roomlist == null?new Object():data.roomlist));
+  store.dispatch(actions.gamelistSet(data.gamelist == null?new Array():data.gamelist));
+  store.dispatch(actions.keyboardSet(data.keyboard == null?new Object():data.keyboard));
 }
+
 wsHandler['createRoom'] = data => {
   store.dispatch(actions.roomlistUpdate(data.roomlist));
   if (data.from == store.getState().user.name) {

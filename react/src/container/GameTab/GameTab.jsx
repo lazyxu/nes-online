@@ -23,7 +23,6 @@ class GameTab extends React.Component {
           {this.props.room!=null && <button className={this.props.tab=='Room'?'Show':'Hide'} onClick={() => this.props.tabSet('Room')}>房间{this.props.room.id}</button>}
           <button className={this.props.tab=='RoomList'?'room-show':'room-hide'} onClick={() => this.props.tabSet('RoomList')}>房间列表</button>
           <div className='partition'>|</div>
-          <button className='Setting' onClick={() => this.props.tabSet('Setting')}>游戏设置</button>
         </div>
         <div className='List'>
         {
@@ -32,8 +31,7 @@ class GameTab extends React.Component {
           (this.props.tab=='MyGame'?<div/>:
           (this.props.tab=='RoomList'?<RoomList/>:
           (this.props.tab=='Room'?<Room/>:
-          (this.props.tab=='Setting'?<div/>:
-          <div/>)))))
+          <div/>))))
         }
         </div>
       </div>

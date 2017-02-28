@@ -15,11 +15,14 @@ export default class Active extends React.Component {
     var id = 'active';
     utils.msgInfo(id, '正在激活账户...');
     api.active(this.props.params.active_code, (data) => {
+      setTimeout(function() {
+        location.reload(true);
+      }, 3000);
       if (!data.state) {
-        utils.msgERR(id, data.msg);
+        utils.msgERR(id, data.msg+'3s后跳转到登录界面');
         return
       }
-      utils.msgOK(id, data.msg);
+      utils.msgOK(id, data.msg+'3s后跳转到登录界面');
       browserHistory.push("/");
     });
   }

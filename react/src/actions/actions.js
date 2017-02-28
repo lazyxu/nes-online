@@ -1,9 +1,21 @@
 import store from '../store.js'
-import keyboardAPI from '../api/user/keyboard.js'
+
 exports.gameSet = game => {
   return {
     type: "gameSet",
     game: game
+  }
+}
+exports.keyboardSet = keyboard => {
+  return {
+    type: "keyboardSet",
+    keyboard: keyboard
+  }
+}
+exports.gamelistSet = gamelist => {
+  return {
+    type: "gamelistSet",
+    gamelist: gamelist
   }
 }
 exports.roomSet = room => {

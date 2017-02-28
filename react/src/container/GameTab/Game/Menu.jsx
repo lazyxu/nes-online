@@ -5,7 +5,7 @@ import './Menu.scss'
 import ws from '../../../utils/websocket'
 import {roomSet, gameTabSet, tabSet} from '../../../actions/actions'
 import nesAPI from '../GameAPI.js'
-import MenuKeyboard from './MenuKeyboard.jsx'
+import KeyboardSetting from './KeyboardSetting.jsx'
 
 class Menu extends React.Component {
 
@@ -18,7 +18,6 @@ class Menu extends React.Component {
     }
   }
   render() {
-    console.log(window.nes);
     var list=[];
     var button="";
     for (var index in this.props.room.players) {
@@ -35,7 +34,7 @@ class Menu extends React.Component {
     return (
       <div className='GameTab'>
         {this.state.page=="键位设置"?
-          <MenuKeyboard/>:
+          <KeyboardSetting/>:
         (this.state.page=="游戏菜单"?
           <div className='menuWindow'>
             <div style={{textAlign: "center"}}>游戏菜单</div>

@@ -7,6 +7,7 @@ import GameTab from './GameTab/GameTab'
 import UserTab from './UserTab/UserTab'
 import ws from '../utils/websocket'
 import Game from './GameTab/Game.jsx'
+import SettingTab from './SettingTab/SettingTab.jsx'
 
 class App extends React.Component {
 
@@ -45,6 +46,7 @@ class App extends React.Component {
         {Account}
         <GameTab />
         <UserTab user={this.props.user}/>
+        <SettingTab/>
         {Footer}
       </div>
     )

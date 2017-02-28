@@ -8,6 +8,7 @@ import user from './user.js'
 import msg from './msg.js'
 import nes from './nes.js'
 import keyboard from './keyboard.js'
+import gamelist from './gamelist.js'
 
 export default combineReducers({
   game,
@@ -19,4 +20,5 @@ export default combineReducers({
   msg,
   nes,
   keyboard,
+  gamelist,
 })

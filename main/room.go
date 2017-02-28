@@ -178,7 +178,11 @@ func (u *User) start() {
 	u.room.state = "游戏中"
 	var keyboard []interface{}
 	for _, p := range u.room.players {
-		keyboard = append(keyboard, getKeyboard(p.name))
+		if p != nil {
+			keyboard = append(keyboard, getKeyboard(p.name))
+		} else {
+			keyboard = append(keyboard, nil)
+		}
 	}
 	u.broadcast(map[string]interface{}{
 		"type":     "start",
