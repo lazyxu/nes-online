@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom'
 import { Provider } from 'react-redux'
 import { Router, Route, IndexRoute, hashHistory } from 'react-router'
 import { connect } from 'react-redux'
-
+    
 import App from './container/App.jsx'
 import Active from './container/MaskLayer/Active'
 import Register from './container/MaskLayer/Register'
