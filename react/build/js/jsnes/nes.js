@@ -102,11 +102,6 @@ JSNES.prototype = {
                         if (this.waitCount != 0) {
                             console.log(this.frameCount+':'+this.waitCount);
                         }
-                        if (this.waitCount >= 10) { // 运行太快了，等待一下其他玩家
-                            console.log('运行太快了，等待一下其他玩家');
-                            this.waitCount = 0;
-                            return
-                        }
                     }
                     if ((this.frameCount+1)%this.frameSend==0) {
                         window.ws.send(JSON.stringify({
@@ -146,7 +141,7 @@ JSNES.prototype = {
                 this.printFps();
                 this.fpsInterval = setInterval( () => {
                     self.printFps();
-                    this.ui.updatePing((this.frameDelay+this.waitCount*this.frameTime)/60*1000);
+                    this.ui.updatePing((this.frameDelay+this.waitCount)*this.frameTime);
                 }, this.opts.fpsInterval);
             }
         }

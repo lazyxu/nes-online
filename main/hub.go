@@ -74,10 +74,7 @@ func (h *Hub) init() {
 	// }
 }
 
-func (u *User) register(m map[string]interface{}) {
-	user := m["user"].(map[string]interface{})
-	u.avatar = user["avatar"].(string)
-	u.name = user["name"].(string)
+func (u *User) register() {
 	u.room = nil
 	u.state = "在线"
 	if user, ok := h.users[u.name]; ok {
@@ -87,8 +84,14 @@ func (u *User) register(m map[string]interface{}) {
 		user.unregister()
 	}
 	h.users[u.name] = u
-	log.Println(h.users)
-	u.broadcast(m)
+	// log.Println(h.users)
+	u.broadcast(map[string]interface{}{
+		"type": "in",
+		"user": map[string]interface{}{
+			"name":   u.name,
+			"avatar": u.avatar,
+		},
+	})
 	users := map[string]interface{}{}
 	for _, user := range h.users {
 		users[user.name] = map[string]interface{}{

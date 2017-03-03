@@ -2,7 +2,6 @@ package koala
 
 import (
 	"errors"
-	"log"
 	"net/http"
 	"time"
 )
@@ -44,7 +43,7 @@ func ExistSession(r *http.Request, cookieName string) bool {
 	return false
 }
 
-// PeekSession 如果有Session则直接返回
+// PeekSession 如果有Session则直接返回,否则返回nil
 func PeekSession(r *http.Request, cookieName string) *Session {
 	c, err := r.Cookie(cookieName)
 	if err != nil {
@@ -75,10 +74,10 @@ func CheckSession(r *http.Request, m map[string]interface{}) bool {
 	return true
 }
 
-// GetSessionValue 获取session中的某个值
+// GetSessionValue 获取session中的某个值，如果没有则返回nil
 func GetSessionValue(r *http.Request, cookieName string, key string) interface{} {
 	session := PeekSession(r, cookieName)
-	log.Println(session)
+	// log.Println(session)
 	if session != nil {
 		return session.Values[key]
 	}
@@ -95,6 +94,7 @@ func GetSession(r *http.Request, w http.ResponseWriter, cookieName string) *Sess
 			Name:    cookieName,
 			Value:   sessionID,
 			Expires: time.Now().Add(s.ExpireTime),
+			Path:    "/",
 		}
 		http.SetCookie(w, c)
 		return &s
@@ -109,6 +109,7 @@ func GetSession(r *http.Request, w http.ResponseWriter, cookieName string) *Sess
 		Name:    cookieName,
 		Value:   sessionID,
 		Expires: time.Now().Add(s.ExpireTime),
+		Path:    "/",
 	}
 	http.SetCookie(w, c)
 	return &s
@@ -128,5 +129,19 @@ func (s *Session) UpdateExpireTime(r *http.Request, w http.ResponseWriter) error
 
 func (s *Session) Destory() error {
 	delete(Sessions, s.ID)
+	return nil
+}
+
+func DestorySession(r *http.Request, w http.ResponseWriter, cookieName string) error {
+	s := PeekSession(r, cookieName)
+	if s != nil {
+		delete(Sessions, s.ID)
+	}
+	cookie := http.Cookie{
+		Name:   cookieName,
+		Path:   "/",
+		MaxAge: -1,
+	}
+	http.SetCookie(w, &cookie)
 	return nil
 }

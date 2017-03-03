@@ -124,22 +124,21 @@ export default class Register extends React.Component {
 
   render() {
     return (
-      <div className='MaskLayer'>
-        <div className='Form'>
-          <h1>注册</h1>
-          <input type='email' placeholder='邮箱' name='mail' onBlur={this.checkMail}/>
-          <div id='checkMail' className='msg'></div>
-          <input type='text' placeholder='用户名' name='name' onBlur={this.checkName}/>
-          <div id='checkName' className='msg'></div>
-          <input type='password' placeholder='密码' name='password' onBlur={this.checkPassword}/>
-          <input type='password' placeholder='再次输入密码' name='password' onBlur={this.checkPassword}/>
-          <div id='checkPassword' className='msg'></div>
-          <div className='link'>
-            <Link to="/" className='rightLink'>已有帐号？登录</Link>
-          </div>
-          <button type='button' id='register' className='disableButton' onClick={this.register}>发送注册邮件</button>
-          <div id='checkRegister' className='msg'></div>
+      <div className='Form'>
+        {/*<img src="/img/background.jpg" className='Background'/>*/}
+        <h1>注册</h1>
+        <input type='email' placeholder='邮箱' name='mail' onBlur={this.checkMail}/>
+        <div id='checkMail' className='msg'></div>
+        <input type='text' placeholder='用户名' name='name' onBlur={this.checkName}/>
+        <div id='checkName' className='msg'></div>
+        <input type='password' placeholder='密码' name='password' onBlur={this.checkPassword}/>
+        <input type='password' placeholder='再次输入密码' name='password' onBlur={this.checkPassword}/>
+        <div id='checkPassword' className='msg'></div>
+        <div className='link'>
+          <Link to="/login" className='rightLink'>已有帐号？登录</Link>
         </div>
+        <button type='button' id='register' className='disableButton' onClick={this.register}>发送注册邮件</button>
+        <div id='checkRegister' className='msg'></div>
       </div>
     )
   }

@@ -25,16 +25,15 @@ export default class ForgetPassword extends React.Component {
 
   render() {
     return (
-      <div className='MaskLayer'>
-        <div className='Form'>
-          <h1>忘记密码</h1>
-          <input type='text' placeholder='邮箱' name='mail' />
-          <div className='link'>
-            <Link to="/" className='leftLink'>想起密码了？登录吧</Link>
-          </div>
-          <button type='button' className='enableButton' onClick={this.forgetPassword}>发送验证邮件</button>
-          <div id='check' className='msg'></div>
+      <div className='Form'>
+        {/*<img src="/img/background.jpg" className='Background'/>*/}
+        <h1>忘记密码</h1>
+        <input type='text' placeholder='邮箱' name='mail' />
+        <div className='link'>
+          <Link to="/login" className='leftLink'>想起密码了？登录吧</Link>
         </div>
+        <button type='button' className='enableButton' onClick={this.forgetPassword}>发送验证邮件</button>
+        <div id='check' className='msg'></div>
       </div>
     )
   }

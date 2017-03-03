@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"nes-online/koala"
 	"net/http"
 
 	"github.com/gorilla/websocket"
@@ -15,12 +16,12 @@ func (u *User) reader() {
 		if err != nil {
 			break
 		}
-		// if m["type"] != "keyboard" {
-		log.Println(m["type"], ": ", m)
-		// }
+		if m["type"] != "keyboard" {
+			log.Println(m["type"], ": ", m)
+		}
 		switch m["type"] {
-		case "in":
-			u.register(m)
+		// case "in":
+		// 	u.register(m)
 		case "createRoom":
 			u.createRoom(m)
 		case "leaveRoom":
@@ -58,19 +59,26 @@ func (u *User) writer() {
 var upgrader = &websocket.Upgrader{ReadBufferSize: 1024, WriteBufferSize: 1024}
 
 func wsHandler(w http.ResponseWriter, r *http.Request) {
-	ws, err := upgrader.Upgrade(w, r, nil)
-	if err != nil {
-		println(err)
-		return
+	data := koala.GetSessionValue(r, cookieName, "user")
+	koala.DestorySession(r, w, cookieName)
+	if user, ok := data.(map[string]interface{}); ok {
+		ws, err := upgrader.Upgrade(w, r, nil)
+		if err != nil {
+			println(err)
+			return
+		}
+		u := &User{
+			msg:    make(chan map[string]interface{}, 256),
+			ws:     ws,
+			name:   user["name"].(string),
+			avatar: user["avatar"].(string),
+		}
+		u.register()
+		defer func() {
+			u.unregister()
+			close(u.msg)
+		}()
+		go u.writer()
+		u.reader()
 	}
-	u := &User{
-		msg: make(chan map[string]interface{}, 256),
-		ws:  ws,
-	}
-	defer func() {
-		u.unregister()
-		close(u.msg)
-	}()
-	go u.writer()
-	u.reader()
 }

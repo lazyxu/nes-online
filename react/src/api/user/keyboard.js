@@ -16,7 +16,7 @@ exports.load = (callback) => {
             playerNo = i
     }
     if (playerNo == 1) {
-      window.nes.keyboard.player1 = keyboard;
+      window.nes.keyboard.player[0]= keyboard;
     } else if(playerNo == 2){
       window.nes.keyboard.player2 = keyboard;
     }
@@ -34,7 +34,7 @@ exports.update = (keyboard, callback) => {
       type: "keyboardSet",
       keyboard: keyboard
     });
-    window.nes.keyboard.player1 = keyboard;
+    window.nes.keyboard.player[0]= keyboard;
     callback(data);
   }).catch((error) => {
     console.error(error);

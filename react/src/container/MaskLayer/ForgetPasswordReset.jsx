@@ -50,18 +50,17 @@ export default class ForgetPasswordReset extends React.Component {
 
   render() {
     return (
-      <div className='MaskLayer'>
-        <div className='Form'>
-          <h1>重置密码</h1>
-          <input type='password' placeholder='密码' name='password' onBlur={this.checkPassword}/>
-          <input type='password' placeholder='再次输入密码' name='password' onBlur={this.checkPassword}/>
-          <div id='checkPassword' className='msg'></div>
-          <div className='link'>
-            <Link to="/" className='leftLink'>想起密码了？登录吧</Link>
-          </div>
-          <button type='button' className='enableButton' id="reset" onClick={this.forgetPasswordReset}>确认</button>
-          <div id='check' className='msg'></div>
+      <div className='Form'>
+        {/*<img src="/img/background.jpg" className='Background'/>*/}
+        <h1>重置密码</h1>
+        <input type='password' placeholder='密码' name='password' onBlur={this.checkPassword}/>
+        <input type='password' placeholder='再次输入密码' name='password' onBlur={this.checkPassword}/>
+        <div id='checkPassword' className='msg'></div>
+        <div className='link'>
+          <Link to="/login" className='leftLink'>想起密码了？登录吧</Link>
         </div>
+        <button type='button' className='enableButton' id="reset" onClick={this.forgetPasswordReset}>确认</button>
+        <div id='check' className='msg'></div>
       </div>
     )
   }

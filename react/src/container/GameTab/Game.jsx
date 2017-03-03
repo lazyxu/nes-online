@@ -29,12 +29,20 @@ class Game extends React.Component {
         this.state.msg.shift();
         this.setState({msg: this.state.msg});
       },
-      1000*20
+      1000*15
     );
     this.setState({msg: this.state.msg});
   }
 
   componentDidMount() {
+    this.msgAdd({
+      from: '提示',
+      msg: '按下enter键向其他玩家发送消息',
+    });
+    this.msgAdd({
+      from: '默认按键设置',
+      msg: '上:w    下:s    左:a    右:d    选择:v    确认:b    A:j    B:k    X:u    Y:i',
+    });
     this.props.gameTabSet('');
     this.interval = setInterval( () => {
           this.setState({time: this.state.time+1});

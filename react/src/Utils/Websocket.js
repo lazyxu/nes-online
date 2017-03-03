@@ -5,6 +5,10 @@ import actions from '../actions/actions.js'
 window.ws = null;
 var wsHandler={};
 
+wsHandler['settingUpdate'] = data => {
+  store.dispatch(actions.keyboardSet(data.keyboard == null?new Object():data.keyboard));
+  store.dispatch(actions.userSet(data.name));
+}
 wsHandler['info'] = data => {
   store.dispatch(actions.roomlistSet(data.roomlist == null?new Object():data.roomlist));
   store.dispatch(actions.gamelistSet(data.gamelist == null?new Array():data.gamelist));
@@ -98,10 +102,6 @@ exports.createWS = user => {
 
     ws.onopen = () => {
       console.log("WebSocket已经打开...");
-      ws.send(JSON.stringify({
-        "type": "in",
-        "user": user
-      }));
     };
 
     ws.onmessage = (e) => {

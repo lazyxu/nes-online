@@ -15,7 +15,19 @@ class App extends React.Component {
     super(props);
   }
 
+  componentDidMount() {
+    if (this.props.user==null) {
+      location.href = "#/login";
+      return
+    }
+    ws.createWS(this.props.user);
+  }
   render() {
+    if (this.props.user==null) {
+      return (
+        <div />
+      )
+    }
     var Header = (
       <div className='Header'>
         <div className='title'>

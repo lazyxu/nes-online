@@ -105,9 +105,21 @@ func loginGithub(k *koala.Params, w http.ResponseWriter, r *http.Request) {
 			err := c.Insert(map[string]interface{}{
 				"github":     user["name"],
 				"name":       user["name"].(string) + "@github",
-				"avatar":     user["avatar"],
+				"avatar":     user["avatar_url"],
 				"created_at": time.Now().Unix(),
 				"updated_at": time.Now().Unix(),
+				"keyboard": map[string]interface{}{
+					"up":     87,
+					"down":   83,
+					"left":   65,
+					"right":  68,
+					"select": 86,
+					"start":  66,
+					"A":      74,
+					"B":      75,
+					"X":      85,
+					"Y":      73,
+				},
 			})
 			return nil, err
 		})
@@ -120,7 +132,7 @@ func loginGithub(k *koala.Params, w http.ResponseWriter, r *http.Request) {
 				"github": user["name"],
 			}, bson.M{
 				"$set": bson.M{
-					"avatar":     user["avatar"],
+					"avatar":     user["avatar_url"],
 					"updated_at": time.Now().Unix(),
 				},
 			})
@@ -130,9 +142,11 @@ func loginGithub(k *koala.Params, w http.ResponseWriter, r *http.Request) {
 			log.Println(err)
 		}
 	}
-	session := koala.GetSession(r, w, "sessionID")
-	session.Values["name"] = user["name"]
-	session.Values["avatar"] = user["avatar"]
+	session := koala.GetSession(r, w, cookieName)
+	session.Values["user"] = map[string]interface{}{
+		"name":   user["name"],
+		"avatar": user["avatar_url"],
+	}
 	koala.Relocation(w, "/")
 }
 

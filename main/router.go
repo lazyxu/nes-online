@@ -14,11 +14,31 @@ func routerInit() {
 
 	koala.RenderPath = "../react/build/"
 	koala.Get("/", func(k *koala.Params, w http.ResponseWriter, r *http.Request) {
-		koala.Render(w, "index.html", nil)
+		user := koala.GetSessionValue(r, cookieName, "user")
+		koala.Render(w, "index.html", map[string]interface{}{
+			"initialState": map[string]interface{}{
+				"user": user,
+			},
+		})
 	})
-	koala.Get("/backstage", func(k *koala.Params, w http.ResponseWriter, r *http.Request) {
-		koala.Render(w, "backstage.html", nil)
-	})
+	// koala.Get("/register", func(k *koala.Params, w http.ResponseWriter, r *http.Request) {
+	// 	koala.Render(w, "index.html", "null")
+	// })
+	// koala.Get("/login", func(k *koala.Params, w http.ResponseWriter, r *http.Request) {
+	// 	koala.Render(w, "index.html", "null")
+	// })
+	// koala.Get("/forgetPassword", func(k *koala.Params, w http.ResponseWriter, r *http.Request) {
+	// 	koala.Render(w, "index.html", "null")
+	// })
+	// koala.Get("/forgetPassword/reset", func(k *koala.Params, w http.ResponseWriter, r *http.Request) {
+	// 	koala.Render(w, "index.html", "null")
+	// })
+	// koala.Get("/register", func(k *koala.Params, w http.ResponseWriter, r *http.Request) {
+	// 	koala.Render(w, "index.html", "null")
+	// })
+	// koala.Get("/backstage", func(k *koala.Params, w http.ResponseWriter, r *http.Request) {
+	// 	koala.Render(w, "backstage.html", nil)
+	// })
 	api()
 	http.HandleFunc("/ws", wsHandler)
 }
