@@ -9,6 +9,7 @@ http://www.it165.net/embed/html/201312/2367.html
 <img src="images/memoryMap.png" width="100%"/>
 CPU：6502 NMOS 芯片。 
     直接寻址能力为 64KB，数据处理能力为 8位。
+    little－endian  $1234 => $34 $12 将低序字节存储在起始地址（低位编址）
     内建一块特殊的音频处理器。 
 RAM：NES 本体预留 8KB 的 RAM 空间，但实际的物理 RAM 仅 2KB。 
 PPU：NES 特有的图形处理芯片，内建 10KB 显示内存。

@@ -13,10 +13,12 @@ class RoomList extends React.Component {
   }
 
   enter(id) {
-    ws.send({
-      "type": "enterRoom",
-      "roomID": id,
-    });
+    if (this.props.roomlist[id].state!="游戏中") {
+      ws.send({
+        "type": "enterRoom",
+        "roomID": id,
+      });
+    }
   }
   render() {
     var list=[];
