@@ -72,6 +72,8 @@ JSNES.Keyboard = function() {
 
 JSNES.Keyboard.prototype = {
     setKey: function(i, key, value) {
+        if (value==0x41)
+            console.log(key, value);
         switch (key) {
             case this.player[i].X:
                 if (value==0x41) {
