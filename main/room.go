@@ -128,11 +128,10 @@ func (u *User) leaveRoom() {
 	}
 	empty := true
 	for _, p := range u.room.players {
-		if p == u {
-			continue
-		}
 		if p != nil {
-			p.state = "房主"
+			if u.state == "房主" {
+				p.state = "房主"
+			}
 			empty = false
 			break
 		}

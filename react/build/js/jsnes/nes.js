@@ -84,40 +84,30 @@ JSNES.prototype = {
                 for (i=0; i<this.frameSend; i++)
                     this.keyboardLog.push([]);
                 this.frameInterval = setInterval( ()=> {
-                    if (this.frameCount%this.frameSend==0 && this.frameCount >= this.frameDelay) { // 如果是关键帧
-                        var players = window.store.getState().room.players;
-                        for (var i in players) {
-                            if (players[i]!=null) { // 等待玩家按键到达
-                                if (typeof window.keyboardAction[i][0]=="undefined") {
-                                    // window.store.dispatch({
-                                    //     type: "msgAdd",
-                                    //     msg: "等待玩家"+i,
-                                    // });
-                                    console.log('wait:'+i);
-                                    this.waitCount++;
-                                    return
+                    if ((this.frameCount+1)%this.frameSend==0) { // 如果是关键帧
+                        if (this.frameCount >= this.frameDelay) { // 等待按键信息到达
+                            var players = window.store.getState().room.players;
+                            for (var i in players) {
+                                if (players[i]!=null) { // 等待玩家按键到达
+                                    if (typeof window.keyboardAction[i][0]=="undefined") {
+                                        console.log('wait: '+i);
+                                        this.waitCount++;
+                                        return
+                                    }
                                 }
                             }
-                        }
-                        if (this.waitCount != 0) {
-                            console.log(this.frameCount+':'+this.waitCount);
+                            if (this.waitCount != 0) {
+                                console.log(this.frameCount+': '+this.waitCount);
+                            }
                         }
                     }
-                    if ((this.frameCount+1)%this.frameSend==0) {
-                        window.ws.send(JSON.stringify({
-                            "type": "keyboard",
-                            "frameID": this.frameCount+this.frameDelay,
-                            "idInRoom": window.store.getState().user.idInRoom,
-                            "keyboard": this.keyboardLog,
-                        }));
-                    }
+                    
                     for (var i in players) { // 触发玩家按键
                         if (players[i]!=null) {
-                            // console.log(this.frameCount);
-                            // console.log(window.keyboardAction);
                             var action = window.keyboardAction[i][0];
+                            var downloadLog = document.getElementById("downloadLog");
+                            downloadLog.setAttribute("href", downloadLog.getAttribute("href")+JSON.stringify(action));
                             for (var j=0;j<action.length;j++) {
-                                // console.log(action[j].key+":"+action[j].value);
                                 this.keyboard.setKey(
                                     i,
                                     action[j].key,
@@ -126,10 +116,18 @@ JSNES.prototype = {
                             }
                         }
                     }
-                    self.frame();
-                    this.frameCount++;
+                    self.frame(); // 模拟当前帧的cpu和画面
+                    if ((this.frameCount+1)%this.frameSend==0) { // 如果是关键帧
+                        window.ws.send(JSON.stringify({ // 发送当前帧的按键信息
+                            "type": "keyboard",
+                            "frameID": this.frameCount+this.frameDelay,
+                            "idInRoom": window.store.getState().user.idInRoom,
+                            "keyboard": this.keyboardLog,
+                        }));
+                        this.keyboardLog[this.frameCount%this.frameSend] = [];
+                    }
+                    this.frameCount++; // 下一帧的准备工作
                     this.ui.updateFrameCount(this.frameCount);
-                    this.keyboardLog[this.frameCount%this.frameSend] = [];
                     for (var i in players) {
                         if (players[i]!=null) {
                             window.keyboardAction[i].shift();

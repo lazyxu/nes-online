@@ -2,7 +2,7 @@
 <img src="images/screenshot.png" width="100%"/>
 
 # logs 
-* 以前的logs位于old_logs.md
+* 以前的logs位于[old_logs.md](./old_logs.md)
 * 现在前端用react和redux重写
 
 ## far future
@@ -20,6 +20,12 @@
 * 如果可能的话，按键消息用 webRTC 传
 * 将窗口组件抽象话，最好能达到像滚动条一样的复用
 * 游戏中按键更改后通知其他玩家
+
+## v0.3.3
+* 网上查了下发现我的杂牌手柄和一般的不太一样，我的上下左右是axes[9]，而一般的是buttons[12]~buttons[15]
+* 修复了结束游戏后房间状态不会改变的bug
+* 今天又出现了不同步...
+* 经过测试发现两个玩家收到的按键消息完全一样，所以不同步的原因是同步按键这个想法不对
 
 ## v0.3.2
 * 尝试加入gamepad，其他按键测试正常，但是连发键没有效果
@@ -69,7 +75,7 @@
 * JSNES: https://github.com/bfirsh/jsnes
 * webRTC: http://blog.csdn.net/inszva/article/details/52840393
 * localStorage & Gamepad: https://github.com/josephlewis42/jsnes
-* Gamepad: https://github.com/alaingilbert/GamepadJs
+* Gamepad: https://developer.mozilla.org/en-US/docs/Web/API/Gamepad_API
 * UI: Nostalgia.NES
 
 # contact me
