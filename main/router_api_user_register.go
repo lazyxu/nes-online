@@ -84,10 +84,10 @@ func register(k *koala.Params, w http.ResponseWriter, r *http.Request) {
 					"right":  68,
 					"select": 86,
 					"start":  66,
-					"A":      74,
-					"B":      75,
-					"X":      85,
-					"Y":      73,
+					"A":      75,
+					"B":      74,
+					"X":      73,
+					"Y":      85,
 				},
 			})
 			return nil, err

@@ -7,39 +7,34 @@ FDS     - Famicom磁盘系统: 安装在Famicom顶部，支持3"双面游戏软�
 ## some materials
 http://www.it165.net/embed/html/201312/2367.html
 <img src="images/memoryMap.png" width="100%"/>
-CPU：6502 NMOS 芯片。 
-    直接寻址能力为 64KB，数据处理能力为 8位。
+CPU：6502 NMOS 芯片。数据总线8bit，地址总线是16bit，寻址空间是64KB
     little－endian  $1234 => $34 $12 将低序字节存储在起始地址（低位编址）
     内建一块特殊的音频处理器。 
-RAM：NES 本体预留 8KB 的 RAM 空间，但实际的物理 RAM 仅 2KB。 
-PPU：NES 特有的图形处理芯片，内建 10KB 显示内存。
+RAM：NES 本体预留 8KB 的 RAM 空间，但实际的物理 RAM 仅 2KB (0x800)。
+pAPU：NES 的音频处理器。
+    因为是设计在 CPU 内部，所以叫做 pAPU（pseudo Audio Processing Unit）。
+    包含 2 个方块波声道，1 个三角波声道，1 个杂音声 道以及 1 个数字声道。 
+PPU：NES 特有的图形处理芯片，直接寻址能力为 64KB，内建 10KB 显示内存。
     支持垂直/平行镜像、垂直/平行滚屏，最大发色数64色。
     同屏最大发色数 26 色（也有说法是 25 色，去掉了透明色）。
     支持 8x8 tile，最多支持 64 个8x8 或 8x16 精灵。
-    显示分辨率 = 256x240。 
-VRAM：图形储存器。
-    这个储存器在PPU内部. NES中安装了16kbits 的VRAM。
-SPR-RAM：子画面储存器，用来储存子画面，共256 bytes。
+    显示分辨率 = 256x240。
+VRAM：图形储存器。这个储存器在PPU内部. NES中安装了16KB (0x4000) 的VRAM。
+SPR-RAM：子画面储存器，用来储存子画面，共256 bytes(0x100)。
     虽然他也在PPU内部，但不是VRAM或者ROM的一部分。
 PRG-ROM：程序只读储存器，存储程序代码的存储器。
     也可以认为是通过MMC控制的扩展存储器中的代码部分。
 PRG-RAM：程序可写存储器，于PRG-ROM同义，不过这个是RAM。
-CHR-ROM：角色只读存储器。
+CHR-ROM(VROM)：角色只读存储器。
     在PPU外部的VRAM数据, 通过MMC在PPU内部与外部交换，或者在启动队列中“读入”VRAM。
-VROM：与CHR-ROM同义。
-SRAM：存档可写存储器。
-    一般用来保存RPG游戏的进度。
-WRAM：与SRAM同义。
-pAPU：NES 的音频处理器。
-    因为是设计在 CPU 内部，所以叫做 pAPU（pseudo Audio Processing Unit）。
-    包含 2 个方块波声道，1 个三角波声道，1 个杂音声 道以及 1 个数字声道。 
 DMC：δ调制通道。
     APU中处理数字信号的通道. 通常被认为是PCM (Pulse信号调制器)通道。
 EX-RAM：扩展存储器。
     在任天堂的MMC5中使用的，允许游戏扩展VRAM的容量。
 Mapper：内存映射设备。
     这并非 NES 本体所有，而是包含在许多游戏卡内部，以扩充 NES 的性能。 
-SRAM：Save RAM，也叫 Battery-Backed RAM，即电池储存RAM。
+SRAM(WRAM)：Save RAM，也叫 Battery-Backed RAM，即电池储存RAM。
+    存档可写存储器。一般用来保存RPG游戏的进度。
     固化在某些游戏卡上的芯片，关机后由电池供电，信息不会丢失。
     多用来保存 RPG 类游戏的档案资料。
     NES 本体为 SRAM 预留了 8KB 的地址空间（实际多数游戏的 SRAM 大小也是 8KB）
@@ -49,13 +44,10 @@ NES 包含 3 种内存。
     1 种是显示内存，在 PPU 内部，CPU 只能通过操作 PPU 寄存器间接访问这块内存。 
     1 种是 OAM 内存（精灵属性内存），同样存在于 PPU 内部，CPU 可通过操作 PPU 寄存器或者利用 DMA 间接访问它
 
-SRAM: Sprite RAM 0x100
 VRAM: 显存 0x8000
 DMA Access: Direct Memory Access，直接内存存取
 PRGROM RomBank
-Battery RAM
 CHR-ROM VromBank
-IRQ: Interrupt Request
 PPU: PhysicsProcessingUnit 物理运算处理器
 
 ## cpu.js
@@ -118,6 +110,11 @@ C  =  CARRY. Set if the add produced a carry, or if the subtraction
 
 ### 主内存
 NES 主内存布局（cpu内部）查看附录
+
+### 中断
+NMI: Non-Maskable Interrupt (PPU)
+IRQ: maskable interrupts (Break)
+reset:
 
 ## ppu.js
 ### Name Tables

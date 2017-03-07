@@ -41,7 +41,7 @@ class Game extends React.Component {
     });
     this.msgAdd({
       from: '默认按键设置',
-      msg: '上:w    下:s    左:a    右:d    选择:v    确认:b    A:j    B:k    X:u    Y:i',
+      msg: '上:w    下:s    左:a    右:d    选择:v    确认:b    A:k    B:j    X:i    Y:u',
     });
     this.props.gameTabSet('');
     this.interval = setInterval( () => {

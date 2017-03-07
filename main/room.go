@@ -191,20 +191,17 @@ func (u *User) start() {
 	})
 }
 
-func (u *User) keyboard() {
-	index := 1
-	for _, user := range u.room.players {
-		if u == user {
-			break
-		}
-		index++
-	}
-
+func (u *User) keyboard(m map[string]interface{}) {
+	u.sendRoomMsg(m, false)
 }
-func (u *User) sendRoomMsg(m map[string]interface{}) {
+
+func (u *User) sendRoomMsg(m map[string]interface{}, sendToSelf bool) {
 	m["from"] = u.name
 	for _, user := range u.room.players {
 		if user == nil {
+			continue
+		}
+		if user == u && !sendToSelf {
 			continue
 		}
 		select {

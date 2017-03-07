@@ -48,6 +48,7 @@ var JSNES = function(opts) {
     this.papu = new JSNES.PAPU(this);
     this.mmap = null; // set in loadRom()
     this.keyboard = new JSNES.Keyboard();
+    this.gamepad = new JSNES.Gamepad(this);
     
     this.ui.updateStatus("Ready to load a ROM.");
 };
@@ -88,9 +89,8 @@ JSNES.prototype = {
                         if (this.frameCount >= this.frameDelay) { // 等待按键信息到达
                             var players = window.store.getState().room.players;
                             for (var i in players) {
-                                if (players[i]!=null) { // 等待玩家按键到达
-                                    if (typeof window.keyboardAction[i][0]=="undefined") {
-                                        console.log('wait: '+i);
+                                if (players[i]!=null) { // 等待其他玩家按键到达
+                                    if (i != window.store.getState().user.idInRoom && typeof window.keyboardAction[i][0]==="undefined") {
                                         this.waitCount++;
                                         return
                                     }
@@ -101,30 +101,38 @@ JSNES.prototype = {
                             }
                         }
                     }
-                    
+                    var playerCount = 0;
                     for (var i in players) { // 触发玩家按键
                         if (players[i]!=null) {
+                            playerCount++;
                             var action = window.keyboardAction[i][0];
-                            var downloadLog = document.getElementById("downloadLog");
-                            downloadLog.setAttribute("href", downloadLog.getAttribute("href")+JSON.stringify(action));
-                            for (var j=0;j<action.length;j++) {
-                                this.keyboard.setKey(
-                                    i,
-                                    action[j].key,
-                                    action[j].value
-                                );
+                            // var downloadLog = document.getElementById("downloadLog");
+                            // downloadLog.setAttribute("href", downloadLog.getAttribute("href")+JSON.stringify(action));
+                            if (action) {
+                                console.log(i);
+                                for (var j=0;j<action.length;j++) {
+                                    this.keyboard.setKey(
+                                        i,
+                                        action[j].key,
+                                        action[j].value
+                                    );
+                                }
                             }
                         }
                     }
                     self.frame(); // 模拟当前帧的cpu和画面
                     if ((this.frameCount+1)%this.frameSend==0) { // 如果是关键帧
-                        window.ws.send(JSON.stringify({ // 发送当前帧的按键信息
-                            "type": "keyboard",
-                            "frameID": this.frameCount+this.frameDelay,
-                            "idInRoom": window.store.getState().user.idInRoom,
-                            "keyboard": this.keyboardLog,
-                        }));
-                        this.keyboardLog[this.frameCount%this.frameSend] = [];
+                        if (playerCount > 1) {
+                            window.ws.send(JSON.stringify({ // 发送当前帧的按键信息
+                                "type": "keyboard",
+                                "frameID": this.frameCount+this.frameDelay,
+                                "idInRoom": window.store.getState().user.idInRoom,
+                                "keyboard": this.keyboardLog,
+                            }));
+                        }
+                        for (i=0; i<this.frameSend; i++) { // 清空本地存储的按键信息
+                            this.keyboardLog[i] = [];
+                        }
                     }
                     this.frameCount++; // 下一帧的准备工作
                     this.ui.updateFrameCount(this.frameCount);

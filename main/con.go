@@ -34,10 +34,10 @@ func (u *User) reader() {
 			u.unready()
 		case "start":
 			u.start()
-		// case "keyboard":
-		// 	u.keyboard()
+		case "keyboard":
+			u.keyboard(m)
 		case "roomMsg":
-			u.sendRoomMsg(m)
+			u.sendRoomMsg(m, true)
 		default:
 			u.broadcast(m)
 		}

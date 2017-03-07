@@ -1,70 +1,82 @@
-var haveEvents = 'ongamepadconnected' in window;
-var controllers = {};
-var 
-function connecthandler(e) {
-  addgamepad(e.gamepad);
-}
-
-function addgamepad(gamepad) {
-  controllers[gamepad.index] = gamepad;
-  requestAnimationFrame(updateStatus);
-}
-
-function updateStatus() {
-  if (!haveEvents) {
-    scangamepads();
-  }
-
-  for (var j in controllers) {
-    var controller = controllers[j];
-    if (window.nes!=null) {
-      var direction = Math.round((controller.axes[9] + 1)*7/2);
-      window.nes.keyboard.setKey(0, window.nes.keyboard.player[0].up, direction==7||direction==0||direction==1?0x41:0x40);
-      window.nes.keyboard.setKey(0, window.nes.keyboard.player[0].down, direction==3||direction==4||direction==5?0x41:0x40);
-      window.nes.keyboard.setKey(0, window.nes.keyboard.player[0].left, direction==5||direction==6||direction==7?0x41:0x40);
-      window.nes.keyboard.setKey(0, window.nes.keyboard.player[0].right, direction==1||direction==2||direction==3?0x41:0x40);
-      window.nes.keyboard.setKey(0, window.nes.keyboard.player[0].select, controller.buttons[8].pressed?0x41:0x40);
-      window.nes.keyboard.setKey(0, window.nes.keyboard.player[0].start, controller.buttons[9].pressed?0x41:0x40);
-      window.nes.keyboard.setKey(0, window.nes.keyboard.player[0].A, controller.buttons[2].pressed?0x41:0x40);
-      window.nes.keyboard.setKey(0, window.nes.keyboard.player[0].B, controller.buttons[1].pressed?0x41:0x40);
-      window.nes.keyboard.setKey(0, window.nes.keyboard.player[0].X, controller.buttons[3].pressed?0x41:0x40);
-      window.nes.keyboard.setKey(0, window.nes.keyboard.player[0].Y, controller.buttons[0].pressed?0x41:0x40);
-      
-      // window.nes.keyboard.state[0][window.nes.keyboard.keys.up] = direction==7||direction==0||direction==1?0x41:0x40;
-      // window.nes.keyboard.state[0][window.nes.keyboard.keys.down] = direction==3||direction==4||direction==5?0x41:0x40;
-      // window.nes.keyboard.state[0][window.nes.keyboard.keys.left] = direction==5||direction==6||direction==7?0x41:0x40;
-      // window.nes.keyboard.state[0][window.nes.keyboard.keys.right] = direction==1||direction==2||direction==3?0x41:0x40;
-      window.nes.keyboard.state[0][window.nes.keyboard.keys.select] = controller.buttons[8].pressed?0x41:0x40;
-      window.nes.keyboard.state[0][window.nes.keyboard.keys.start] = controller.buttons[9].pressed?0x41:0x40;
-      window.nes.keyboard.state[0][window.nes.keyboard.keys.A] = controller.buttons[2].pressed?0x41:0x40;
-      window.nes.keyboard.state[0][window.nes.keyboard.keys.B] = controller.buttons[1].pressed?0x41:0x40;
-      window.nes.keyboard.state[0][window.nes.keyboard.keys.X] = controller.buttons[3].pressed?0x41:0x40;
-      window.nes.keyboard.state[0][window.nes.keyboard.keys.Y] = controller.buttons[0].pressed?0x41:0x40;
+JSNES.Gamepad = function(nes) {
+    this.nes = nes;
+    this.oldState = {
+        up: 0x40,
+        down: 0x40,
+        left: 0x40,
+        right: 0x40,
+        select: 0x40,
+        start: 0x40,
+        A: 0x40,
+        B: 0x40,
+        X: 0x40,
+        Y: 0x40,
     }
-  }
-
-  requestAnimationFrame(updateStatus);
-}
-
-function scangamepads() {
-  var gamepads = navigator.getGamepads ? navigator.getGamepads() : (navigator.webkitGetGamepads ? navigator.webkitGetGamepads() : []);
-  for (var i = 0; i < gamepads.length; i++) {
-    if (gamepads[i]) {
-      if (gamepads[i].index in controllers) {
-        controllers[gamepads[i].index] = gamepads[i];
-      } else {
-        addgamepad(gamepads[i]);
-      }
+    this.newState = {
+        up: 0x40,
+        down: 0x40,
+        left: 0x40,
+        right: 0x40,
+        select: 0x40,
+        start: 0x40,
+        A: 0x40,
+        B: 0x40,
+        X: 0x40,
+        Y: 0x40,
     }
-  }
+    setInterval( ()=> {
+        this.updateStatus();
+    }, 1000/60 );
 }
 
-
-window.addEventListener("gamepadconnected", connecthandler);
-window.addEventListener("gamepaddisconnected", () => {
-  delete controllers[gamepad.index];
-});
-
-if (!haveEvents) {
-  setInterval(scangamepads, 500);
+JSNES.Gamepad.prototype = {
+    updateStatus: function() {
+        var gamepad = null;
+        var gamepads = navigator.getGamepads ? navigator.getGamepads() : (navigator.webkitGetGamepads ? navigator.webkitGetGamepads() : []);
+        for (var i = 0; i < gamepads.length; i++) {
+            if (gamepads[i]) {
+                gamepad = gamepads[i];
+            }
+        }
+        if (gamepad != null) {
+            var direction = Math.round((gamepad.axes[9] + 1)*7/2);
+            this.newState = {
+                up: direction==7||direction==0||direction==1?0x41:0x40,
+                down: direction==3||direction==4||direction==5?0x41:0x40,
+                left: direction==5||direction==6||direction==7?0x41:0x40,
+                right: direction==1||direction==2||direction==3?0x41:0x40,
+                select: gamepad.buttons[8].pressed?0x41:0x40,
+                start: gamepad.buttons[9].pressed?0x41:0x40,
+                A: gamepad.buttons[2].pressed?0x41:0x40,
+                B: gamepad.buttons[1].pressed?0x41:0x40,
+                X: gamepad.buttons[3].pressed?0x41:0x40,
+                Y: gamepad.buttons[0].pressed?0x41:0x40,
+            }
+            for (var index in this.newState) {
+                if (this.newState[index] != this.oldState[index]) {
+                    var idInRoom = window.store.getState().user.idInRoom;
+                    var key = this.nes.keyboard.player[idInRoom][index];
+                    var value = this.newState[index];
+                    console.log("[gamepad] " + index + ": " + value==0x41?"down":"up");
+                    window.nes.keyboardLog[window.nes.frameCount%window.nes.frameSend].push({
+                        'key': this.nes.keyboard.player[idInRoom][index],
+                        'value': this.newState[index],
+                    });
+                    if (typeof window.keyboardAction[idInRoom][window.nes.frameDelay]==="undefined") {
+                        window.keyboardAction[idInRoom][window.nes.frameDelay] = [{
+                            'key': this.nes.keyboard.player[idInRoom][index],
+                            'value': this.newState[index],
+                        }];
+                    } else {
+                        window.keyboardAction[idInRoom][window.nes.frameDelay].push({
+                            'key': this.nes.keyboard.player[idInRoom][index],
+                            'value': this.newState[index],
+                        });
+                    }
+                    // this.nes.keyboard.setKey(0, this.nes.keyboard.player[0][index], this.newState[index] );
+                }
+            }
+            this.oldState = this.newState;
+        }
+    }
 }

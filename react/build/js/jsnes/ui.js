@@ -44,7 +44,7 @@ if (typeof jQuery !== 'undefined') {
                 self.status = $('<div style="position: absolute;top: 0;right: 0;color: white;z-index: 1;"></div>').appendTo(parent);
                 self.frame = $('<div style="position: absolute;bottom: 0;left: 0;color: white;z-index: 1;"></div>').appendTo(parent);
                 self.ping = $('<div style="position: absolute;top: 0;left: 0;color: green;z-index: 1;"></div>').appendTo(parent);
-                self.downloadLog = $('<a id="downloadLog" href="data:text/plain," style="position: absolute;bottom: 0;right: 0;color: blue;z-index: 1;">按键记录下载</a>').appendTo(parent);
+                // self.downloadLog = $('<a id="downloadLog" href="data:text/plain," style="position: absolute;bottom: 0;right: 0;color: blue;z-index: 1;">按键记录下载</a>').appendTo(parent);
                 
                 /*
                  * Canvas

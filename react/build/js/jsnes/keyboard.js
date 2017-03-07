@@ -76,21 +76,16 @@ JSNES.Keyboard.prototype = {
         //     console.log(key, value);
         switch (key) {
             case this.player[i].X:
-                if (value==0x41) {
+                if (value==0x41) { // 按下按键
                     if (this.interval[i].X) {
                         clearInterval(this.interval[i].X);
-                        this.interval[i].X = null;
                     }
                     this.interval[i].X = setInterval( () => {
-                        if (this.state[i][this.keys.A]==0x40)
-                            this.state[i][this.keys.A] = 0x41;
-                        else if (this.state[i][this.keys.A]==0x41)
-                            this.state[i][this.keys.A] = 0x40;
+                        this.state[i][this.keys.A] = 0x81 - this.state[i][this.keys.A];
                     }, 50);
                 }
-                else if (value==0x40) {
+                else if (value==0x40) { // 放开按键
                     clearInterval(this.interval[i].X);
-                    this.interval[i].X = null;
                     this.state[i][this.keys.A] = 0x40;
                 }
                 break;
@@ -127,24 +122,44 @@ JSNES.Keyboard.prototype = {
     },
 
     keyDown: function(evt) {
+        console.log("[keyboard] " + evt.keyCode + ": down");
         window.nes.keyboardLog[window.nes.frameCount%window.nes.frameSend].push({
             'key': evt.keyCode,
             'value': 0x41,
         });
-        // if (!this.setKey(evt.keyCode, 0x41) && evt.preventDefault) {
-        //     evt.preventDefault();
-        // }
+        var idInRoom = window.store.getState().user.idInRoom;
+        if (typeof window.keyboardAction[idInRoom][window.nes.frameDelay]==="undefined") {
+            window.keyboardAction[idInRoom][window.nes.frameDelay] = [{
+                'key': evt.keyCode,
+                'value': 0x41,
+            }];
+        } else {
+            window.keyboardAction[idInRoom][window.nes.frameDelay].push({
+                'key': evt.keyCode,
+                'value': 0x41,
+            });
+        }
         evt.preventDefault();
     },
     
     keyUp: function(evt) {
+        console.log("[keyboard] " + evt.keyCode + ": up");
         window.nes.keyboardLog[window.nes.frameCount%window.nes.frameSend].push({
             'key': evt.keyCode,
             'value': 0x40,
         });
-        // if (!this.setKey(evt.keyCode, 0x40) && evt.preventDefault) {
-        //     evt.preventDefault();
-        // }
+        var idInRoom = window.store.getState().user.idInRoom;
+        if (typeof window.keyboardAction[idInRoom][window.nes.frameDelay]==="undefined") {
+            window.keyboardAction[idInRoom][window.nes.frameDelay] = [{
+                'key': evt.keyCode,
+                'value': 0x40,
+            }];
+        } else {
+            window.keyboardAction[idInRoom][window.nes.frameDelay].push({
+                'key': evt.keyCode,
+                'value': 0x40,
+            });
+        }
         evt.preventDefault();
     },
     
