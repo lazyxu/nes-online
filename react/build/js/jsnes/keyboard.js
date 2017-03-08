@@ -72,10 +72,8 @@ JSNES.Keyboard = function() {
 
 JSNES.Keyboard.prototype = {
     setKey: function(i, key, value) {
-        // if (value==0x41)
-        //     console.log(key, value);
         switch (key) {
-            case this.player[i].X:
+            case 'X':
                 if (value==0x41) { // 按下按键
                     if (this.interval[i].X) {
                         clearInterval(this.interval[i].X);
@@ -89,7 +87,7 @@ JSNES.Keyboard.prototype = {
                     this.state[i][this.keys.A] = 0x40;
                 }
                 break;
-            case this.player[i].Y:
+            case 'Y':
                 if (value==0x41) {
                     if (this.interval[i].Y) {
                         clearInterval(this.interval[i].Y);
@@ -108,57 +106,51 @@ JSNES.Keyboard.prototype = {
                     this.state[i][this.keys.B] = 0x40;
                 }
                 break;
-            case this.player[i].A: this.state[i][this.keys.A] = value; break;
-            case this.player[i].B: this.state[i][this.keys.B] = value; break;
-            case this.player[i].select: this.state[i][this.keys.select] = value; break;
-            case this.player[i].start: this.state[i][this.keys.start] = value; break;
-            case this.player[i].up: this.state[i][this.keys.up] = value; break;
-            case this.player[i].down: this.state[i][this.keys.down] = value; break;
-            case this.player[i].left: this.state[i][this.keys.left] = value; break;
-            case this.player[i].right: this.state[i][this.keys.right] = value; break;
-            default: return true;
+            case 'A': this.state[i][this.keys.A] = value; break;
+            case 'B': this.state[i][this.keys.B] = value; break;
+            case 'select': this.state[i][this.keys.select] = value; break;
+            case 'start': this.state[i][this.keys.start] = value; break;
+            case 'up': this.state[i][this.keys.up] = value; break;
+            case 'down': this.state[i][this.keys.down] = value; break;
+            case 'left': this.state[i][this.keys.left] = value; break;
+            case 'right': this.state[i][this.keys.right] = value; break;
         }
-        return false; // preventDefault
     },
 
     keyDown: function(evt) {
         console.log("[keyboard] " + evt.keyCode + ": down");
-        window.nes.keyboardLog[window.nes.frameCount%window.nes.frameSend].push({
-            'key': evt.keyCode,
-            'value': 0x41,
-        });
         var idInRoom = window.store.getState().user.idInRoom;
-        if (typeof window.keyboardAction[idInRoom][window.nes.frameDelay]==="undefined") {
-            window.keyboardAction[idInRoom][window.nes.frameDelay] = [{
-                'key': evt.keyCode,
-                'value': 0x41,
-            }];
-        } else {
-            window.keyboardAction[idInRoom][window.nes.frameDelay].push({
-                'key': evt.keyCode,
-                'value': 0x41,
-            });
+        for (var key in this.player[idInRoom]) {
+            if (evt.keyCode==this.player[idInRoom][key]) {
+                var value = 0x41;
+                window.nes.keyboardLog[window.nes.frameCount%window.nes.frameSend].push({
+                    'key': key,
+                    'value': value,
+                });
+                window.keyboardAction[idInRoom][window.nes.frameDelay].push({
+                    'key': key,
+                    'value': value,
+                });
+            }
         }
         evt.preventDefault();
     },
     
     keyUp: function(evt) {
         console.log("[keyboard] " + evt.keyCode + ": up");
-        window.nes.keyboardLog[window.nes.frameCount%window.nes.frameSend].push({
-            'key': evt.keyCode,
-            'value': 0x40,
-        });
         var idInRoom = window.store.getState().user.idInRoom;
-        if (typeof window.keyboardAction[idInRoom][window.nes.frameDelay]==="undefined") {
-            window.keyboardAction[idInRoom][window.nes.frameDelay] = [{
-                'key': evt.keyCode,
-                'value': 0x40,
-            }];
-        } else {
-            window.keyboardAction[idInRoom][window.nes.frameDelay].push({
-                'key': evt.keyCode,
-                'value': 0x40,
-            });
+        for (var key in this.player[idInRoom]) {
+            if (evt.keyCode==this.player[idInRoom][key]) {
+                var value = 0x40;
+                window.nes.keyboardLog[window.nes.frameCount%window.nes.frameSend].push({
+                    'key': key,
+                    'value': value,
+                });
+                window.keyboardAction[idInRoom][window.nes.frameDelay].push({
+                    'key': key,
+                    'value': value,
+                });
+            }
         }
         evt.preventDefault();
     },

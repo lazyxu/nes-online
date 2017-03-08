@@ -55,24 +55,16 @@ JSNES.Gamepad.prototype = {
             for (var index in this.newState) {
                 if (this.newState[index] != this.oldState[index]) {
                     var idInRoom = window.store.getState().user.idInRoom;
-                    var key = this.nes.keyboard.player[idInRoom][index];
                     var value = this.newState[index];
                     console.log("[gamepad] " + index + ": " + value==0x41?"down":"up");
                     window.nes.keyboardLog[window.nes.frameCount%window.nes.frameSend].push({
-                        'key': this.nes.keyboard.player[idInRoom][index],
+                        'key': index,
                         'value': this.newState[index],
                     });
-                    if (typeof window.keyboardAction[idInRoom][window.nes.frameDelay]==="undefined") {
-                        window.keyboardAction[idInRoom][window.nes.frameDelay] = [{
-                            'key': this.nes.keyboard.player[idInRoom][index],
-                            'value': this.newState[index],
-                        }];
-                    } else {
-                        window.keyboardAction[idInRoom][window.nes.frameDelay].push({
-                            'key': this.nes.keyboard.player[idInRoom][index],
-                            'value': this.newState[index],
-                        });
-                    }
+                    window.keyboardAction[idInRoom][window.nes.frameDelay].push({
+                        'key': index,
+                        'value': this.newState[index],
+                    });
                     // this.nes.keyboard.setKey(0, this.nes.keyboard.player[0][index], this.newState[index] );
                 }
             }

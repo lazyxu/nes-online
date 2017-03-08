@@ -82,15 +82,18 @@ JSNES.prototype = {
                 this.isRunning = true;
                 this.waitCount = 0;
                 this.keyboardLog = [];
-                for (i=0; i<this.frameSend; i++)
+                var idInRoom = window.store.getState().user.idInRoom;
+                for (i=0; i<this.frameSend; i++) {
                     this.keyboardLog.push([]);
+                    window.keyboardAction[idInRoom].push([]);
+                }
                 this.frameInterval = setInterval( ()=> {
                     if ((this.frameCount+1)%this.frameSend==0) { // 如果是关键帧
                         if (this.frameCount >= this.frameDelay) { // 等待按键信息到达
                             var players = window.store.getState().room.players;
                             for (var i in players) {
                                 if (players[i]!=null) { // 等待其他玩家按键到达
-                                    if (i != window.store.getState().user.idInRoom && typeof window.keyboardAction[i][0]==="undefined") {
+                                    if (i != idInRoom && typeof window.keyboardAction[i][0]==="undefined") {
                                         this.waitCount++;
                                         return
                                     }
@@ -126,7 +129,7 @@ JSNES.prototype = {
                             window.ws.send(JSON.stringify({ // 发送当前帧的按键信息
                                 "type": "keyboard",
                                 "frameID": this.frameCount+this.frameDelay,
-                                "idInRoom": window.store.getState().user.idInRoom,
+                                "idInRoom": idInRoom,
                                 "keyboard": this.keyboardLog,
                             }));
                         }
@@ -136,6 +139,7 @@ JSNES.prototype = {
                     }
                     this.frameCount++; // 下一帧的准备工作
                     this.ui.updateFrameCount(this.frameCount);
+                    window.keyboardAction[idInRoom].push([]);
                     for (var i in players) {
                         if (players[i]!=null) {
                             window.keyboardAction[i].shift();
