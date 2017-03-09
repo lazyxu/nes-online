@@ -137,7 +137,7 @@ JSNES.Keyboard.prototype = {
     },
     
     keyUp: function(evt) {
-        console.log("[keyboard] " + evt.keyCode + ": up");
+        console.log(window.nes.frameCount + "[keyboard] " + evt.keyCode + ": up");
         var idInRoom = window.store.getState().user.idInRoom;
         for (var key in this.player[idInRoom]) {
             if (evt.keyCode==this.player[idInRoom][key]) {

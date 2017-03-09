@@ -65,6 +65,9 @@ if (typeof jQuery !== 'undefined') {
                 self.dynamicaudio = new DynamicAudio({
                     swf: nes.opts.swfPath+'dynamicaudio.swf'
                 });
+
+                this.resize();
+                window.addEventListener("resize", ()=>this.resize());
             };
         
             UI.prototype = {
@@ -81,51 +84,16 @@ if (typeof jQuery !== 'undefined') {
                         self.nes.keyboard.keyPress(evt);
                     });
                 },
-
+                
                 resize: function() {
-                    var self = this;
                     var height = document.documentElement.clientHeight-30;
                     var width = document.documentElement.clientWidth;
-                    var emulator = document.getElementById("emulator");
                     var landscape = ( height / 240 * 256 > width) ? false : true;
                     if (!landscape) {
-                        self.screen.animate({width: width + 'px', height: ( width / 256 * 240) + "px"});
+                        this.screen.animate({width: width + 'px', height: ( width / 256 * 240) + "px"});
                     } else {
-                        self.screen.animate({width: ( height / 240 * 256) + "px", height: height + "px"});
+                        this.screen.animate({width: ( height / 240 * 256) + "px", height: height + "px"});
                     }
-                },
-
-                loadROM: function(url) {
-                    var self = this;
-                    $.ajax({
-                        url: url,
-                        xhr: function() {
-                            var xhr = $.ajaxSettings.xhr();
-                            if (typeof xhr.overrideMimeType !== 'undefined') {
-                                // Download as binary
-                                xhr.overrideMimeType('text/plain; charset=x-user-defined');
-                            }
-                            self.xhr = xhr;
-                            return xhr;
-                        },
-                        complete: function(xhr, status) {
-                            var i, data;
-                            if (JSNES.Utils.isIE()) {
-                                var charCodes = JSNESBinaryToArray(
-                                    xhr.responseBody
-                                ).toArray();
-                                data = String.fromCharCode.apply(
-                                    undefined, 
-                                    charCodes
-                                );
-                            }
-                            else {
-                                data = xhr.responseText;
-                            }
-                            self.nes.loadRom(data);
-                            self.nes.start();
-                        }
-                    });
                 },
                 
                 resetCanvas: function() {

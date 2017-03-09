@@ -20,7 +20,8 @@ var JSNES = function(opts) {
     this.opts = {
         ui: JSNES.DummyUI,
         swfPath: 'lib/',
-        
+        romPath: '',
+
         preferredFrameRate: 60,
         fpsInterval: 500, // Time between updating FPS in ms
         showDisplay: true,
@@ -39,7 +40,7 @@ var JSNES = function(opts) {
             }
         }
     }
-    
+    createPeerConnection();
     this.frameTime = 1000 / this.opts.preferredFrameRate;
     
     this.ui = new this.opts.ui(this);
@@ -51,6 +52,7 @@ var JSNES = function(opts) {
     this.gamepad = new JSNES.Gamepad(this);
     
     this.ui.updateStatus("Ready to load a ROM.");
+    this.loadROM(this.opts.romPath);
 };
 
 JSNES.VERSION = "<%= version %>";
@@ -85,12 +87,13 @@ JSNES.prototype = {
                 var idInRoom = window.store.getState().user.idInRoom;
                 for (i=0; i<this.frameSend; i++) {
                     this.keyboardLog.push([]);
-                    window.keyboardAction[idInRoom].push([]);
                 }
+                var peerConnectionWaitTime = 5000;
+                var peerConnectionWaitCount = 0;
                 this.frameInterval = setInterval( ()=> {
+                    var players = window.store.getState().room.players;
                     if ((this.frameCount+1)%this.frameSend==0) { // 如果是关键帧
                         if (this.frameCount >= this.frameDelay) { // 等待按键信息到达
-                            var players = window.store.getState().room.players;
                             for (var i in players) {
                                 if (players[i]!=null) { // 等待其他玩家按键到达
                                     if (i != idInRoom && typeof window.keyboardAction[i][0]==="undefined") {
@@ -105,14 +108,13 @@ JSNES.prototype = {
                         }
                     }
                     var playerCount = 0;
-                    for (var i in players) { // 触发玩家按键
+                    for (var i=0;i<players.length;i++) { // 触发玩家按键
                         if (players[i]!=null) {
                             playerCount++;
                             var action = window.keyboardAction[i][0];
                             // var downloadLog = document.getElementById("downloadLog");
                             // downloadLog.setAttribute("href", downloadLog.getAttribute("href")+JSON.stringify(action));
                             if (action) {
-                                console.log(i);
                                 for (var j=0;j<action.length;j++) {
                                     this.keyboard.setKey(
                                         i,
@@ -126,12 +128,19 @@ JSNES.prototype = {
                     self.frame(); // 模拟当前帧的cpu和画面
                     if ((this.frameCount+1)%this.frameSend==0) { // 如果是关键帧
                         if (playerCount > 1) {
-                            window.ws.send(JSON.stringify({ // 发送当前帧的按键信息
+                            var info = JSON.stringify({ // 发送当前帧的按键信息
                                 "type": "keyboard",
                                 "frameID": this.frameCount+this.frameDelay,
                                 "idInRoom": idInRoom,
                                 "keyboard": this.keyboardLog,
-                            }));
+                            })
+                            if (typeof window.dataChannel!=="undefined" && window.dataChannel.readyState=="open") {
+                                // console.log(this.frameCount+'dataChannel');
+                                window.dataChannel.send(info);
+                            } else {
+                                // console.log(this.frameCount+'ws');
+                                window.ws.send(info);
+                            }
                         }
                         for (i=0; i<this.frameSend; i++) { // 清空本地存储的按键信息
                             this.keyboardLog[i] = [];
@@ -140,11 +149,12 @@ JSNES.prototype = {
                     this.frameCount++; // 下一帧的准备工作
                     this.ui.updateFrameCount(this.frameCount);
                     window.keyboardAction[idInRoom].push([]);
-                    for (var i in players) {
+                    for (var i=0;i<players.length;i++) {
                         if (players[i]!=null) {
                             window.keyboardAction[i].shift();
                         }
                     }
+                    // console.log(window.keyboardAction);
                     this.waitCount = 0;
                 }, this.frameTime);
                 this.resetFps();
@@ -247,6 +257,39 @@ JSNES.prototype = {
         if (this.romData !== null) {
             this.loadRom(this.romData);
         }
+    },
+
+    loadROM: function(url) {
+        var self = this;
+        $.ajax({
+            url: url,
+            xhr: function() {
+                var xhr = $.ajaxSettings.xhr();
+                if (typeof xhr.overrideMimeType !== 'undefined') {
+                    // Download as binary
+                    xhr.overrideMimeType('text/plain; charset=x-user-defined');
+                }
+                self.xhr = xhr;
+                return xhr;
+            },
+            complete: function(xhr, status) {
+                var i, data;
+                if (JSNES.Utils.isIE()) {
+                    var charCodes = JSNESBinaryToArray(
+                        xhr.responseBody
+                    ).toArray();
+                    data = String.fromCharCode.apply(
+                        undefined, 
+                        charCodes
+                    );
+                }
+                else {
+                    data = xhr.responseText;
+                }
+                self.loadRom(data);
+                self.start();
+            }
+        });
     },
     
     // Loads a ROM file into the CPU and PPU.

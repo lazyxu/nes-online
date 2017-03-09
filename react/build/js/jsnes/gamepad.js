@@ -56,7 +56,7 @@ JSNES.Gamepad.prototype = {
                 if (this.newState[index] != this.oldState[index]) {
                     var idInRoom = window.store.getState().user.idInRoom;
                     var value = this.newState[index];
-                    console.log("[gamepad] " + index + ": " + value==0x41?"down":"up");
+                    console.log(window.nes.frameCount + "[gamepad] " + index + ": " + value==0x41?"down":"up");
                     window.nes.keyboardLog[window.nes.frameCount%window.nes.frameSend].push({
                         'key': index,
                         'value': this.newState[index],

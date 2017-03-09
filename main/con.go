@@ -38,6 +38,12 @@ func (u *User) reader() {
 			u.keyboard(m)
 		case "roomMsg":
 			u.sendRoomMsg(m, true)
+		case "__offer":
+			u.sendRoomMsg(m, false)
+		case "__answer":
+			u.sendRoomMsg(m, false)
+		case "__ice_candidate":
+			u.sendRoomMsg(m, false)
 		default:
 			u.broadcast(m)
 		}

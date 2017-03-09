@@ -17,9 +17,6 @@ class Game extends React.Component {
       msg: [],
       time: 0,
     }
-    this.resizeHandler = () => {
-      window.nes.ui.resize();
-    }
   }
 
   msgAdd(msg) {
@@ -49,19 +46,10 @@ class Game extends React.Component {
         },
         1000
     );
-    // keyboard.load(() => {
-    //   var msg = {
-    //     from: "系统",
-    //     msg: "按键设置加载成功",
-    //   }
-    //   this.msgAdd(msg);
-    // });
     window.nes = new JSNES({
         ui: $('#emulator').JSNESUI(),
+        romPath: "/rom/"+this.props.room.game+".nes",
     });
-    window.nes.ui.loadROM("/rom/"+this.props.room.game+".nes");
-    window.nes.ui.resize();
-    window.addEventListener("resize", this.resizeHandler);
     window.nes.ui.addKeyboard(document.getElementById('window'));
     document.getElementById('window').addEventListener("keyup", (e)=> {
       if(e.keyCode == 13) {
@@ -83,7 +71,6 @@ class Game extends React.Component {
   }
   componentWillUnmount() {
     window.nes.stop();
-    window.removeEventListener("resize", this.resizeHandler);
     clearInterval(this.interval);
   }
 
