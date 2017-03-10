@@ -14,7 +14,7 @@ class KeyboardSetting extends React.Component {
 
   setKeyboard() {
     keyboard.update(this.state, data => {
-      window.nes.keyboard.player[0] = this.state;
+      window.nes.keyboard.player[this.props.user.idInRoom] = this.state;
       document.getElementById('window').focus();
       this.props.gameTabSet('');
     })

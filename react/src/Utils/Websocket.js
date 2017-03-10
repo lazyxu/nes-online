@@ -114,8 +114,8 @@ exports.createWS = user => {
 
     ws.onclose = (e) => {
       console.log(e.code, e.reason);
-      console.log("WebSocket已经断开，请重新登录");
-      location.href = "#/login";
+      alert("WebSocket已经断开");
+      // location.href = "#/login";
     };
   }
 }

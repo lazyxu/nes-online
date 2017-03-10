@@ -49,7 +49,7 @@ class Menu extends React.Component {
               <button onClick={() => this.props.gameTabSet("")} disabled>保存游戏</button>
               <button onClick={() => this.props.gameTabSet("")} disabled>装载游戏</button>
               <button onClick={() => {window.nes.ui.emulateSoundChange(), this.setState({emulateSound: !this.state.emulateSound})}}>{this.state.emulateSound?'关闭声音':'打开声音'}</button>
-              <button onClick={() => this.setState({page: "键位设置"})} disabled>键位设置</button>
+              <button onClick={() => this.setState({page: "键位设置"})}>键位设置</button>
               <button onClick={() => this.leave()}>结束游戏</button>
               <br />
               <button onClick={() => {document.getElementById('window').focus();this.props.gameTabSet("")}}>回到游戏</button>
