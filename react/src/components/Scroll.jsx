@@ -2,7 +2,7 @@ import React from 'react'
 
 import './Scroll.scss'
 
-/*
+/* usage:
     <Scroll 
       mainBoxID='UserListBox' 
       contentID='UserList' 
@@ -12,7 +12,7 @@ import './Scroll.scss'
     />
 */
 export default class Scroll extends React.Component {
-
+  
   constructor(props) {
     super(props);
     this.wheelData = 0;

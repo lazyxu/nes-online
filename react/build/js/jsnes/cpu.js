@@ -1680,6 +1680,11 @@ JSNES.CPU.OpData.prototype = {
     ADDR_INDABS    : 12,
     
     setOp: function(inst, op, addr, size, cycles){
+        // op 操作码
+        // inst 指令
+        // addr 寻址方式
+        // size 指令在内存中的大小，占多少字节
+        // cycles 运行该指令需要多少个cpu周期
         this.opdata[op] = 
             ((inst  &0xFF)    )| 
             ((addr  &0xFF)<< 8)| 

@@ -6,12 +6,12 @@
 * 现在前端用react和redux重写
 
 ## far future
-* 修改密码，修改头像
 * 共享操作（离开房间自动开启）
-* 保存游戏至服务器，装载游戏
-* 添加好友，显示好友状态，邀请好友
-* 支持保存录像和播放录像
+* 保存游戏，装载游戏
+* 保存录像，播放录像
+* 修改密码，修改头像
 * 允许创建本地rom并上传
+* 添加好友，显示好友状态，邀请好友
 * 资源的分步加载
 
 ## before release
@@ -83,13 +83,15 @@
 但是...我写的代码依旧很糟糕...
 
 # reference
+* JSNES: https://github.com/bfirsh/jsnes
 * react: https://facebook.github.io/react/docs/installation.html
 * redux: http://cn.redux.js.org/index.html
-* JSNES: https://github.com/bfirsh/jsnes
 * webRTC: http://blog.csdn.net/inszva/article/details/52840393
 * localStorage & Gamepad: https://github.com/josephlewis42/jsnes
 * Gamepad: https://developer.mozilla.org/en-US/docs/Web/API/Gamepad_API
 * UI: Nostalgia.NES
+* nes相关资料: https://github.com/rockcarry/ffnes
+* nes硬件知识: http://problemkaputt.de/everynes.htm
 
 # contact me
 * mail: nes@juanix.cn
