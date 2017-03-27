@@ -2,7 +2,7 @@ package main
 
 import (
 	"encoding/json"
-	"nes-online/koala"
+	"github.com/MeteorKL/koala"
 	"net/http"
 
 	mgo "gopkg.in/mgo.v2"

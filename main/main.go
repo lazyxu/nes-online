@@ -3,10 +3,11 @@ package main
 import (
 	"fmt"
 	"io/ioutil"
-	"nes-online/koala"
 	"os"
 	"strconv"
 	"strings"
+
+	"github.com/MeteorKL/koala"
 )
 
 var localRomlist string
@@ -80,11 +81,11 @@ func main() {
 	// updateRomlistInHTML("static/template/nes.html", "static/views/nes.html", "both")
 	// updateRomlistInHTML("static/template/alone.html", "static/views/alone.html", "local")
 
-	initGame("../react/build/rom")
+	// initGame("../react/build/rom")
 	routerInit()
 
-	h.init()
+	// h.init()
 
 	// http
-	koala.Run("8081")
+	koala.Run("8080")
 }

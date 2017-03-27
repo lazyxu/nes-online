@@ -3,7 +3,7 @@
 // 数据总线8bit，地址总线是16bit，寻址空间是64KB
 CPU = function(nes) {
     this.nes = nes;
-    this.addressingMode = { // 13种寻址方式
+    this.addrMode = { // 13种寻址方式
         ZP        : 0,
         REL       : 1,
         IMP       : 2,
@@ -73,7 +73,7 @@ CPU = function(nes) {
         0x02020105, 0x05020b2b, 0x000000ff, 0x000000ff, 0x000000ff, 0x0402062b, 0x06020618, 0x000000ff, 
         0x0201022d, 0x0403092b, 0x000000ff, 0x000000ff, 0x000000ff, 0x0403082b, 0x07030818, 0x000000ff
     ];
-    this.flagsOffset =  {             // 位于寄存器 P 的第 n 位
+    this.flagOffset =  {             // 位于寄存器 P 的第 n 位
         Canny:      0, // Carry Flag (C) 无符号计算时的上溢和下溢，可以被SEC (Set Carry Flag) 和 CLC (Clear Carry Flag)指令设置和取消
         Zero:       1, // Zero Flag (Z) 上一个指令的计算结果为0则设置
         IRQDisable: 2, // Interrupt Disable (I) 用来防止系统响应IRQs中断，可以被SEI (Set Interrupt Disable) 和 CLI (Clear Interrupt Disable)指令设置和取消
@@ -87,8 +87,7 @@ CPU = function(nes) {
 };
 
 CPU.prototype = {
-    reset: function() {
-
+    reset() {
         this.int = {      // 中断初始化，中断向量表位于 0xFFFA-0xFFFF，RTI (Return From Interrupt) 指令表示结束中断
             IRQs:  false, // (maskable interrupts) 被特定的memory mappers触发，可以被BRK (Break)指令触发，中断发生时跳转到0xFFFE 和 0xFFFF中存的地址
             NMI:   false, // NMI (Non-Maskable Interrupt) 当PPU发生V-Blank的时候产生中断，可以被PPU Control Register 1(0x2000)的di7位阻止，中断发生时跳转到0xFFFA 和 0xFFFB中存的地址
@@ -101,63 +100,175 @@ CPU.prototype = {
             A:    0x00, // 8bit Accumulator 存储算术和逻辑运算结果，或者从内存中取回的值
             X:    0x00, // 8bit Index Register X 存储寻址模式中的计数和偏移，可以从内存中取值，可以读取和设置SP
             Y:    0x00, // 8bit Index Register Y 存储寻址模式中的计数和偏移，可以从内存中取值，不能影响SP
-            P:    0x58, // 8bit Processor Status Register (flags) 标志寄存器，8个标志位
+            STATUS:    0x58, // 8bit Processor Status Register (flags) 标志寄存器，8个标志位
         };
         
         this.mem = new MAINMEM(this);
-    },    
-    
-    doInterrupt() {
-                // Check interrupts:
-        if(this.irqRequested){
-            temp =
-                (this.F_CARRY)|
-                ((this.F_ZERO===0?1:0)<<1)|
-                (this.F_INTERRUPT<<2)|
-                (this.F_DECIMAL<<3)|
-                (this.F_BRK<<4)|
-                (this.F_NOTUSED<<5)|
-                (this.F_OVERFLOW<<6)|
-                (this.F_SIGN<<7);
+        this.emulate();
+    }, 
 
-            this.REG_PC_NEW = this.REG_PC;
-            this.F_INTERRUPT_NEW = this.F_INTERRUPT;
-            switch(this.irqType){
-                case 0: {
-                    // Normal IRQ:
-                    if(this.F_INTERRUPT!=0){
-                        ////System.out.println("Interrupt was masked.");
-                        break;
-                    }
-                    this.doIrq(temp);
-                    ////System.out.println("Did normal IRQ. I="+this.F_INTERRUPT);
-                    break;
-                }case 1:{
-                    // NMI:
-                    this.doNonMaskableInterrupt(temp);
-                    break;
-
-                }case 2:{
-                    // Reset:
-                    this.doResetInterrupt();
-                    break;
-                }
-            }
-
-            this.REG_PC = this.REG_PC_NEW;
-            this.F_INTERRUPT = this.F_INTERRUPT_NEW;
-            this.F_BRK = this.F_BRK_NEW;
-            this.irqRequested = false;
-        }
-    },
     // 每条指令可能有1，2或者3字节长，
     // 取决于寻址模式的不同。
     // 其中第一个字节为操作码(opcode)，
     // 而剩余的字节为操作数(oprand)
-    emulate: function() { // Emulates a single CPU instruction, returns the number of cycles
-        // 检查中断
-        if(this.irqRequested){
-            this.doInterrupt();
+    emulate() { // Emulates a single CPU instruction, returns the number of cycles
+        
+        var opinf = this.opcode[this.mem.get(this.reg.PC+1)];
+        var cycleCount = opinf >> 24; // 运行时间
+        var addrMode = (opinf >> 8) & 0xFF; // 寻址方式
+        var opLength = (opinf >> 16) & 0xFF; // 指令长度
+
+        var cycleAdd = 0;
+        var opaddr = this.REG_PC;
+        var addr = 0;
+        switch(addrMode) {
+            case this.addrMode.ZP: // Zero Page
+                addr = this.load(opaddr+2);
+                break;
+            case this.addrMode.REL: // Relative mode.
+                addr = this.load(opaddr+2);
+                if (addr<0x80) {
+                    addr += this.REG_PC;
+                } else {
+                    addr += this.REG_PC-256;
+                }
+                break;
+            case this.addrMode.IMP:
+                // Ignore. Address is implied in instruction.
+                break;
+            case this.addrMode.ABS:
+                // Absolute mode. Use the two bytes following the opcode as 
+                // an address.
+                addr = this.load16bit(opaddr+2);
+                break;
+            case this.addrMode.ACC:
+                // Accumulator mode. The address is in the accumulator 
+                // register.
+                addr = this.REG_ACC;
+                break;
+            case this.addrMode.IMM:
+                // Immediate mode. The value is given after the opcode.
+                addr = this.REG_PC;
+                break;
+            case this.addrMode.ZPX:
+                // Zero Page Indexed mode, X as index. Use the address given 
+                // after the opcode, then add the
+                // X register to it to get the final address.
+                addr = (this.load(opaddr+2)+this.REG_X)&0xFF;
+                break;
+            case this.addrMode.ZPY:
+                // Zero Page Indexed mode, Y as index. Use the address given 
+                // after the opcode, then add the
+                // Y register to it to get the final address.
+                addr = (this.load(opaddr+2)+this.REG_Y)&0xFF;
+                break;
+            case this.addrMode.ABSX:
+                // Absolute Indexed Mode, X as index. Same as zero page 
+                // indexed, but with the high byte.
+                addr = this.load16bit(opaddr+2);
+                if((addr&0xFF00)!=((addr+this.REG_X)&0xFF00)){
+                    cycleAdd = 1;
+                }
+                addr+=this.REG_X;
+                break;
+            case this.addrMode.ABSY:
+                // Absolute Indexed Mode, Y as index. Same as zero page 
+                // indexed, but with the high byte.
+                addr = this.load16bit(opaddr+2);
+                if((addr&0xFF00)!=((addr+this.REG_Y)&0xFF00)){
+                    cycleAdd = 1;
+                }
+                addr+=this.REG_Y;
+                break;
+            case this.addrMode.PREIDXIND:
+                // Pre-indexed Indirect mode. Find the 16-bit address 
+                // starting at the given location plus
+                // the current X register. The value is the contents of that 
+                // address.
+                addr = this.load(opaddr+2);
+                if((addr&0xFF00)!=((addr+this.REG_X)&0xFF00)){
+                    cycleAdd = 1;
+                }
+                addr+=this.REG_X;
+                addr&=0xFF;
+                addr = this.load16bit(addr);
+                break;
+            case this.addrMode.POSTIDXIND:
+                // Post-indexed Indirect mode. Find the 16-bit address 
+                // contained in the given location
+                // (and the one following). Add to that address the contents 
+                // of the Y register. Fetch the value
+                // stored at that adress.
+                addr = this.load16bit(this.load(opaddr+2));
+                if((addr&0xFF00)!=((addr+this.REG_Y)&0xFF00)){
+                    cycleAdd = 1;
+                }
+                addr+=this.REG_Y;
+                break;
+            case this.addrMode.INDABS:
+                // Indirect Absolute mode. Find the 16-bit address contained 
+                // at the given location.
+                addr = this.load16bit(opaddr+2);// Find op
+                if(addr < 0x1FFF) {
+                    addr = this.mem[addr] + (this.mem[(addr & 0xFF00) | (((addr & 0xFF) + 1) & 0xFF)] << 8);// Read from address given in op
+                } else {
+                    addr = this.nes.mmap.load(addr) + (this.nes.mmap.load((addr & 0xFF00) | (((addr & 0xFF) + 1) & 0xFF)) << 8);
+                }
+                break;
         }
-    }
+
+
+
+        this.reg.PC += opLength;
+        // 检查中断
+        this.checkInterrupt();
+    },
+    
+    // 中断
+    checkInterrupt() {
+        console.log("checkInterrupt:");
+        console.log(this.int);
+        // 优先级 RESET > NMI > IRQ
+        if (this.int.RESET) {
+            this.doIrq(0xFFFC);
+        } else if (this.int.NMI) {
+            this.doIrq(0xFFFA);
+        } else if (this.int.IRQs) {
+            if (!this.flagGet(this.flagOffset.IRQDisable)) {
+                this.doIrq(0xFFFE);
+            }
+        }
+    },
+    doIrq(address) {
+        // 把PC和状态寄存器压入栈
+        this.push((this.reg.PC>>8)&0xFF);
+        this.push(this.reg.PC&0xFF);
+        this.push(this.reg.STATUS);
+
+        // 设置interrupt disable flag，防止多次调用
+        this.flagSet(this.flagOffset.IRQDisable, 0);
+
+        // 将PC设置为中断向量表中对应的值
+        this.reg.PC = this.mem.get(address) | ((this.mem.get(address)+1) << 8);
+    },
+
+    flagGet(offset) {
+        return (this.reg.STATUS>>offset)&1;  // 8bit
+    },
+    flagSet(offset, value) { 
+        if (value==0) {
+            this.reg.STATUS &= !(1<<offset);
+        } else {
+            this.reg.STATUS |= (1<<offset);
+        }
+    },
+
+    push(value) {
+        this.mem.set(0x0100 | this.reg.SP, value);
+        this.reg.SP--;
+    },
+    pull() {
+        this.reg.SP++;
+        return this.mem.get(0x0100 | this.reg.SP);
+    },
 }

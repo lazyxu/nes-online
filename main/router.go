@@ -1,8 +1,9 @@
 package main
 
 import (
-	"nes-online/koala"
 	"net/http"
+
+	"github.com/MeteorKL/koala"
 )
 
 func routerInit() {
@@ -21,24 +22,6 @@ func routerInit() {
 			},
 		})
 	})
-	// koala.Get("/register", func(k *koala.Params, w http.ResponseWriter, r *http.Request) {
-	// 	koala.Render(w, "index.html", "null")
-	// })
-	// koala.Get("/login", func(k *koala.Params, w http.ResponseWriter, r *http.Request) {
-	// 	koala.Render(w, "index.html", "null")
-	// })
-	// koala.Get("/forgetPassword", func(k *koala.Params, w http.ResponseWriter, r *http.Request) {
-	// 	koala.Render(w, "index.html", "null")
-	// })
-	// koala.Get("/forgetPassword/reset", func(k *koala.Params, w http.ResponseWriter, r *http.Request) {
-	// 	koala.Render(w, "index.html", "null")
-	// })
-	// koala.Get("/register", func(k *koala.Params, w http.ResponseWriter, r *http.Request) {
-	// 	koala.Render(w, "index.html", "null")
-	// })
-	// koala.Get("/backstage", func(k *koala.Params, w http.ResponseWriter, r *http.Request) {
-	// 	koala.Render(w, "backstage.html", nil)
-	// })
 	api()
 	http.HandleFunc("/ws", wsHandler)
 }

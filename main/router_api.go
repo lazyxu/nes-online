@@ -1,6 +1,6 @@
 package main
 
-import "nes-online/koala"
+import "github.com/MeteorKL/koala"
 
 const cookieName = "sessionID"
 

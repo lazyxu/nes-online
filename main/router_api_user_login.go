@@ -3,7 +3,7 @@ package main
 import (
 	"encoding/json"
 	"log"
-	"nes-online/koala"
+	"github.com/MeteorKL/koala"
 	"net/http"
 	"regexp"
 	"strings"

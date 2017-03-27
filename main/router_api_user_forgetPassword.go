@@ -2,7 +2,7 @@ package main
 
 import (
 	"log"
-	"nes-online/koala"
+	"github.com/MeteorKL/koala"
 	"net/http"
 	"time"
 
