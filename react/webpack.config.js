@@ -7,7 +7,7 @@ var BUILD_PATH = path.resolve(ROOT_PATH, '../static/js/');
 
 module.exports= {
   entry: {
-    bundle: './src/index.jsx',
+    bundle: './src/App.jsx',
     react: [
       'react',
       'react-router',

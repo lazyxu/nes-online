@@ -1,0 +1,33 @@
+.GameTab > .window > .exitButtons {
+  position: absolute;
+  bottom: 31px;
+  left: 10%;
+  right: 10%;
+}
+.GameTab > .window > .historyBox {
+  background: #161b1f;
+  position: absolute;
+  top: 89px;
+  bottom: 108px;
+  left: 43px;
+  right: 43px;
+  overflow: hidden;
+  border: 2px solid #e0c548;
+  border-radius: 3px;
+}
+.GameTab > .window > .historyBox > .history {
+  position:absolute; 
+  left:0; 
+  top:0; 
+  height:auto;
+  right: 10;
+  padding: 5px 15px;
+  color: white;
+  float: left;
+}
+.GameTab > .window > .historyBox > .history > .list {
+  padding: 0;
+  border: 0;
+  margin-bottom: 5px;
+  text-align: left;
+}

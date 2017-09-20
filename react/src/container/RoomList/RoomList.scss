@@ -1,0 +1,42 @@
+.RoomList {
+  position:relative; 
+  width: 100%;
+  min-height: 300px;
+  overflow: scroll;
+  border: 1px solid #eaecef;
+  text-align: center;
+}
+.RoomList > table {
+  width: 100%;
+  border-spacing:0;
+}
+.RoomList > table > thead > tr {
+  height: 32px;
+  color: #adb6cd;
+  background: #15385f;
+}
+.RoomList > table > tbody > tr > td {
+  padding: 5px 16px;
+}
+.RoomList > table > tbody > tr > td > img{
+  height: 20px;
+  width: 20px;
+  float: left;
+  border: 1px solid #a0a0a0;
+  margin-right: 12px;
+}
+.RoomList > table > tbody > tr > td > span{
+  float: left;
+  font-size: 16px;
+  padding: 3px;
+}
+.RoomList > table > tbody > .odd {
+  height: 32px;
+  color: #adb6cd;
+  background: #02050e;
+}
+.RoomList > table > tbody > .even{
+  height: 32px;
+  color: #adb6cd;
+  background: #1f2126;
+}

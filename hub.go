@@ -106,7 +106,6 @@ func (u *User) register() {
 	u.msg <- map[string]interface{}{
 		"type":     "info",
 		"roomlist": getRoomList(),
-		"gamelist": getGameList(),
 		"keyboard": getKeyboard(u.name),
 	}
 }

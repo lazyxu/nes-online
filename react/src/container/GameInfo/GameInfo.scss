@@ -1,0 +1,33 @@
+.GameInfo {
+  position:relative;
+  width: 100%;
+  text-align: center;
+  border: 1px solid #eaecef;
+}
+.GameInfo > .window {
+  border-bottom: 1px solid #eaecef;
+  padding: 10px;
+}
+.GameInfo > .window > img {
+  margin:10px auto;
+  width: 256px;
+  height: 256px;
+}
+.GameInfo > .gameButtonBox {
+  text-align:center;
+}
+.GameInfo > .gameButtonBox > button {
+  background: #205ec5;
+  color: #efefef;
+  height: 35px;
+  width: 75px;
+  margin: 10px;
+  border: 1px;
+  border-radius: 2px;
+  outline: none;
+}
+.GameInfo > .gameButtonBox > button:hover {
+  color: #ffffff;
+  background: #004693;
+  cursor: pointer;
+}

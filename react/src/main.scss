@@ -1,0 +1,41 @@
+html {
+  -webkit-tap-highlight-color: rgba(0,0,0,0);
+  -webkit-text-size-adjust: 100%;
+  -ms-text-size-adjust: 100%;
+}
+body {
+  font-size: 14.5px;
+  line-height: 1.8;
+  font-family: Consolas, monaco, "Helvetica Neue", Helvetica, Arial, "Hiragino Sans GB", "Microsoft YaHei", 微软雅黑, STHeiti, "WenQuanYi Micro Hei", sans-serif;
+}
+article, aside, details, figcaption, figure, footer, header, hgroup, main, menu, nav, section, summary {
+    display: block;
+}
+* {
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+a {
+  color: #2561c2; /*093d72;*/
+  text-decoration: none;
+  background-color: transparent;
+}
+
+a:hover,a:focus {
+  color: #b42522;
+}
+:hover,:focus {
+  transition:all 0.3s
+}
+a:hover,a:focus {
+  text-decoration:none
+}
+p {
+  margin: 0 0 10px;
+}
+:after, :before {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}

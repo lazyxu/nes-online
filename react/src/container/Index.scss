@@ -10,27 +10,51 @@
   background: #444444;
 }
 .Header {
-  position: fixed; 
-  top: 0; 
-  left: 0;
-  height: 16px; 
+  height: 64px;
   width: 100%;
-  background: linear-gradient(#1c1c1c, #2c2c2c);
+  padding: 8px;
+  border-bottom: 1px solid #eaecef;
 }
-.Header > .title {
-  background: url(/img/logo@16.png) no-repeat 3px 0px;
+.Header > .Title {
+  background: url(/img/logo@48.png) no-repeat;
   outline: none;
   border: 0;
-  color: #fff;
+  font-size: 16px;
+  padding: 6px 64px;
+  height: 64px;
+}
+.Body {
+  min-height: 300px;
+  min-height: 600px;
+}
+.Body .LocationBar {
+  border: 1px solid #eaecef;
+  margin: 10px 0;
+  padding: 5px 10px;
+}
+.Body .LocationBar > a {
+  border-bottom: 1px;
+}
+.Body .LocationBar > .CurrentLocation {
+  color: #004693;
+  border-bottom: 1px solid #004693;
+}
+.Footer {
+  clear: both;
+  border-top: 1px solid #eaecef;
+  padding: 15px;
+  text-align: center;
   font-size: 12px;
-  padding: 0px 24px;
+  line-height: 1.5;
+  color: #586069;    
+  margin-top: 20px;
 }
 .Account {
   position: fixed; 
   top: 16px; 
   left: 0;
   height: 32px; 
-  width: 100%; 
+  width: 100%;
   background: linear-gradient(#2c2c2c, #4c4c4c); 
 }
 .Account > .user {
@@ -52,12 +76,4 @@
   background: none;
   color: #fff;
   font-size: 16px;
-}
-.Footer {
-  position: fixed; 
-  bottom: 0; 
-  left: 0;
-  height: 32px;
-  width: 100%; 
-  background: #5c5c5c;
 }

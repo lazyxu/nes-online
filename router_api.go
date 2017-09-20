@@ -5,7 +5,7 @@ import "github.com/MeteorKL/koala"
 const cookieName = "sessionID"
 
 func api() {
-	koala.Get("/api/listGame", listGame)
+	koala.Get("/api/getGameList", getGameList)
 
 	apiUser()
 	apiRegister()
