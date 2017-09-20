@@ -18,12 +18,10 @@ ReactDOM.render(
     <Provider store={store}>
       <Router history={hashHistory}>
         <Route path="/">
-          <Route path="/active/:active_code" component={Active}/>
-          <Route path="/register" component={Register}/>
           <IndexRoute component={App}/>
           <Route path="/login" component={Login}/>
-          <Route path="/forgetPassword" component={ForgetPassword}/>
-          <Route path="/forgetPassword/reset" component={ForgetPasswordReset}/>
+          {/* <Route path="/forgetPassword" component={ForgetPassword}/>
+          <Route path="/forgetPassword/reset" component={ForgetPasswordReset}/> */}
         </Route>
       </Router>
     </Provider>

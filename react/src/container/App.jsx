@@ -3,11 +3,11 @@ import { connect } from 'react-redux'
 import { hashHistory } from 'react-router'
 
 import './main.scss'
-import GameTab from './GameTab/GameTab'
-import UserTab from './UserTab/UserTab'
-import ws from '../utils/websocket'
-import Game from './GameTab/Game.jsx'
-import SettingTab from './SettingTab/SettingTab.jsx'
+// import GameTab from './GameTab/GameTab'
+// import UserTab from './UserTab/UserTab'
+// import ws from '../utils/websocket'
+// import Game from './GameTab/Game.jsx'
+// import SettingTab from './SettingTab/SettingTab.jsx'
 
 class App extends React.Component {
 
@@ -16,18 +16,9 @@ class App extends React.Component {
   }
 
   componentDidMount() {
-    if (this.props.user == null) {
-      location.href = "#/login";
-      return
-    }
-    ws.createWS(this.props.user);
+    // ws.createWS(this.props.user);
   }
   render() {
-    if (this.props.user == null) {
-      return (
-        <div />
-      )
-    }
     var Header = (
       <div className='Header'>
         <div className='title'>
@@ -43,23 +34,13 @@ class App extends React.Component {
           <a href="http://www.miibeian.gov.cn/" rel="nofollow" target="_blank">浙ICP备 16025067号-1</a></p>
       </footer>
     )
-    var Account = (
-      <div className='Account'>
-        <div className='user'>
-          <img src={this.props.user.avatar} />
-          <input value={this.props.user.name} disabled></input>
-        </div>
-      </div>
-    )
     return (
       <div >
-        {this.props.children}
-        {this.props.tab == 'Game' ? <Game /> : <div />}
+        {/* {this.props.children} */}
+        {/* {this.props.tab == 'Game' ? <Game /> : <div />} */}
         {Header}
-        {Account}
-        <GameTab />
-        <UserTab user={this.props.user} />
-        <SettingTab />
+        {/* <GameTab />
+        <SettingTab /> */}
         {Footer}
       </div>
     )

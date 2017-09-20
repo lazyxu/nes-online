@@ -3,7 +3,7 @@ var webpack = require('webpack');
 
 var ROOT_PATH = path.resolve(__dirname);
 var APP_PATH = path.resolve(ROOT_PATH, 'src');
-var BUILD_PATH = path.resolve(ROOT_PATH, 'build/js/');
+var BUILD_PATH = path.resolve(ROOT_PATH, '../static/js/');
 
 module.exports= {
   entry: {
@@ -36,7 +36,7 @@ module.exports= {
       }
     ]
   },
-  // devtool: 'eval-source-map',
+  devtool: 'eval-source-map',
   plugins: [
     new webpack.optimize.CommonsChunkPlugin({
       name: ["react"],
