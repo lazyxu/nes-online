@@ -1,5 +1,5 @@
 /old/*
-
+*DS_Store
 /react/build/img/tmp/*
 /react/node_modules/*
 /react/build/rom/*
