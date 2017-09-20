@@ -16,14 +16,14 @@ class App extends React.Component {
   }
 
   componentDidMount() {
-    if (this.props.user==null) {
+    if (this.props.user == null) {
       location.href = "#/login";
       return
     }
     ws.createWS(this.props.user);
   }
   render() {
-    if (this.props.user==null) {
+    if (this.props.user == null) {
       return (
         <div />
       )
@@ -36,16 +36,17 @@ class App extends React.Component {
       </div>
     )
     var Footer = (
-      <div className='Footer'>
-        <a style={{float: "right"}} target="blank" href="https://github.com/MeteorKL">
-          <img src="/img/github.png"/>
-        </a>
-      </div>
+      <footer>
+        <p>
+          <i class="fa fa-copyright"> 2017</i>
+          <a href="http://MeteorKL.com/"> MeteorKL</a>
+          <a href="http://www.miibeian.gov.cn/" rel="nofollow" target="_blank">浙ICP备 16025067号-1</a></p>
+      </footer>
     )
     var Account = (
       <div className='Account'>
         <div className='user'>
-          <img src={this.props.user.avatar}/>
+          <img src={this.props.user.avatar} />
           <input value={this.props.user.name} disabled></input>
         </div>
       </div>
@@ -53,12 +54,12 @@ class App extends React.Component {
     return (
       <div >
         {this.props.children}
-        {this.props.tab=='Game'?<Game/>:<div/>}
+        {this.props.tab == 'Game' ? <Game /> : <div />}
         {Header}
         {Account}
         <GameTab />
-        <UserTab user={this.props.user}/>
-        <SettingTab/>
+        <UserTab user={this.props.user} />
+        <SettingTab />
         {Footer}
       </div>
     )
@@ -66,10 +67,10 @@ class App extends React.Component {
 }
 
 function mapStateToProps(state) {
-    return {
-      user: state.user,
-      tab: state.tab,
-    }
+  return {
+    user: state.user,
+    tab: state.tab,
+  }
 }
 
 export default connect(mapStateToProps, null)(App);
