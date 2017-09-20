@@ -3,11 +3,12 @@ package main
 import (
 	"encoding/json"
 	"log"
-	"github.com/MeteorKL/koala"
 	"net/http"
 	"regexp"
 	"strings"
 	"time"
+
+	"github.com/MeteorKL/koala"
 
 	mgo "gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
@@ -77,14 +78,14 @@ func loginCheck(k *koala.Params, w http.ResponseWriter, r *http.Request) {
 
 // loginGithub 根据用户名查看用户公开信息 https://api.github.com/users/meteorkl
 func loginGithub(k *koala.Params, w http.ResponseWriter, r *http.Request) {
-	res := koala.PostRequest("https://github.com/login/oauth/access_token", map[string]string{
+	_, res := koala.PostRequest("https://github.com/login/oauth/access_token", map[string]string{
 		"client_id":     "2443d910b04cd68c5a66",
 		"client_secret": "7612e0862cd87dc2f298aff7051d36561086b939",
 		"code":          k.ParamGet["code"][0],
 	})
 	tokenParam := strings.Split(string(res), "&")[0]
 	token := strings.Split(tokenParam, "=")[1]
-	jsondata := koala.GetRequest("https://api.github.com/user?access_token=" + token)
+	_, jsondata := koala.GetRequest("https://api.github.com/user?access_token=" + token)
 	user := make(map[string]interface{})
 	err := json.Unmarshal(jsondata, &user)
 	if err != nil {

@@ -1,0 +1,8 @@
+{
+    "addr":"115.29.39.184:27017",
+    "username":"nes",
+    "password":"nes1123",
+    "database":"nes",
+    "source":"nes",
+    "mechanism":"SCRAM-SHA-1"
+}
