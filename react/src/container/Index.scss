@@ -10,18 +10,28 @@
   background: #444444;
 }
 .Header {
-  height: 64px;
   width: 100%;
-  padding: 8px;
+  margin: 8px;
   border-bottom: 1px solid #eaecef;
 }
-.Header > .Title {
+.Header .Title {
   background: url(/img/logo@48.png) no-repeat;
   outline: none;
   border: 0;
   font-size: 16px;
   padding: 6px 64px;
   height: 64px;
+}
+.Header > .Navbar {
+  margin: 10px;
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+.Header > .Navbar > img {
+  margin: 0 12px;
+  height: 48px;
+  width: 48px;
 }
 .Body {
   min-height: 300px;

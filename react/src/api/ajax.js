@@ -6,8 +6,7 @@ exports.Get = (url) => {
     xhr.addEventListener('readystatechange', function() {
       if (xhr.readyState === 4 && xhr.status === 200) {
         try {
-          const data = JSON.parse(xhr.responseText);
-          resolve(data);
+          resolve(xhr.responseText);
         } catch (e) {
           reject(e);
         }
@@ -53,8 +52,7 @@ exports.Post = (url, query) => {
     xhr.addEventListener('readystatechange', function() {
       if (xhr.readyState === 4 && xhr.status === 200) {
         try {
-          const data = JSON.parse(xhr.responseText);
-          resolve(data);
+          resolve(xhr.responseText);
         } catch (e) {
           reject(e);
         }

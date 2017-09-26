@@ -74,6 +74,7 @@ exports.userSet = user => {
     user: user
   }
 }
+
 exports.gameTabSet = gameTab => {
   return {
     type: "gameTabSet",

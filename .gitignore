@@ -4,5 +4,7 @@
 /react/node_modules/*
 /react/build/rom/*
 
-/main/*.json
+*.log
+*.json
 roms/
+static/origin_roms/*

@@ -1,4 +1,4 @@
-package main
+package router
 
 import (
 	"net/http"
@@ -6,7 +6,7 @@ import (
 	"github.com/MeteorKL/koala"
 )
 
-func routerInit() {
+func Init() {
 	http.Handle("/img/", http.FileServer(http.Dir("static")))
 	http.Handle("/roms/", http.FileServer(http.Dir("static")))
 	// http.Handle("/static/", http.FileServer(http.Dir("static")))
@@ -15,7 +15,7 @@ func routerInit() {
 
 	koala.RenderPath = "static/"
 	koala.Get("/", func(k *koala.Params, w http.ResponseWriter, r *http.Request) {
-		user := koala.GetSessionValue(r, cookieName, "user")
+		user := koala.GetSessionValue(r, CookieName, "user")
 		koala.Render(w, "index.html", map[string]interface{}{
 			"initialState": map[string]interface{}{
 				"user": user,
@@ -23,5 +23,4 @@ func routerInit() {
 		})
 	})
 	api()
-	http.HandleFunc("/ws", wsHandler)
 }

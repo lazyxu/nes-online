@@ -3,11 +3,13 @@ package main
 import (
 	"fmt"
 	"io/ioutil"
+	"net/http"
 	"os"
 	"strconv"
 	"strings"
 
 	"github.com/MeteorKL/koala"
+	"github.com/MeteorKL/nes-online/router"
 )
 
 var localRomlist string
@@ -82,8 +84,9 @@ func main() {
 	// updateRomlistInHTML("static/template/alone.html", "static/views/alone.html", "local")
 
 	// initGame("../react/build/rom")
-	routerInit()
+	router.Init()
 
+	http.HandleFunc("/ws", wsHandler)
 	// h.init()
 
 	// http

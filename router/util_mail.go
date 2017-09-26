@@ -1,6 +1,8 @@
-package main
+package router
 
 import (
+	"strconv"
+
 	"github.com/MeteorKL/koala"
 
 	gomail "gopkg.in/gomail.v1"
@@ -16,13 +18,17 @@ func SendToMail(to, subject, body, mailtype string) error {
 	user := mailSetting["user"]
 	password := mailSetting["password"]
 	host := mailSetting["host"]
-
+	port, err := strconv.Atoi(mailSetting["port"])
+	if err != nil {
+		println(err)
+		port = 465
+	}
 	msg := gomail.NewMessage()
 	msg.SetHeader("From", user)
 	msg.SetHeader("To", to)
 	msg.SetHeader("Subject", subject)
 	msg.SetBody(mailtype, body)
-	mailer := gomail.NewMailer(host, user, password, 465)
+	mailer := gomail.NewMailer(host, user, password, port)
 	if err := mailer.Send(msg); err != nil {
 		return err
 	}

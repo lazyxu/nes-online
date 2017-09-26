@@ -1,9 +1,8 @@
 import util from './util.js'
-var initialState = {
-  name: '未登录',
-  avatar: '/img/avatar/questionMark.jpg'
-}
-export default function reducer(state = initialState, action) {
+import constant from "../constant.js"
+
+export default function reducer(state = constant.INIT_USER_STATE, action) {
+    console.log(action)
   switch (action.type) {
     case 'userSet':
       return action.user;

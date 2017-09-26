@@ -1,5 +1,6 @@
 {
     "user":"nes@juanix.cn",
 	"password" : "NESOnline1123",
-    "host": "smtp.exmail.qq.com"
+    "host": "smtp.exmail.qq.com",
+    "port": "465"
 }

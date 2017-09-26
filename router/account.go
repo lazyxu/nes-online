@@ -1,9 +1,10 @@
-package main
+package router
 
 import (
 	"encoding/json"
-	"github.com/MeteorKL/koala"
 	"net/http"
+
+	"github.com/MeteorKL/koala"
 
 	mgo "gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
@@ -14,12 +15,9 @@ func apiUser() {
 		oldName := k.ParamPost["oldName"][0]
 		name := k.ParamPost["name"][0]
 		if oldName != name {
-			state, msg := checkName(name)
-			if !state {
-				koala.WriteJSON(w, map[string]interface{}{
-					"state": state,
-					"msg":   msg,
-				})
+			exist := existName(name)
+			if exist {
+				writeErrJSON(w, "该昵称已被使用")
 				return
 			}
 		}

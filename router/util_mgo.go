@@ -1,4 +1,4 @@
-package main
+package router
 
 import (
 	"github.com/MeteorKL/koala"

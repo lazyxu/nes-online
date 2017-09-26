@@ -2,7 +2,7 @@ import React from 'react'
 import { connect } from 'react-redux'
 
 import './GameList.scss'
-import api from '../../api/game/index.js'
+import gameApi from '../../api/game.js'
 import Scroll from '../../components/Scroll.jsx'
 import { gameSet, tabSet } from '../../actions/actions'
 
@@ -16,15 +16,15 @@ class GameList extends React.Component {
   }
 
   componentDidMount() {
-    api.getGameList(gameList => {
-      console.log(gameList)
-      this.setState({ gameList: gameList })
-    }
-    )
+    gameApi.getGameList().then(resp => {
+      if (resp.error) {
+        return
+      }
+      this.setState({ gameList: resp.data })
+    })
   }
 
   chooseGame(game) {
-    console.log("选择游戏 " + game)
     location.href = "#/game/" + game
     return false
   }
@@ -33,7 +33,8 @@ class GameList extends React.Component {
     return (
       <div>
         <div className="LocationBar">
-          <a className="CurrentLocation" href="#/">游戏大厅</a> | <a href="#/roomList/">房间列表</a>
+          <a className="CurrentLocation" href="#/gameList">游戏大厅</a><span> | </span>
+          <a href="#/roomList/">房间列表</a>
         </div>
         <div className="GameList">
           {this.state.gameList.map(game => {

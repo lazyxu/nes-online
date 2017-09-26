@@ -1,8 +1,7 @@
-package main
+package router
 
 import (
 	"encoding/json"
-	"log"
 	"net/http"
 	"regexp"
 	"strings"
@@ -18,69 +17,57 @@ func login(k *koala.Params, w http.ResponseWriter, r *http.Request) {
 	account := k.ParamPost["account"][0]
 	password := k.ParamPost["password"][0]
 	match, _ := regexp.MatchString(`(\w-*\.*)+@(\w-?)+(\.\w{2,})+`, account)
-	Type := ""
+	accountType := ""
 	if match {
-		Type = "mail"
+		accountType = "mail"
 	} else {
-		Type = "name"
+		accountType = "name"
 	}
 	user, _ := selectFromCollection("user", func(c *mgo.Collection) (map[string]interface{}, error) {
 		user := make(map[string]interface{})
 		err := c.Find(map[string]interface{}{
-			Type:       account,
-			"password": password,
-		}).One(&user)
+			accountType: account,
+			"password":  password,
+		}).Select(bson.M{"password": 0}).One(&user)
 		return user, err
 	}) // 没找到也会有错误信息 not found，所以就不判断了
 	if len(user) == 0 {
-		koala.WriteJSON(w, map[string]interface{}{
-			"state": false,
-			"msg":   "帐号或密码错误",
-		})
+		writeErrJSON(w, "帐号或密码错误")
 		return
 	}
 	if _, ok := user["active_code"]; ok {
-		koala.WriteJSON(w, map[string]interface{}{
-			"state": false,
-			"msg":   "邮箱尚未激活",
-		})
+		writeErrJSON(w, "邮箱尚未激活")
 		return
 	}
-	session := koala.GetSession(r, w, cookieName)
-	session.Values["user"] = map[string]interface{}{
-		"name":   user["name"],
-		"avatar": user["avatar"],
-	}
-	koala.WriteJSON(w, map[string]interface{}{
-		"state": true,
-		"msg":   "登录成功",
-		"user": map[string]interface{}{
-			"name":   user["name"],
-			"avatar": user["avatar"],
-		},
-	})
+	session := koala.GetSession(r, w, CookieName)
+	session.Values["user"] = user
+	writeSuccessJSON(w, "登录成功", user)
 }
 
-func loginCheck(k *koala.Params, w http.ResponseWriter, r *http.Request) {
-	session := koala.PeekSession(r, cookieName)
-	log.Println(session)
+func checkLogin(k *koala.Params, w http.ResponseWriter, r *http.Request) {
+	session := koala.PeekSession(r, CookieName)
 	if session != nil {
-		koala.WriteJSON(w, map[string]interface{}{
-			"state": true,
-			"user":  session.Values["user"],
-		})
+		writeSuccessJSON(w, "用户已经登录", session.Values["user"])
 		return
 	}
-	koala.WriteJSON(w, map[string]interface{}{
-		"state": false,
-	})
+	writeErrJSON(w, "你还没登录啊")
 }
+
+var clientInfo map[string]string
 
 // loginGithub 根据用户名查看用户公开信息 https://api.github.com/users/meteorkl
 func loginGithub(k *koala.Params, w http.ResponseWriter, r *http.Request) {
+	if clientInfo == nil {
+		var err error
+		clientInfo, err = koala.ReadJSONFile("util_github.json")
+		if err != nil {
+			writeErrJSON(w, "读取配置信息失败，请联系管理员")
+			return
+		}
+	}
 	_, res := koala.PostRequest("https://github.com/login/oauth/access_token", map[string]string{
-		"client_id":     "2443d910b04cd68c5a66",
-		"client_secret": "7612e0862cd87dc2f298aff7051d36561086b939",
+		"client_id":     clientInfo["client_id"],
+		"client_secret": clientInfo["client_secret"],
 		"code":          k.ParamGet["code"][0],
 	})
 	tokenParam := strings.Split(string(res), "&")[0]
@@ -88,11 +75,8 @@ func loginGithub(k *koala.Params, w http.ResponseWriter, r *http.Request) {
 	_, jsondata := koala.GetRequest("https://api.github.com/user?access_token=" + token)
 	user := make(map[string]interface{})
 	err := json.Unmarshal(jsondata, &user)
-	if err != nil {
-		log.Println(err)
-	}
-	if user == nil {
-		koala.Relocation(w, "/")
+	if err != nil || user == nil {
+		writeErrJSON(w, "获取用户GitHub信息失败")
 		return
 	}
 	n, err := queryInCollection("user", func(c *mgo.Collection) (interface{}, error) {
@@ -125,7 +109,8 @@ func loginGithub(k *koala.Params, w http.ResponseWriter, r *http.Request) {
 			return nil, err
 		})
 		if err != nil {
-			log.Println(err)
+			writeErrJSON(w, "注册用户GitHub信息失败")
+			return
 		}
 	} else {
 		_, err = queryInCollection("user", func(c *mgo.Collection) (interface{}, error) {
@@ -140,19 +125,20 @@ func loginGithub(k *koala.Params, w http.ResponseWriter, r *http.Request) {
 			return nil, err
 		})
 		if err != nil {
-			log.Println(err)
+			writeErrJSON(w, "更新用户GitHub信息失败")
+			return
 		}
 	}
-	session := koala.GetSession(r, w, cookieName)
-	session.Values["user"] = map[string]interface{}{
-		"name":   user["name"],
-		"avatar": user["avatar_url"],
-	}
+	session := koala.GetSession(r, w, CookieName)
+	session.Values["user"] = user
 	koala.Relocation(w, "/")
 }
 
 func apiLogin() {
 	koala.Post("/api/login", login)
-	koala.Post("/api/loginCheck", loginCheck)
+	koala.Post("/api/checkLogin", checkLogin)
 	koala.Get("/api/loginGithub", loginGithub)
+	koala.Post("/api/logout", func(k *koala.Params, w http.ResponseWriter, r *http.Request) {
+		koala.DestorySession(r, w, CookieName)
+	})
 }

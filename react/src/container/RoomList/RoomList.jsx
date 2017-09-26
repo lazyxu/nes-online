@@ -57,7 +57,7 @@ class RoomList extends React.Component {
     return (
       <div>
         <div className="LocationBar">
-        <a href="#/">游戏大厅</a> | <a className="CurrentLocation" href="#/roomList/">房间列表</a>
+        <a href="#/gameList">游戏大厅</a> | <a className="CurrentLocation" href="#/roomList/">房间列表</a>
         </div>
         <div className='RoomList' id='RoomList'>
           <table>

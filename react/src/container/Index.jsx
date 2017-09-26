@@ -3,36 +3,68 @@ import { connect } from 'react-redux'
 import { hashHistory } from 'react-router'
 
 import './Index.scss'
-import GameList from './GameList/GameList'
-// import UserTab from './UserTab/UserTab'
-// import ws from '../utils/websocket'
-// import Game from './GameTab/Game.jsx'
-// import SettingTab from './SettingTab/SettingTab.jsx'
+import userApi from '../api/user.js'
+import constant from '../constant.js'
+import { userSet } from '../actions/actions'
 
 class Index extends React.Component {
 
   constructor(props) {
-    super(props);
+    super(props)
+  }
+
+  componentDidMount() {
+    userApi.checkLogin().then(resp => {
+      if (resp.state) {
+        this.props.userSet(resp.user)
+      }
+    })
   }
 
   render() {
+    var userType = this.props.user.type
+    var userName = this.props.user.name
+    // var userAvatar = this.props.user.avatar
     return (
       <div >
-        <div className='Header'>
-          <div className='Title'>
+        <div className="Header">
+          <a href="#/gameList">
+            <img src="/img/logo@48.png" />
+          </a>
+          <a href="#/gameList">
             NES Online
-          </div>
+          </a>
+          {userType == -1 ?
+            <div className="Navbar">
+              <a href="#/visitorLogin">游客登录</a><span> | </span>
+              <a href="#/register">注册</a><span> | </span>
+              <a className="CurrentLocation" href="#/login/">登录</a>
+            </div> :
+            (userType == 0 ?
+              <div className="Navbar">
+                <a href="#/settings">个人设置</a><span> | </span>
+                <span> {userName} </span>
+              </div> :
+              <div className="Navbar">
+                <a href="#/settings">个人设置</a><span> | </span>
+                <a href="#/changePassword">修改密码</a><span> | </span>
+                <a href="#/logout">注销</a><span> | </span>
+                <span>{userName}</span>
+                {/* <img src={userAvatar} /> */}
+              </div>
+            )
+          }
         </div>
-        <div className='Body'>
+        <div className="Body">
           {this.props.children}
         </div>
-        <div className='Footer'>
+        <div className="Footer">
           <p>
             <span>Copyright © 2017</span>
             <a href="http://MeteorKL.com/"> MeteorKL</a>
             <a href="http://www.miibeian.gov.cn/" rel="nofollow" target="_blank">浙ICP备 16025067号-1</a></p>
         </div>
-      </div>
+      </div >
     )
   }
 }
@@ -44,4 +76,4 @@ function mapStateToProps(state) {
   }
 }
 
-export default connect(mapStateToProps, null)(Index);
+export default connect(mapStateToProps, { userSet })(Index)
