@@ -9,7 +9,7 @@ import './Form.scss'
 import utils from './utils'
 import userApi from '../../api/user.js'
 import { userSet } from '../../actions/actions'
-import ws from '../../utils/websocket.js'
+import ws from '../../websocket/index.js'
 
 class VisitorLogin extends React.Component {
   constructor(props) {
@@ -20,15 +20,14 @@ class VisitorLogin extends React.Component {
   }
 
   login() {
-    var account = this.refs.account.value
-    var password = this.refs.password.value
-    userApi.visitorLogin(account, password).then(resp => {
-      console.log(resp)
+    var name = this.refs.name.value
+    userApi.visitorLogin(name).then(resp => {
       if (resp.error) {
         this.setState({ login: { color: 'red', value: resp.msg } })
         return
       }
       this.props.userSet(resp.data)
+      ws.create()
       this.setState({ login: { color: 'green', value: resp.msg } })
       location.href = "#/gameList"
     })
@@ -48,7 +47,7 @@ class VisitorLogin extends React.Component {
         </div>
         <div className='Form'>
           <h1>请先登录</h1>
-          <input type='text' placeholder='为自己取个昵称吧' ref='account' autoComplete="off" autoFocus />
+          <input type='text' placeholder='为自己取个昵称吧' ref='name' autoComplete="off" autoFocus />
           <div className='link'>
             <Link to="/register" className='leftLink'>注册账号</Link>
             <Link to="/login" className='rightLink'>已有账号,登录</Link>

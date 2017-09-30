@@ -9,7 +9,7 @@ import (
 
 	"github.com/MeteorKL/koala"
 
-	mgo "gopkg.in/mgo.v2"
+	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 	"github.com/MeteorKL/koala/session"
 	"log"
@@ -19,6 +19,8 @@ const USER_UNLOGIN = -1
 const USER_VISITOR = 0
 const USER_LOGIN = 1
 const USER_GITHUB = 2
+
+var userNames = make(map[string]bool)
 
 var SessionStore = session.NewSessionStore(session.DEFAULT_EXPIRE_TIME)
 
@@ -142,13 +144,24 @@ func loginGithub(k *koala.Params, w http.ResponseWriter, r *http.Request) {
 	}
 	s := SessionStore.GetSession(r, w, CookieName)
 	user["type"] = USER_GITHUB
-	s.Set("user" ,user)
+	s.Set("user", user)
 	writeSuccessJSON(w, "登录成功", user)
 }
 
 func visitorLogin(k *koala.Params, w http.ResponseWriter, r *http.Request) {
-	// name := k.ParamPost["name"][0]
-
+	name := k.ParamPost["name"][0]
+	if _, exist := userNames[name]; exist {
+		writeErrJSON(w, "该昵称已经被使用")
+		return
+	}
+	userNames[name] = true
+	s := SessionStore.GetSession(r, w, CookieName)
+	user := make(map[string]interface{})
+	user["name"] = name
+	user["avatar"] = DEFAULT_AVATAR_URL
+	user["type"] = USER_VISITOR
+	s.Set("user", user)
+	writeSuccessJSON(w, "登录成功", user)
 }
 
 func apiLogin() {

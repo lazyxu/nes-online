@@ -10,7 +10,7 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
-var defaultAvatarURL = "/img/avatar/questionMark.jpg"
+const DEFAULT_AVATAR_URL = "/img/avatar/questionMark.jpg"
 
 func existMail(mail string) bool {
 	n, _ := getCountFromCollection("user", func(c *mgo.Collection) (int, error) {
@@ -48,7 +48,7 @@ func register(k *koala.Params, w http.ResponseWriter, r *http.Request) {
 				"name":        name,
 				"password":    password,
 				"active_code": activeCode,
-				"avatar":      defaultAvatarURL,
+				"avatar":      DEFAULT_AVATAR_URL,
 				"created_at":  time.Now().Unix(),
 				"updated_at":  time.Now().Unix(),
 				"keyboard": map[string]interface{}{

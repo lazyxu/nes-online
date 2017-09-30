@@ -3,6 +3,7 @@ import { connect } from 'react-redux'
 
 import './GameInfo.scss'
 import roomApi from '../../api/room.js'
+import userApi from '../../api/user.js'
 import ws from '../../websocket/index.js'
 import { roomSet, tabSet } from '../../actions/actions'
 
@@ -17,6 +18,7 @@ class GameInfo extends React.Component {
   }
 
   render() {
+    userApi.requireLogin()
     var gameName = this.props.params.gameName
     return (
       <div>

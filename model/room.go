@@ -1,13 +1,30 @@
-package main
+package model
 
-import "strconv"
+import (
+	"strconv"
+)
 
-func getRoomList() map[string]interface{} {
-	rooms := map[string]interface{}{}
+
+
+type Room struct {
+	id       int
+	name     string
+	game     string
+	password string
+	state    string
+	players  []*User
+	// keyboardsLog [][][]Keyboard // 玩家id，
+}
+
+func (u *User) getRoomList() {
+	rooms := []interface{}{}
 	for _, r := range h.rooms {
-		rooms[strconv.Itoa(r.id)] = r.roomlistInfo()
+		rooms = append(rooms, r.roomlistInfo())
 	}
-	return rooms
+	u.msg <- map[string]interface{}{
+		"type": "getRoomList",
+		"roomList": rooms,
+	}
 }
 
 func (r *Room) updateRoomState() {
@@ -176,9 +193,9 @@ func (u *User) unready() {
 func (u *User) start() {
 	u.room.state = "游戏中"
 	var keyboard []interface{}
-	// for _, p := range u.room.players {
+	// for _, p := range u.Room.players {
 	// 	if p != nil {
-	// 		keyboard = append(keyboard, getKeyboard(p.name))
+	// 		keyboard = append(keyboard, getKeyboard(p.Name))
 	// 	} else {
 	// 		keyboard = append(keyboard, nil)
 	// 	}

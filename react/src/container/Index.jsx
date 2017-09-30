@@ -14,13 +14,13 @@ class Index extends React.Component {
     super(props)
   }
 
-  componentDidMount() {
-    userApi.checkLogin()
-  }
+  // componentDidMount() {
+  //   userApi.checkLogin()
+  // }
 
-  componentDidUpdate() {
-    userApi.checkLogin()
-  }
+  // componentDidUpdate() {
+  //   userApi.checkLogin()
+  // }
 
   render() {
     var userType = this.props.user.type

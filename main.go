@@ -10,6 +10,7 @@ import (
 
 	"github.com/MeteorKL/koala"
 	"github.com/MeteorKL/nes-online/router"
+	"github.com/MeteorKL/nes-online/model"
 )
 
 var localRomlist string
@@ -87,7 +88,7 @@ func main() {
 	router.Init()
 
 	http.HandleFunc("/ws", wsHandler)
-	// h.init()
+	model.NewHub()
 
 	// http
 	koala.Run("8080")

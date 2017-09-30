@@ -22,24 +22,34 @@ import Room from './container/Room/Room'
 import actions from './actions/actions'
 import store from './store.js'
 
+
+import constant from './constant.js'
+import userApi from './api/user.js'
+
+const requireAuth = (nextState, replace) => {
+  if (store.getState().user.type == constant.USER_UNLOGIN) {
+    replace({ pathname: '/visitorLogin' })
+  }
+}
+
 ReactDOM.render(
   <div>
     <Provider store={store}>
       <Router history={hashHistory}>
         <Route path="/" component={Index}>
-          <IndexRoute component={GameList}/>
-          <Route path="/gameList" component={GameList}/>
-          <Route path="/game/:gameName" component={GameInfo}/>
-          <Route path="/roomList" component={RoomList}/>
-          <Route path="/login" component={Login}/>
-          <Route path="/visitorLogin" component={VisitorLogin}/>
-          <Route path="/logout" component={Logout}/>
-          <Route path="/register" component={Register}/>
-          <Route path="/active/:active_code" component={Active}/>
-          <Route path="/forgetPassword" component={ForgetPassword}/>
-          <Route path="/resetPassword/:verifyCode" component={ResetPassword}/>
-          <Route path="/settings/account" component={SettingAccount}/>
-          <Route path="/game/:gameName/room/:roomID" component={Room}/>
+          <IndexRoute component={GameList} />
+          <Route path="/gameList" component={GameList} />
+          <Route path="/game/:gameName" component={GameInfo} />
+          <Route path="/roomList" component={RoomList} onEnter={requireAuth} />
+          <Route path="/login" component={Login} />
+          <Route path="/visitorLogin" component={VisitorLogin} />
+          <Route path="/logout" component={Logout} onEnter={requireAuth}/>
+          <Route path="/register" component={Register} />
+          <Route path="/active/:active_code" component={Active} />
+          <Route path="/forgetPassword" component={ForgetPassword} />
+          <Route path="/resetPassword/:verifyCode" component={ResetPassword} />
+          <Route path="/settings/account" component={SettingAccount} />
+          <Route path="/game/:gameName/room/:roomID" component={Room} onEnter={requireAuth} />
         </Route>
       </Router>
     </Provider>

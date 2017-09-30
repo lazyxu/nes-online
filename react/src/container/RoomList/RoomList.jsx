@@ -2,7 +2,7 @@ import React from 'react'
 import { connect } from 'react-redux'
 
 import './RoomList.scss'
-import ws from '../../utils/websocket'
+import ws from '../../websocket/index.js'
 import Scroll from '../../components/Scroll.jsx'
 import { roomListSet } from '../../actions/actions.js'
 
@@ -18,13 +18,13 @@ class RoomList extends React.Component {
 
   componentDidMount() {
     ws.addOnmessage("getRoomList", roomList =>
-      this.setState(roomList)
+      this.setState({roomList: roomList})
     )
-    this.interval = setInterval(() => {
-      send({
+    // this.interval = setInterval(() => {
+      ws.send({
         type: "getRoomList"
       })
-    }, 1000)
+    // }, 1000)
   }
 
   componentWillUnmount() {

@@ -2,6 +2,7 @@ import React from 'react'
 import { connect } from 'react-redux'
 
 import './Room.scss'
+import userApi from '../../api/user.js'
 import ws from '../../websocket/index.js'
 import Scroll from '../../components/Scroll.jsx'
 
@@ -49,6 +50,7 @@ class Room extends React.Component {
   }
 
   render() {
+    userApi.requireLogin()
     return (
       <div className='Room'>
         <div className='game-info'>
@@ -69,7 +71,7 @@ class Room extends React.Component {
           </table>
         </div>
         <div className='controls'>
-          <button onClick={this.leave.bind(this)}>退出</button>
+          {/* <button onClick={this.leave.bind(this)}>退出</button> */}
           <button>邀请好友</button>
           {/* {button=="开始"?<button style={{background: 'red'}} onClick={this.start.bind(this)}>开始</button>:
           (button=="等待准备"?<button style={{background: 'gray'}} disabled>等待准备</button>:

@@ -4,27 +4,21 @@ import actions from '../actions/actions.js'
 import constant from '../constant.js'
 import ws from '../websocket/index.js'
 
-exports.checkLogin = () => {
-    if (store.getState().user.type == constant.USER_UNLOGIN) {
-        var url = '/api/checkLogin'
-        ajax.Post(url).then(resp => {
-            resp = JSON.parse(resp)
-            if (resp.error) {
-                return
-            }
-            store.dispatch(actions.userSet(resp.data))
-            ws.create()
-        }).catch((err) => {
-            console.error(err)
-        })
-    }
-}
-
-exports.requireLogin = () => {
-    if (store.getState().user.type == constant.USER_UNLOGIN) {
-        window.location = '#/visitorLogin'
-    }
-}
+// exports.checkLogin = () => {
+//     if (store.getState().user.type == constant.USER_UNLOGIN) {
+//         var url = '/api/checkLogin'
+//         ajax.Post(url).then(resp => {
+//             resp = JSON.parse(resp)
+//             if (resp.error) {
+//                 return
+//             }
+//             store.dispatch(actions.userSet(resp.data))
+//             ws.create()
+//         }).catch((err) => {
+//             console.error(err)
+//         })
+//     }
+// }
 
 exports.login = (account, password) => {
     return new Promise(resolve => {
@@ -40,7 +34,7 @@ exports.login = (account, password) => {
 
 exports.visitorLogin = (name) => {
     return new Promise(resolve => {
-        var url = '/api/login'
+        var url = '/api/visitorLogin'
         var query = 'name=' + name
         ajax.Post(url, query).then(resp => {
             resolve(JSON.parse(resp))
