@@ -1,9 +1,36 @@
 import ajax from './ajax.js'
+import store from '../store.js'
+import actions from '../actions/actions.js'
+import constant from '../constant.js'
+import ws from '../websocket/index.js'
 
 exports.checkLogin = () => {
-    return new Promise(resolve => {
+    if (store.getState().user.type == constant.USER_UNLOGIN) {
         var url = '/api/checkLogin'
         ajax.Post(url).then(resp => {
+            resp = JSON.parse(resp)
+            if (resp.error) {
+                return
+            }
+            store.dispatch(actions.userSet(resp.data))
+            ws.create()
+        }).catch((err) => {
+            console.error(err)
+        })
+    }
+}
+
+exports.requireLogin = () => {
+    if (store.getState().user.type == constant.USER_UNLOGIN) {
+        window.location = '#/visitorLogin'
+    }
+}
+
+exports.login = (account, password) => {
+    return new Promise(resolve => {
+        var url = '/api/login'
+        var query = 'account=' + account + '&password=' + password
+        ajax.Post(url, query).then(resp => {
             resolve(JSON.parse(resp))
         }).catch((err) => {
             console.error(err)
@@ -11,10 +38,10 @@ exports.checkLogin = () => {
     })
 }
 
-exports.login = (account, password) => {
+exports.visitorLogin = (name) => {
     return new Promise(resolve => {
         var url = '/api/login'
-        var query = 'account=' + account + '&password=' + password
+        var query = 'name=' + name
         ajax.Post(url, query).then(resp => {
             resolve(JSON.parse(resp))
         }).catch((err) => {
@@ -104,10 +131,22 @@ exports.resetPassword = (mail, verifyCode, password) => {
     })
 }
 
-exports.changePassword = (mail, oldPassword, password) => {
+exports.changePassword = (oldPassword, password) => {
     return new Promise(resolve => {
         var url = '/api/changePassword'
-        var query = 'mail=' + mail + '&oldPassword=' + oldPassword + '&password=' + password
+        var query = '&oldPassword=' + oldPassword + '&password=' + password
+        ajax.Post(url, query).then(resp => {
+            resolve(JSON.parse(resp))
+        }).catch((err) => {
+            console.error(err)
+        })
+    })
+}
+
+exports.changeName = (name) => {
+    return new Promise(resolve => {
+        var url = '/api/changeName'
+        var query = 'name=' + name
         ajax.Post(url, query).then(resp => {
             resolve(JSON.parse(resp))
         }).catch((err) => {

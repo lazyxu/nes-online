@@ -7,13 +7,14 @@ import (
 	"math/rand"
 	"strconv"
 
-	"github.com/MeteorKL/koala"
+	"github.com/MeteorKL/koala/util"
 	mgo "gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
+	"github.com/MeteorKL/koala"
 )
 
 func generateVerifyCode(mail string) string {
-	return koala.HashString(strconv.Itoa(rand.Int()) + mail + time.Now().Format("2006-01-02 15:04:05"))
+	return util.HashString(strconv.Itoa(rand.Int()) + mail + time.Now().Format("2006-01-02 15:04:05"))
 }
 
 func forgetPassword(k *koala.Params, w http.ResponseWriter, r *http.Request) {
@@ -59,6 +60,7 @@ func resetPassword(k *koala.Params, w http.ResponseWriter, r *http.Request) {
 			"$set": bson.M{
 				"password":    password,
 				"verify_code": generateVerifyCode(mail),
+				"updated_at":  time.Now().Unix(),
 			},
 		})
 		return nil, err
@@ -71,30 +73,76 @@ func resetPassword(k *koala.Params, w http.ResponseWriter, r *http.Request) {
 }
 
 func changePassword(k *koala.Params, w http.ResponseWriter, r *http.Request) {
-	oldPassword := k.ParamPost["oldPassword"][0]
-	mail := k.ParamPost["mail"][0]
-	password := k.ParamPost["password"][0]
-	_, err := queryInCollection("user", func(c *mgo.Collection) (interface{}, error) {
-		err := c.Update(map[string]interface{}{
-			"mail":     mail,
-			"password": oldPassword,
-		}, bson.M{
-			"$set": bson.M{
-				"password":    password,
-				"verify_code": generateVerifyCode(mail),
-			},
-		})
-		return nil, err
-	})
-	if err != nil {
-		writeErrJSON(w, "密码错误")
+	s := SessionStore.PeekSession(r, CookieName)
+	if s == nil {
+		writeErrJSON(w, "你还没有登录")
 		return
 	}
-	writeSuccessJSON(w, "修改密码成功", nil)
+	if u, ok := s.Get("user").(map[string]interface{}); ok {
+		if mail, ok := u["mail"]; ok {
+			oldPassword := k.ParamPost["oldPassword"][0]
+			password := k.ParamPost["password"][0]
+
+			_, err := queryInCollection("user", func(c *mgo.Collection) (interface{}, error) {
+				err := c.Update(map[string]interface{}{
+					"mail":     mail,
+					"password": oldPassword,
+				}, bson.M{
+					"$set": bson.M{
+						"password":    password,
+						"verify_code": generateVerifyCode(mail.(string)),
+						"updated_at":  time.Now().Unix(),
+					},
+				})
+				return nil, err
+			})
+			if err != nil {
+				writeErrJSON(w, "密码错误")
+				return
+			}
+			writeSuccessJSON(w, "修改密码成功", nil)
+			return
+		}
+	}
+	writeErrJSON(w, "你不是通过邮箱注册的")
+}
+
+func changeName(k *koala.Params, w http.ResponseWriter, r *http.Request) {
+	s := SessionStore.PeekSession(r, CookieName)
+	if s == nil {
+		writeErrJSON(w, "你还没有登录")
+		return
+	}
+	if u, ok := s.Get("user").(map[string]interface{}); ok {
+		if oldName, ok := u["name"]; ok {
+			name := k.ParamPost["name"][0]
+			_, err := queryInCollection("user", func(c *mgo.Collection) (interface{}, error) {
+				err := c.Update(map[string]interface{}{
+					"name": oldName,
+				}, bson.M{
+					"$set": bson.M{
+						"name":       name,
+						"updated_at": time.Now().Unix(),
+					},
+				})
+				return nil, err
+			})
+			if err != nil {
+				writeErrJSON(w, "你的账户不存在？请联系管理员")
+				return
+			}
+			u["name"] = name
+			s.Set("user", u)
+			writeSuccessJSON(w, "修改昵称成功", u)
+			return
+		}
+	}
+	writeErrJSON(w, "该昵称已存在")
 }
 
 func apiForgetPassword() {
 	koala.Post("/api/forgetPassword", forgetPassword)
 	koala.Post("/api/resetPassword", resetPassword)
 	koala.Post("/api/changePassword", changePassword)
+	koala.Post("/api/changeName", changeName)
 }

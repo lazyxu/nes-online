@@ -1,36 +1,17 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
-import './SettingTab.scss'
+import './Setting.scss'
 import ws from '../../utils/websocket'
 import Scroll from '../../components/Scroll.jsx'
 import {roomSet, tabSet} from '../../actions/actions'
 import utils from './utils'
-import api from '../../api/user/register'
-import apiSetting from '../../api/user/setting.js'
+import userApi from '../../api/user.js'
 
-class SettingTab extends React.Component {
+class Setting extends React.Component {
 
   constructor(props) {
     super(props);
-    this.state = {
-      hidden: false,
-      name: this.props.user.name,
-      up: this.props.keyboard.up,
-      down: this.props.keyboard.down,
-      left: this.props.keyboard.left,
-      right: this.props.keyboard.right,
-      select: this.props.keyboard.select,
-      start: this.props.keyboard.start,
-      A: this.props.keyboard.A,
-      B: this.props.keyboard.B,
-      X: this.props.keyboard.X,
-      Y: this.props.keyboard.Y,
-    }
-  }
-
-  componentDidMount() {
-    this.setState({hidden: true});
   }
 
   checkName() {
@@ -62,28 +43,7 @@ class SettingTab extends React.Component {
       document.getElementById('save').disabled = false;
     });
   }
-  settingUpdate() {
-    apiSetting.settingUpdate(this.state.name, {
-        'up': this.state.up,
-        'down': this.state.down,
-        'left': this.state.left,
-        'right': this.state.right,
-        'select': this.state.select,
-        'start': this.state.start,
-        'A': this.state.A,
-        'B': this.state.B,
-        'X': this.state.X,
-        'Y': this.state.Y,
-      }, data => {
-        var id = 'saveCheck';
-        if (!data.state) {
-          utils.msgERR(id, data.msg);
-          return
-        }
-        utils.msgOK(id, data.msg);
-        this.setState({hidden: true});
-      })
-  }
+  
   render() {
     return (
       <div>
@@ -157,4 +117,4 @@ function mapStateToProps(state) {
   }
 }
 
-export default connect(mapStateToProps, {roomSet, tabSet})(SettingTab);
+export default connect(mapStateToProps, {roomSet, tabSet})(Setting);

@@ -6,6 +6,7 @@ import './Index.scss'
 import userApi from '../api/user.js'
 import constant from '../constant.js'
 import { userSet } from '../actions/actions'
+import ws from '../websocket/index.js'
 
 class Index extends React.Component {
 
@@ -14,11 +15,11 @@ class Index extends React.Component {
   }
 
   componentDidMount() {
-    userApi.checkLogin().then(resp => {
-      if (resp.state) {
-        this.props.userSet(resp.user)
-      }
-    })
+    userApi.checkLogin()
+  }
+
+  componentDidUpdate() {
+    userApi.checkLogin()
   }
 
   render() {
@@ -42,12 +43,11 @@ class Index extends React.Component {
             </div> :
             (userType == 0 ?
               <div className="Navbar">
-                <a href="#/settings">个人设置</a><span> | </span>
+                <a href="#/settings/account">设置</a><span> | </span>
                 <span> {userName} </span>
               </div> :
               <div className="Navbar">
-                <a href="#/settings">个人设置</a><span> | </span>
-                <a href="#/changePassword">修改密码</a><span> | </span>
+                <a href="#/settings/account">设置</a><span> | </span>
                 <a href="#/logout">注销</a><span> | </span>
                 <span>{userName}</span>
                 {/* <img src={userAvatar} /> */}

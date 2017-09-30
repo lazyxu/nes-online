@@ -4,7 +4,6 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/MeteorKL/koala"
 	"github.com/MeteorKL/nes-online/router"
 
 	"github.com/gorilla/websocket"
@@ -67,9 +66,8 @@ func (u *User) writer() {
 var upgrader = &websocket.Upgrader{ReadBufferSize: 1024, WriteBufferSize: 1024}
 
 func wsHandler(w http.ResponseWriter, r *http.Request) {
-	data := koala.GetSessionValue(r, router.CookieName, "user")
-	koala.DestorySession(r, w, router.CookieName)
-	if user, ok := data.(map[string]interface{}); ok {
+	s := router.SessionStore.PeekSession(r, router.CookieName)
+	if user, ok := s.Get("user").(map[string]interface{}); ok {
 		ws, err := upgrader.Upgrade(w, r, nil)
 		if err != nil {
 			println(err)

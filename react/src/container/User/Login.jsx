@@ -9,7 +9,7 @@ import './Form.scss'
 import utils from './utils'
 import userApi from '../../api/user.js'
 import { userSet } from '../../actions/actions'
-import ws from '../../websocket/index.js'
+import ws from '../../utils/websocket.js'
 
 class Login extends React.Component {
   constructor(props) {
@@ -23,14 +23,15 @@ class Login extends React.Component {
     var account = this.refs.account.value
     var password = this.refs.password.value
     userApi.login(account, password).then(resp => {
+      var id = 'check'
+      console.log(this.refs)
       if (resp.error) {
         this.setState({ login: { color: 'red', value: resp.msg } })
-        return
+      } else {
+        this.props.userSet(resp.user)
+        this.setState({ login: { color: 'green', value: resp.msg } })
+        location.href = "#/gameList"
       }
-      this.props.userSet(resp.data)
-      ws.create()
-      this.setState({ login: { color: 'green', value: resp.msg } })
-      location.href = "#/gameList"
     })
   }
 

@@ -4,16 +4,38 @@ import { connect } from 'react-redux'
 import './RoomList.scss'
 import ws from '../../utils/websocket'
 import Scroll from '../../components/Scroll.jsx'
-import {roomlistSet} from '../../actions/actions.js'
+import { roomListSet } from '../../actions/actions.js'
 
 class RoomList extends React.Component {
 
   constructor(props) {
     super(props);
+    this.state = {
+      roomList: []
+    }
+    this.interval = null
+  }
+
+  componentDidMount() {
+    ws.addOnmessage("getRoomList", roomList =>
+      this.setState(roomList)
+    )
+    this.interval = setInterval(() => {
+      send({
+        type: "getRoomList"
+      })
+    }, 1000)
+  }
+
+  componentWillUnmount() {
+    if (this.interval != null) {
+      clearInterval(this.interval)
+    }
+    ws.removeOnmessage("getRoomList")
   }
 
   enter(id) {
-    if (this.props.roomlist[id].state!="游戏中") {
+    if (this.state.roomList[id].state != "游戏中") {
       ws.send({
         "type": "enterRoom",
         "roomID": id,
@@ -22,18 +44,18 @@ class RoomList extends React.Component {
   }
 
   render() {
-    var list=[];
-    for (var index in this.props.roomlist) {
+    var list = [];
+    for (var index in this.props.roomList) {
       if (index & 1) {
         list.push(
           <tbody key={index} onClick={this.enter.bind(this, index)}>
             <tr className='odd'>
-              <td>{this.props.roomlist[index].id}</td>
-              <td>{this.props.roomlist[index].name}</td>
-              <td>{this.props.roomlist[index].host}</td>
-              <td>{this.props.roomlist[index].game}</td>
-              <td>{this.props.roomlist[index].number}</td>
-              <td>{this.props.roomlist[index].state}</td>
+              <td>{this.state.roomList[index].id}</td>
+              <td>{this.state.roomList[index].name}</td>
+              <td>{this.state.roomList[index].host}</td>
+              <td>{this.state.roomList[index].game}</td>
+              <td>{this.state.roomList[index].number}</td>
+              <td>{this.state.roomList[index].state}</td>
             </tr>
           </tbody>
         )
@@ -42,12 +64,12 @@ class RoomList extends React.Component {
         list.push(
           <tbody key={index} onClick={this.enter.bind(this, index)}>
             <tr className='even'>
-              <td>{this.props.roomlist[index].id}</td>
-              <td>{this.props.roomlist[index].name}</td>
-              <td>{this.props.roomlist[index].host}</td>
-              <td>{this.props.roomlist[index].game}</td>
-              <td>{this.props.roomlist[index].number}</td>
-              <td>{this.props.roomlist[index].state}</td>
+              <td>{this.state.roomList[index].id}</td>
+              <td>{this.state.roomList[index].name}</td>
+              <td>{this.state.roomList[index].host}</td>
+              <td>{this.state.roomList[index].game}</td>
+              <td>{this.state.roomList[index].number}</td>
+              <td>{this.state.roomList[index].state}</td>
             </tr>
           </tbody>
         )
@@ -57,7 +79,7 @@ class RoomList extends React.Component {
     return (
       <div>
         <div className="LocationBar">
-        <a href="#/gameList">游戏大厅</a> | <a className="CurrentLocation" href="#/roomList/">房间列表</a>
+          <a href="#/gameList">游戏大厅</a> | <a className="CurrentLocation" href="#/roomList/">房间列表</a>
         </div>
         <div className='RoomList' id='RoomList'>
           <table>
@@ -78,9 +100,9 @@ class RoomList extends React.Component {
 }
 
 function mapStateToProps(props) {
-    return {
-      roomlist: props.roomlist,
-    }
+  return {
+    roomList: props.roomList,
+  }
 }
 
 export default connect(mapStateToProps, null)(RoomList);

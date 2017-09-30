@@ -14,21 +14,24 @@ import ws from '../../utils/websocket.js'
 class VisitorLogin extends React.Component {
   constructor(props) {
     super(props)
+    this.state = {
+      login: { color: "", value: "" },
+    }
   }
 
   login() {
-    // var account = this.refs.account.value
-    // var password = this.refs.password.value
-    // api.login(account, password, (data) => {
-    //   var id = 'check'
-    //   if (!data.state) {
-    //     utils.msgERR(id, data.msg)
-    //     return
-    //   }
-    //   this.props.userSet(data.user)
-    //   utils.msgOK(id, data.msg)
-    //   location.href = "#/gameList"
-    // })
+    var account = this.refs.account.value
+    var password = this.refs.password.value
+    userApi.visitorLogin(account, password).then(resp => {
+      console.log(resp)
+      if (resp.error) {
+        this.setState({ login: { color: 'red', value: resp.msg } })
+        return
+      }
+      this.props.userSet(resp.data)
+      this.setState({ login: { color: 'green', value: resp.msg } })
+      location.href = "#/gameList"
+    })
   }
 
   enter(e) {
@@ -44,12 +47,14 @@ class VisitorLogin extends React.Component {
           <a href="#/roomList/">房间列表</a>
         </div>
         <div className='Form'>
+          <h1>请先登录</h1>
           <input type='text' placeholder='为自己取个昵称吧' ref='account' autoComplete="off" autoFocus />
           <div className='link'>
             <Link to="/register" className='leftLink'>注册账号</Link>
-            <Link to="/login" className='rightLink'>用户登录</Link>
+            <Link to="/login" className='rightLink'>已有账号,登录</Link>
           </div>
           <button type='button' className='enableButton' onClick={this.login.bind(this)}>游客登录</button>
+          <div className='msg' style={{ "color": this.state.login.color }}>{this.state.login.value}</div>
         </div>
       </div>
     )

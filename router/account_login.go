@@ -11,7 +11,16 @@ import (
 
 	mgo "gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
+	"github.com/MeteorKL/koala/session"
+	"log"
 )
+
+const USER_UNLOGIN = -1
+const USER_VISITOR = 0
+const USER_LOGIN = 1
+const USER_GITHUB = 2
+
+var SessionStore = session.NewSessionStore(session.DEFAULT_EXPIRE_TIME)
 
 func login(k *koala.Params, w http.ResponseWriter, r *http.Request) {
 	account := k.ParamPost["account"][0]
@@ -39,18 +48,20 @@ func login(k *koala.Params, w http.ResponseWriter, r *http.Request) {
 		writeErrJSON(w, "邮箱尚未激活")
 		return
 	}
-	session := koala.GetSession(r, w, CookieName)
-	session.Values["user"] = user
+	s := SessionStore.GetSession(r, w, CookieName)
+	user["type"] = USER_LOGIN
+	s.Set("user", user)
+	log.Println(s.Get("user"))
 	writeSuccessJSON(w, "登录成功", user)
 }
 
 func checkLogin(k *koala.Params, w http.ResponseWriter, r *http.Request) {
-	session := koala.PeekSession(r, CookieName)
-	if session != nil {
-		writeSuccessJSON(w, "用户已经登录", session.Values["user"])
+	s := SessionStore.PeekSession(r, CookieName)
+	if s == nil {
+		writeErrJSON(w, "你还没登录啊")
 		return
 	}
-	writeErrJSON(w, "你还没登录啊")
+	writeSuccessJSON(w, "用户已经登录", s.Get("user"))
 }
 
 var clientInfo map[string]string
@@ -129,16 +140,23 @@ func loginGithub(k *koala.Params, w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
-	session := koala.GetSession(r, w, CookieName)
-	session.Values["user"] = user
-	koala.Relocation(w, "/")
+	s := SessionStore.GetSession(r, w, CookieName)
+	user["type"] = USER_GITHUB
+	s.Set("user" ,user)
+	writeSuccessJSON(w, "登录成功", user)
+}
+
+func visitorLogin(k *koala.Params, w http.ResponseWriter, r *http.Request) {
+	// name := k.ParamPost["name"][0]
+
 }
 
 func apiLogin() {
 	koala.Post("/api/login", login)
+	koala.Post("/api/visitorLogin", visitorLogin)
 	koala.Post("/api/checkLogin", checkLogin)
 	koala.Get("/api/loginGithub", loginGithub)
 	koala.Post("/api/logout", func(k *koala.Params, w http.ResponseWriter, r *http.Request) {
-		koala.DestorySession(r, w, CookieName)
+		SessionStore.DelSession(r, w, CookieName)
 	})
 }

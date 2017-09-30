@@ -43,7 +43,7 @@ export default class ChangePassword extends React.Component {
   render() {
     return (
       <div className='Form'>
-        <h1>重置密码</h1>
+        <h1>修改密码</h1>
         <input type='text' placeholder='用户名' ref='username'/>
         <input type='password' placeholder='原来的密码' ref='oldPassword' />
         <input type='password' placeholder='新密码' ref='password' onBlur={this.checkPassword.bind(this)} />

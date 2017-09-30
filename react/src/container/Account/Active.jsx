@@ -15,14 +15,11 @@ export default class Active extends React.Component {
 
   componentDidMount() {
     userApi.active(this.props.params.active_code).then(resp => {
-      setTimeout(function () {
-        location.href = "#/"
-      }, 3000)
       if (resp.error) {
-        this.setState({ active: { color: 'red', value: resp.msg + ' 3s后跳转到登录界面' } })
+        this.setState({ active: { color: 'red', value: resp.msg } })
         return
       }
-      this.setState({ active: { color: 'green', value: resp.msg + ' 3s后跳转到登录界面' } })
+      this.setState({ active: { color: 'green', value: resp.msg  } })
     })
   }
 

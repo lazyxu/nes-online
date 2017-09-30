@@ -87,10 +87,10 @@ export default class Register extends React.Component {
   }
 
   register() {
-    var mail = this.refs.mail.value
-    var name = this.refs.name.value
-    var password = this.refs.password.value
     if (this.state.checkMail.color == "green" && this.state.checkName.color == "green" && this.state.checkPassword.color == "green") {
+      var mail = this.refs.mail.value
+      var name = this.refs.name.value
+      var password = this.refs.password.value
       userApi.register(mail, name, password).then(resp => {
         if (resp.error) {
           this.setState({ register: { color: 'red', value: resp.msg } })

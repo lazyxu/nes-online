@@ -1,19 +1,9 @@
-.MaskLayer { 
-  position: fixed;
-  left: 0;
-  top: 0;
-  width: 100%; 
-  height: 100%; 
-  background-color: #444;
-  opacity: 0.9; 
-  -moz-opacity: 0.9; 
-  filter: alpha(opacity=90);
-  z-index: 100;
-  font-family: arial;
-}
 .Form {
   width: 300px;
   margin: 50px auto;
+}
+.Form > h1 {
+  text-align: center;
 }
 .Form > input:-moz-placeholder {
     color: #b9b9b9;
@@ -57,25 +47,25 @@
   height: 24px;
   margin-left: 5px;
 }
-.Form > .link {
+.link {
   height: 15px;
   margin: 5px;
 }
-.Form > .link > .leftLink,
-.Form > .link > .rightLink {
+.link > .leftLink,
+.link > .rightLink {
   text-decoration: none;
   color: #b9b9b9;
   font-size: 15px;
   margin-bottom: 15px;
 }
-.Form > .link > .leftLink {
+.link > .leftLink {
   float: left;
 }
-.Form > .link > .rightLink {
+.link > .rightLink {
   float: right;
 }
-.Form > .link > .leftLink:hover,
-.Form > .link > .rightLink:hover {
+.link > .leftLink:hover,
+.link > .rightLink:hover {
   text-decoration: underline;
   color: #000;
 }

@@ -14,9 +14,6 @@ class Logout extends React.Component {
   componentDidMount() {
     userApi.logout().then(res => {
       this.props.userSet(constant.INIT_USER_STATE)
-      setTimeout(function () {
-        location.href = "#/";
-      }, 3000)
     })
   }
 
@@ -27,7 +24,7 @@ class Logout extends React.Component {
           <a href="#/gameList">游戏大厅</a><span> | </span>
           <a href="#/roomList/">房间列表</a>
         </div>
-        <span style={{ "color": "green" }}>注销成功，3s后跳转到登录界面</span>
+        <span style={{ "color": "green" }}>注销成功</span>
       </div>
     )
   }

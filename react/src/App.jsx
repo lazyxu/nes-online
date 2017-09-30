@@ -9,7 +9,7 @@ import Index from './container/Index.jsx'
 import GameInfo from './container/GameInfo/GameInfo'
 import GameList from './container/GameList/GameList'
 import RoomList from './container/RoomList/RoomList'
-import Room from './container/Room/Room'
+
 import Active from './container/Account/Active'
 import Register from './container/Account/Register'
 import Logout from './container/Account/Logout'
@@ -17,6 +17,8 @@ import Login from './container/Account/Login'
 import VisitorLogin from './container/Account/VisitorLogin'
 import ForgetPassword from './container/Account/ForgetPassword'
 import ResetPassword from './container/Account/ResetPassword'
+import SettingAccount from './container/Setting/Account'
+import Room from './container/Room/Room'
 import actions from './actions/actions'
 import store from './store.js'
 
@@ -28,7 +30,6 @@ ReactDOM.render(
           <IndexRoute component={GameList}/>
           <Route path="/gameList" component={GameList}/>
           <Route path="/game/:gameName" component={GameInfo}/>
-          <Route path="/room/:roomID" component={Room}/>
           <Route path="/roomList" component={RoomList}/>
           <Route path="/login" component={Login}/>
           <Route path="/visitorLogin" component={VisitorLogin}/>
@@ -37,6 +38,8 @@ ReactDOM.render(
           <Route path="/active/:active_code" component={Active}/>
           <Route path="/forgetPassword" component={ForgetPassword}/>
           <Route path="/resetPassword/:verifyCode" component={ResetPassword}/>
+          <Route path="/settings/account" component={SettingAccount}/>
+          <Route path="/game/:gameName/room/:roomID" component={Room}/>
         </Route>
       </Router>
     </Provider>

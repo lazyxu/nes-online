@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 
 import './GameInfo.scss'
 import roomApi from '../../api/room.js'
-import ws from '../../utils/websocket'
+import ws from '../../websocket/index.js'
 import { roomSet, tabSet } from '../../actions/actions'
 
 class GameInfo extends React.Component {
@@ -13,10 +13,7 @@ class GameInfo extends React.Component {
   }
 
   create() {
-    roomApi.createRoom(this.props.game, gameList => {
-      console.log(gameList)
-      this.setState({ gameList: gameList })
-    })
+    ws.createRoom(this.props.params.gameName)
   }
 
   render() {
@@ -25,7 +22,7 @@ class GameInfo extends React.Component {
       <div>
         <div className="LocationBar">
           <a href="#/gameList">游戏大厅</a><span> >> </span>
-          <a className="CurrentLocation" href={"#/game/"+gameName}>{gameName}</a><span> | </span>
+          <a className="CurrentLocation" href={"#/game/" + gameName}>{gameName}</a><span> | </span>
           <a href="#/roomList/">房间列表</a>
         </div>
         <div className='GameInfo'>
@@ -39,7 +36,7 @@ class GameInfo extends React.Component {
             <button onClick={this.create.bind(this)}>创建游戏</button>
             {/* <button >加入游戏</button> */}
             {/* <button >添加收藏</button> */}
-            <button onClick={()=> {location.href = "#/gameList"}}>返回</button>
+            <button onClick={() => { location.href = "#/gameList" }}>返回</button>
           </div>
         </div>
       </div>

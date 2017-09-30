@@ -6,7 +6,7 @@ import (
 	"github.com/MeteorKL/koala"
 )
 
-const CookieName = "NESOnline"
+const CookieName = "SessionID"
 
 func writeErrJSON(w http.ResponseWriter, msg string) {
 	koala.WriteJSON(w, map[string]interface{}{

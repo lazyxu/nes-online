@@ -15,12 +15,7 @@ func Init() {
 
 	koala.RenderPath = "static/"
 	koala.Get("/", func(k *koala.Params, w http.ResponseWriter, r *http.Request) {
-		user := koala.GetSessionValue(r, CookieName, "user")
-		koala.Render(w, "index.html", map[string]interface{}{
-			"initialState": map[string]interface{}{
-				"user": user,
-			},
-		})
+		koala.Render(w, "index.html", nil)
 	})
 	api()
 }

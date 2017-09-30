@@ -1,0 +1,67 @@
+.Setting {
+  padding: 0 20px;
+}
+.Setting > .Item {
+  padding: 10px 0;
+}
+.Setting > .Item > input:-moz-placeholder {
+  color: #b9b9b9;
+}
+.Setting > .Item > input::-moz-placeholder {
+  color: #b9b9b9;
+}
+.Setting > .Item > input:-ms-input-placeholder {
+  color: #b9b9b9;
+}
+.Setting > .Item > input::-webkit-input-placeholder {
+  color: #b9b9b9;
+}
+.Setting > .Item > input {
+  display: block;
+  margin: 5px 0;
+  width: 300px;
+  height: 30px;
+  padding: 5px 7px 5px 15px;
+  border: 1px solid #ddd;
+  font-size: 14px;
+  border-radius: 6px;
+  transition: all .2s;
+}
+.Setting > .Item > input:focus {
+  border: 1px solid #fff;
+  outline: none;
+  -moz-box-shadow: 0 2px 3px 0 rgba(0,0,0,.1) inset, 0 2px 7px 0 rgba(0,0,0,.2);
+  -webkit-box-shadow: 0 2px 3px 0 rgba(0,0,0,.1) inset, 0 2px 7px 0 rgba(0,0,0,.2);
+  box-shadow: 0 2px 3px 0 rgba(0,0,0,.1) inset, 0 2px 7px 0 rgba(0,0,0,.2);
+}
+.Setting > .Item > .msg {
+  font-size: 15px;
+  height: 24px;
+  margin-left: 5px;
+}
+.Setting > .Item > button {
+  display: inline-block;
+  margin-bottom: 10px;
+  width: 130px;
+  font-size: 16px;
+  height: 30px;
+  color: #fff;
+  text-decoration: none;
+  border: none;
+  outline: none;
+  border-radius: 6px;
+  -moz-border-radius: 6px;
+  -webkit-border-radius: 6px;
+}
+.Setting > .Item > .disableButton {
+  background: #b9b9b9;
+}
+.Setting > .Item > .enableButton {
+  background: #1AD996;
+}
+.Setting > .Item > .enableButton:hover {
+  background: #2AE9A6;
+}
+.Setting > .Item > .enableButton:active {
+  background: #0AC986;
+}

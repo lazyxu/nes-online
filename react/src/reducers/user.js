@@ -2,7 +2,6 @@ import util from './util.js'
 import constant from "../constant.js"
 
 export default function reducer(state = constant.INIT_USER_STATE, action) {
-    console.log(action)
   switch (action.type) {
     case 'userSet':
       return action.user;
