@@ -50,7 +50,6 @@ class Room extends React.Component {
   }
 
   render() {
-    userApi.requireLogin()
     return (
       <div className='Room'>
         <div className='game-info'>

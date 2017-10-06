@@ -9,3 +9,4 @@ nes
 *.json
 roms/
 static/origin_roms/*
+*.rdb

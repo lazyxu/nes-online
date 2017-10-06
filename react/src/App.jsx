@@ -40,7 +40,7 @@ ReactDOM.render(
           <IndexRoute component={GameList} />
           <Route path="/gameList" component={GameList} />
           <Route path="/game/:gameName" component={GameInfo} />
-          <Route path="/roomList" component={RoomList} onEnter={requireAuth} />
+          <Route path="/roomList" component={RoomList} />
           <Route path="/login" component={Login} />
           <Route path="/visitorLogin" component={VisitorLogin} />
           <Route path="/logout" component={Logout} onEnter={requireAuth}/>

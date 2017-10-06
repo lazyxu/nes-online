@@ -18,7 +18,6 @@ class GameInfo extends React.Component {
   }
 
   render() {
-    userApi.requireLogin()
     var gameName = this.props.params.gameName
     return (
       <div>

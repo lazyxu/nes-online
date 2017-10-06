@@ -71,7 +71,6 @@ class Account extends React.Component {
   }
 
   render() {
-    userApi.requireLogin()
     return (
       <div>
         <div className="LocationBar">

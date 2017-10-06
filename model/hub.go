@@ -1,8 +1,9 @@
 package model
 
+import "github.com/MeteorKL/nes-online/router"
+
 type Hub struct {
-	visitors  map[string]*User
-	users     map[string]*User
+	users     [router.USER_MAX]map[string]*User
 	rooms     map[int]*Room
 	roomCount int
 }
@@ -14,21 +15,8 @@ type Hub struct {
 
 var h *Hub
 
-func VisitorLogin(name string) bool {
-	for n := range h.visitors {
-		if n==name {
-			return false
-		}
-	}
-	h.visitors[name] = &User{
-		name: name,
-	}
-	return true
-}
-
 func NewHub() *Hub {
 	h = &Hub{
-		users:     make(map[string]*User),
 		rooms:     make(map[int]*Room),
 		roomCount: 10000,
 	}

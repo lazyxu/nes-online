@@ -20,11 +20,11 @@ class RoomList extends React.Component {
     ws.addOnmessage("getRoomList", roomList =>
       this.setState({roomList: roomList})
     )
-    // this.interval = setInterval(() => {
+    this.interval = setInterval(() => {
       ws.send({
         type: "getRoomList"
       })
-    // }, 1000)
+    }, 10000)
   }
 
   componentWillUnmount() {
