@@ -13,7 +13,17 @@ class GameInfo extends React.Component {
     super(props);
   }
 
-  create() {
+  componentWillMount() {
+    ws.addOnmessage('createRoom', data => {
+      location.href = '#/room/' + data.room.id
+    })
+  }
+
+  componentWillUnmount() {
+    ws.removeOnmessage('createRoom')
+  }
+
+  createRoom() {
     ws.createRoom(this.props.params.gameName)
   }
 
@@ -34,7 +44,7 @@ class GameInfo extends React.Component {
             <div>Mapper类型：1</div>
           </div>
           <div className='gameButtonBox'>
-            <button onClick={this.create.bind(this)}>创建游戏</button>
+            <button onClick={() => this.createRoom()}>创建游戏</button>
             {/* <button >加入游戏</button> */}
             {/* <button >添加收藏</button> */}
             <button onClick={() => { location.href = "#/gameList" }}>返回</button>

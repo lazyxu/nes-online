@@ -1,4 +1,4 @@
-var initialState = 'GameList'
+var initialState = ''
 export default function reducer(state = initialState, action) {
   switch (action.type) {
     case 'tabSet':

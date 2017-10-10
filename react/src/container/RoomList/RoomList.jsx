@@ -11,69 +11,46 @@ class RoomList extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      roomList: []
+      roomList: null
     }
     this.interval = null
   }
 
   componentDidMount() {
-    ws.addOnmessage("getRoomList", roomList =>
-      this.setState({roomList: roomList})
+    ws.addOnmessage("roomList", data =>
+      this.setState({ roomList: data.roomList })
     )
-    this.interval = setInterval(() => {
-      ws.send({
-        type: "getRoomList"
-      })
-    }, 10000)
+    ws.send({
+      type: "getRoomList"
+    })
   }
 
   componentWillUnmount() {
-    if (this.interval != null) {
-      clearInterval(this.interval)
-    }
-    ws.removeOnmessage("getRoomList")
+    ws.removeOnmessage("roomList")
   }
 
   enter(id) {
     if (this.state.roomList[id].state != "游戏中") {
-      ws.send({
-        "type": "enterRoom",
-        "roomID": id,
-      });
+      location.href = '#/room/' + this.state.roomList[id].id
     }
   }
 
   render() {
-    var list = [];
-    for (var index in this.props.roomList) {
-      if (index & 1) {
-        list.push(
-          <tbody key={index} onClick={this.enter.bind(this, index)}>
-            <tr className='odd'>
-              <td>{this.state.roomList[index].id}</td>
-              <td>{this.state.roomList[index].name}</td>
-              <td>{this.state.roomList[index].host}</td>
-              <td>{this.state.roomList[index].game}</td>
-              <td>{this.state.roomList[index].number}</td>
-              <td>{this.state.roomList[index].state}</td>
+    var roomList = []
+    if (this.state.roomList != null) {
+      this.state.roomList.forEach((room, i)=> {
+        roomList.push(
+          <tbody key={i} onClick={() => this.enter(i)}>
+            <tr className={i & 1 ? 'even' : 'odd'}>
+              <td>{room.id}</td>
+              <td>{room.host}</td>
+              <td>{room.game}</td>
+              <td>{room.number}</td>
+              <td>{room.state}</td>
             </tr>
           </tbody>
         )
-      }
-      else {
-        list.push(
-          <tbody key={index} onClick={this.enter.bind(this, index)}>
-            <tr className='even'>
-              <td>{this.state.roomList[index].id}</td>
-              <td>{this.state.roomList[index].name}</td>
-              <td>{this.state.roomList[index].host}</td>
-              <td>{this.state.roomList[index].game}</td>
-              <td>{this.state.roomList[index].number}</td>
-              <td>{this.state.roomList[index].state}</td>
-            </tr>
-          </tbody>
-        )
-      }
+      })
     }
 
     return (
@@ -84,14 +61,13 @@ class RoomList extends React.Component {
         <div className='RoomList' id='RoomList'>
           <table>
             <thead><tr>
-              <td width='10%'>房间号</td>
-              <td width='20%'>房间名</td>
+              <td width='15%'>房间号</td>
               <td width='20%'>房主</td>
               <td width='30%'>游戏名称</td>
               <td width='10%'>人数</td>
-              <td width='10%'>状态</td>
+              <td width='15%'>状态</td>
             </tr></thead>
-            {list}
+            {roomList}
           </table>
         </div>
       </div>

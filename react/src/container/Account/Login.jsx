@@ -8,7 +8,7 @@ import './Form.scss'
 
 import utils from './utils'
 import userApi from '../../api/user.js'
-import { userSet } from '../../actions/actions'
+import { userSet, tabSet } from '../../actions/actions'
 import ws from '../../websocket/index.js'
 
 class Login extends React.Component {
@@ -30,23 +30,22 @@ class Login extends React.Component {
       this.props.userSet(resp.data)
       ws.create()
       this.setState({ login: { color: 'green', value: resp.msg } })
-      location.href = "#/gameList"
+      this.props.tabSet('')
+      location.reload(true)
     })
   }
 
   render() {
     return (
-      <div>
-        <div className="LocationBar">
-          <a href="#/gameList">游戏大厅</a><span> | </span>
-          <a href="#/roomList/">房间列表</a>
-        </div>
+      <div className="MaskLayer" >
         <div className='Form'>
+          <span className="Close" onClick={()=>this.props.tabSet('')}>X</span>
+          <h1>登录</h1>
           <input type='text' placeholder='用户名/邮箱' ref='account' autoComplete="off" autoFocus />
           <input type='password' placeholder='密码' ref='password' autoComplete="off" onKeyUp={e => { if (e.keyCode == 13) this.login() }} />
           <div className='link'>
-            <Link to="/register" className='leftLink'>没有帐号？</Link>
-            <Link to="/forgetPassword" className='rightLink'>忘记密码？</Link>
+            <a onClick={()=>this.props.tabSet('Register')} className='leftLink'>没有帐号？</a>
+            <a onClick={()=>this.props.tabSet('ForgetPassword')} className='rightLink'>忘记密码？</a>
           </div>
           <button type='button' className='enableButton' onClick={this.login.bind(this)}>登 录</button>
           <div className='msg' style={{ "color": this.state.login.color }}>{this.state.login.value}</div>
@@ -60,4 +59,4 @@ class Login extends React.Component {
   }
 }
 
-export default connect(null, { userSet })(Login)
+export default connect(null, { userSet, tabSet })(Login)

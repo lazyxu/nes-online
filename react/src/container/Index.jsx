@@ -5,7 +5,11 @@ import { hashHistory } from 'react-router'
 import './Index.scss'
 import userApi from '../api/user.js'
 import constant from '../constant.js'
-import { userSet } from '../actions/actions'
+import Login from './Account/Login'
+import VisitorLogin from './Account/VisitorLogin'
+import Register from './Account/Register'
+import ForgetPassword from './Account/ForgetPassword'
+import { userSet, tabSet } from '../actions/actions'
 import ws from '../websocket/index.js'
 
 class Index extends React.Component {
@@ -14,13 +18,38 @@ class Index extends React.Component {
     super(props)
   }
 
-  // componentDidMount() {
-  //   userApi.checkLogin()
-  // }
+  componentWillMount() {
+    ws.addOnmessage('relogin', data => {
+      alert("你的账号在异地登录，如果不是你本人操作，请及时修改密码");
+      this.props.userSet(constant.INIT_USER_STATE)
+    })
+    if ((this.props.tab == null || this.props.tab == '') && this.props.user.type == constant.USER_UNLOGIN) {
+      userApi.checkLogin().then(resp => {
+        if (resp.error) {
+          this.props.tabSet('VisitorLogin')
+          return
+        }
+        this.props.userSet(resp.data)
+        ws.create()
+      })
+    }
+  }
 
-  // componentDidUpdate() {
-  //   userApi.checkLogin()
-  // }
+  componentDidUpdate() {
+    if ((this.props.tab == null || this.props.tab == '') && this.props.user.type == constant.USER_UNLOGIN) {
+      this.props.tabSet('VisitorLogin')
+    }
+  }
+
+  componentDidUnmount() {
+    ws.removeOnmessage('relogin')
+  }
+
+  logout() {
+    userApi.logout().then(resp => {
+      this.props.userSet(constant.INIT_USER_STATE)
+    })
+  }
 
   render() {
     var userType = this.props.user.type
@@ -28,6 +57,12 @@ class Index extends React.Component {
     // var userAvatar = this.props.user.avatar
     return (
       <div >
+        {this.props.tab == 'VisitorLogin' ? <VisitorLogin /> :
+          this.props.tab == 'Login' ? <Login /> :
+            this.props.tab == 'Register' ? <Register /> :
+              this.props.tab == 'ForgetPassword' ? <ForgetPassword /> :
+                <div />
+        }
         <div className="Header">
           <a href="#/gameList">
             <img src="/img/logo@48.png" />
@@ -37,18 +72,19 @@ class Index extends React.Component {
           </a>
           {userType == -1 ?
             <div className="Navbar">
-              <a href="#/visitorLogin">游客登录</a><span> | </span>
-              <a href="#/register">注册</a><span> | </span>
-              <a className="CurrentLocation" href="#/login/">登录</a>
+              <a onClick={() => this.props.tabSet('VisitorLogin')}>游客登录</a><span> | </span>
+              <a onClick={() => this.props.tabSet('Register')}>注册</a><span> | </span>
+              <a className="CurrentLocation" onClick={() => this.props.tabSet('Login')}>登录</a>
             </div> :
             (userType == 0 ?
               <div className="Navbar">
                 <a href="#/settings/account">设置</a><span> | </span>
+                <a onClick={() => this.logout()}>注销</a><span> | </span>
                 <span> {userName} </span>
               </div> :
               <div className="Navbar">
                 <a href="#/settings/account">设置</a><span> | </span>
-                <a href="#/logout">注销</a><span> | </span>
+                <a onClick={() => this.logout()}>注销</a><span> | </span>
                 <span>{userName}</span>
                 {/* <img src={userAvatar} /> */}
               </div>
@@ -76,4 +112,4 @@ function mapStateToProps(state) {
   }
 }
 
-export default connect(mapStateToProps, { userSet })(Index)
+export default connect(mapStateToProps, { userSet, tabSet })(Index)

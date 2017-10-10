@@ -1,11 +1,13 @@
 import React from 'react'
 import { Link } from 'react-router'
+import { connect } from 'react-redux'
 
 import './Form.scss'
 import utils from './utils'
 import userApi from '../../api/user.js'
+import {tabSet } from '../../actions/actions'
 
-export default class ForgetPassword extends React.Component {
+class ForgetPassword extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
@@ -26,15 +28,13 @@ export default class ForgetPassword extends React.Component {
 
   render() {
     return (
-      <div>
-        <div className="LocationBar">
-          <a href="#/gameList">游戏大厅</a><span> | </span>
-          <a href="#/roomList/">房间列表</a>
-        </div>
+      <div className="MaskLayer">
         <div className='Form'>
+          <span className="Close" onClick={()=>this.props.tabSet('')}>X</span>
+          <h1>忘记密码</h1>
           <input ref='mail' type='text' placeholder='邮箱' autoFocus />
           <div className='link'>
-            <Link to="/login" className='leftLink'>想起密码了？登录吧</Link>
+            <a onClick={()=>this.props.tabSet('Login')} className='leftLink'>想起密码了？登录吧</a>
           </div>
           <button type='button' className='enableButton' onClick={this.forgetPassword.bind(this)}>发送验证邮件</button>
           <div className='msg' style={{ "color": this.state.forgetPassword.color }}>{this.state.forgetPassword.value}</div>
@@ -43,3 +43,5 @@ export default class ForgetPassword extends React.Component {
     )
   }
 }
+
+export default connect(null, { tabSet })(ForgetPassword)

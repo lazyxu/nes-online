@@ -11,11 +11,6 @@ import GameList from './container/GameList/GameList'
 import RoomList from './container/RoomList/RoomList'
 
 import Active from './container/Account/Active'
-import Register from './container/Account/Register'
-import Logout from './container/Account/Logout'
-import Login from './container/Account/Login'
-import VisitorLogin from './container/Account/VisitorLogin'
-import ForgetPassword from './container/Account/ForgetPassword'
 import ResetPassword from './container/Account/ResetPassword'
 import SettingAccount from './container/Setting/Account'
 import Room from './container/Room/Room'
@@ -26,11 +21,11 @@ import store from './store.js'
 import constant from './constant.js'
 import userApi from './api/user.js'
 
-const requireAuth = (nextState, replace) => {
-  if (store.getState().user.type == constant.USER_UNLOGIN) {
-    replace({ pathname: '/visitorLogin' })
-  }
-}
+// const requireAuth = (nextState, replace) => {
+//   if (store.getState().user.type == constant.USER_UNLOGIN) {
+//     replace({ pathname: '/roomList' })
+//   }
+// }
 
 ReactDOM.render(
   <div>
@@ -41,15 +36,10 @@ ReactDOM.render(
           <Route path="/gameList" component={GameList} />
           <Route path="/game/:gameName" component={GameInfo} />
           <Route path="/roomList" component={RoomList} />
-          <Route path="/login" component={Login} />
-          <Route path="/visitorLogin" component={VisitorLogin} />
-          <Route path="/logout" component={Logout} onEnter={requireAuth}/>
-          <Route path="/register" component={Register} />
           <Route path="/active/:active_code" component={Active} />
-          <Route path="/forgetPassword" component={ForgetPassword} />
           <Route path="/resetPassword/:verifyCode" component={ResetPassword} />
           <Route path="/settings/account" component={SettingAccount} />
-          <Route path="/game/:gameName/room/:roomID" component={Room} onEnter={requireAuth} />
+          <Route path="/room/:roomID" component={Room} />
         </Route>
       </Router>
     </Provider>

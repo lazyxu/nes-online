@@ -53,8 +53,17 @@ var send = data => {
   ws.send(JSON.stringify(data))
 }
 exports.send = data => {
-  ws.send(JSON.stringify(data))
+  if (ws != null) {
+    ws.send(JSON.stringify(data))
+  } else {
+    setTimeout(function () {
+      if (ws != null) {
+        ws.send(JSON.stringify(data))
+      }
+    }, 2000);
+  }
 }
+
 exports.createRoom = gameName => {
   send({
     type: "createRoom",

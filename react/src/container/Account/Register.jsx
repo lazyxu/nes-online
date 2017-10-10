@@ -1,11 +1,13 @@
 import React from 'react'
 import { Link } from 'react-router'
+import { connect } from 'react-redux'
 
 import './Form.scss'
 import utils from './utils'
 import userApi from '../../api/user.js'
+import {tabSet } from '../../actions/actions'
 
-export default class Register extends React.Component {
+class Register extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
@@ -105,12 +107,10 @@ export default class Register extends React.Component {
 
   render() {
     return (
-      <div>
-        <div className="LocationBar">
-          <a href="#/gameList">游戏大厅</a><span> | </span>
-          <a href="#/roomList/">房间列表</a>
-        </div>
+      <div className="MaskLayer">
         <div className='Form'>
+          <span className="Close" onClick={()=>this.props.tabSet('')}>X</span>
+          <h1>注册</h1>
           <input type='email' placeholder='邮箱' ref='mail' onBlur={this.checkMail.bind(this)} autoFocus />
           <div ref='checkMail' className='msg' style={{ "color": this.state.checkMail.color }}>{this.state.checkMail.value}</div>
           <input type='text' placeholder='用户名' ref='name' onBlur={this.checkName.bind(this)} />
@@ -119,7 +119,7 @@ export default class Register extends React.Component {
           <input type='password' placeholder='再次输入密码' ref='rePassword' onBlur={this.checkPassword.bind(this)} />
           <div ref='checkPassword' className='msg' style={{ "color": this.state.checkPassword.color }}>{this.state.checkPassword.value}</div>
           <div className='link'>
-            <Link to="/login" className='rightLink'>已有帐号？登录</Link>
+            <a onClick={()=>this.props.tabSet('Login')}  className='rightLink'>已有帐号？登录</a>
           </div>
           <button type='button' className={this.state.buttonEnable ? 'enableButton' : 'disableButton'} onClick={this.register.bind(this)}>发送注册邮件</button>
           <div ref='register' className='msg' style={{ "color": this.state.register.color }}>{this.state.register.value}</div>
@@ -128,3 +128,5 @@ export default class Register extends React.Component {
     )
   }
 }
+
+export default connect(null, { tabSet })(Register)

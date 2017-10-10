@@ -4,8 +4,6 @@ import (
 	"strconv"
 )
 
-
-
 type Room struct {
 	id       int
 	name     string
@@ -16,15 +14,18 @@ type Room struct {
 	// keyboardsLog [][][]Keyboard // 玩家id，
 }
 
-func (u *User) getRoomList() {
-	rooms := []interface{}{}
-	for _, r := range h.rooms {
-		rooms = append(rooms, r.roomlistInfo())
-	}
+func (u *User) sendRoomList() {
 	u.msg <- map[string]interface{}{
-		"type": "getRoomList",
-		"roomList": rooms,
+		"type":     "roomList",
+		"roomList": roomlist(),
 	}
+}
+
+func sendRoomList() {
+	broadcast(map[string]interface{}{
+		"type":     "roomList",
+		"roomList": roomlist(),
+	})
 }
 
 func (r *Room) updateRoomState() {
@@ -40,26 +41,30 @@ func (r *Room) updateRoomState() {
 	r.state = "等待开始"
 }
 
-func (r *Room) roomlistInfo() map[string]interface{} {
-	count := 0
-	host := ""
-	for _, p := range r.players {
-		if p != nil {
-			count++
-			if p.state == "房主" {
-				host = p.name
+func roomlist() []interface{} {
+	roomlistInfo := []interface{}{}
+	for _, r := range h.rooms {
+		count := 0
+		host := ""
+		for _, p := range r.players {
+			if p != nil {
+				count++
+				if p.state == "房主" {
+					host = p.name
+				}
 			}
 		}
+		r.updateRoomState()
+		roomlistInfo = append(roomlistInfo, map[string]interface{}{
+			"id":     r.id,
+			"name":   r.name,
+			"host":   host,
+			"game":   r.game,
+			"number": strconv.Itoa(count) + "/" + strconv.Itoa(len(r.players)),
+			"state":  r.state,
+		})
 	}
-	r.updateRoomState()
-	return map[string]interface{}{
-		"id":     r.id,
-		"name":   r.name,
-		"host":   host,
-		"game":   r.game,
-		"number": strconv.Itoa(count) + "/" + strconv.Itoa(len(r.players)),
-		"state":  r.state,
-	}
+	return roomlistInfo
 }
 
 func (r *Room) roomInfo() map[string]interface{} {
@@ -105,28 +110,47 @@ func (u *User) createRoom(m map[string]interface{}) {
 	u.room = h.rooms[roomID]
 	u.state = "房主"
 	u.idInRoom = 0
-	u.broadcast(map[string]interface{}{
-		"type":     "createRoom",
-		"idInRoom": u.idInRoom,
-		"room":     h.rooms[roomID].roomInfo(),
-		"roomlist": h.rooms[roomID].roomlistInfo(),
-	})
+	u.msg <- map[string]interface{}{
+		"type": "createRoom",
+		"room": h.rooms[roomID].roomInfo(),
+	}
 }
 
 func (u *User) enterRoom(m map[string]interface{}) {
-	roomID, _ := strconv.Atoi(m["roomID"].(string))
+	sroomID, _ := m["roomID"].(string)
+	roomID, _ := strconv.Atoi(sroomID)
+	if _, ok := h.rooms[roomID]; !ok {
+		u.msg <- map[string]interface{}{
+			"type": "roomMsg",
+			"errMsg": "房间不存在",
+		}
+		return
+	}
+	flag := false
 	for index, user := range h.rooms[roomID].players {
-		if user == nil {
+		if user == u {
+			flag = true
+			break
+		} else if user == nil {
+			flag = true
 			u.idInRoom = index
 			u.room = h.rooms[roomID]
 			u.state = ""
 			h.rooms[roomID].players[index] = u
-			u.broadcast(map[string]interface{}{
-				"type":     "enterRoom",
-				"idInRoom": u.idInRoom,
-				"room":     h.rooms[roomID].roomInfo(),
-				"roomlist": h.rooms[roomID].roomlistInfo(),
-			})
+			break
+		}
+	}
+	if flag {
+		u.sendRoomMsg(map[string]interface{}{
+			"type": "roomMsg",
+			"msg":  "玩家 " + u.name + " 进入了房间",
+			"room": u.room.roomInfo(),
+		}, "系统消息", true)
+		sendRoomList()
+	} else {
+		u.msg <- map[string]interface{}{
+			"type": "roomMsg",
+			"errMsg": "房间已满",
 		}
 	}
 }
@@ -135,8 +159,6 @@ func (u *User) leaveRoom() {
 	if u.room == nil {
 		return
 	}
-	roomID := u.room.id
-	userName := u.name
 	for index, p := range u.room.players {
 		if p == u {
 			u.room.players[index] = nil
@@ -155,39 +177,32 @@ func (u *User) leaveRoom() {
 	}
 	if empty {
 		delete(h.rooms, u.room.id)
-		u.broadcast(map[string]interface{}{
-			"type":     "leaveRoom",
-			"userName": userName,
-			"roomID":   u.room.id,
-			"roomlist": "empty",
-		})
-	} else {
-		u.broadcast(map[string]interface{}{
-			"type":     "leaveRoom",
-			"userName": userName,
-			"room":     h.rooms[roomID].roomInfo(),
-			"roomlist": h.rooms[roomID].roomlistInfo(),
-		})
 	}
+	u.sendRoomMsg(map[string]interface{}{
+		"type": "roomMsg",
+		"msg":  "玩家 " + u.name + " 离开了房间",
+		"room": u.room.roomInfo(),
+	}, "系统消息", true)
+	sendRoomList()
 	u.room = nil
 }
 
 func (u *User) ready() {
 	u.state = "已准备"
-	u.broadcast(map[string]interface{}{
-		"type":     "updateRoom",
+	u.sendRoomMsg(map[string]interface{}{
+		"type": "roomMsg",
 		"room":     u.room.roomInfo(),
-		"roomlist": u.room.roomlistInfo(),
-	})
+	}, u.name, true)
+	sendRoomList()
 }
 
 func (u *User) unready() {
 	u.state = ""
-	u.broadcast(map[string]interface{}{
-		"type":     "updateRoom",
+	u.sendRoomMsg(map[string]interface{}{
+		"type": "roomMsg",
 		"room":     u.room.roomInfo(),
-		"roomlist": u.room.roomlistInfo(),
-	})
+	}, u.name, true)
+	sendRoomList()
 }
 
 func (u *User) start() {
@@ -203,17 +218,17 @@ func (u *User) start() {
 	u.broadcast(map[string]interface{}{
 		"type":     "start",
 		"room":     u.room.roomInfo(),
-		"roomlist": u.room.roomlistInfo(),
 		"keyboard": keyboard,
 	})
+	sendRoomList()
 }
 
 func (u *User) keyboard(m map[string]interface{}) {
-	u.sendRoomMsg(m, false)
+	u.sendRoomMsg(m, u.name, false)
 }
 
-func (u *User) sendRoomMsg(m map[string]interface{}, sendToSelf bool) {
-	m["from"] = u.name
+func (u *User) sendRoomMsg(m map[string]interface{}, from string, sendToSelf bool) {
+	m["from"] = from
 	for _, user := range u.room.players {
 		if user == nil {
 			continue
@@ -224,7 +239,7 @@ func (u *User) sendRoomMsg(m map[string]interface{}, sendToSelf bool) {
 		select {
 		case user.msg <- m:
 		default:
-			delete(h.users, user.name)
+			delete(h.users[u.typ], user.name)
 			close(user.msg)
 		}
 	}

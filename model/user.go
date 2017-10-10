@@ -58,7 +58,7 @@ func (u *User) Reader() {
 		}
 		switch m["type"] {
 		case "getRoomList":
-			u.getRoomList()
+			u.sendRoomList()
 		case "createRoom":
 			u.createRoom(m)
 		case "leaveRoom":
@@ -74,13 +74,13 @@ func (u *User) Reader() {
 		case "keyboard":
 			u.keyboard(m)
 		case "roomMsg":
-			u.sendRoomMsg(m, true)
+			u.sendRoomMsg(m, u.name, true)
 		case "__offer":
-			u.sendRoomMsg(m, false)
+			u.sendRoomMsg(m, u.name, false)
 		case "__answer":
-			u.sendRoomMsg(m, false)
+			u.sendRoomMsg(m, u.name, false)
 		case "__ice_candidate":
-			u.sendRoomMsg(m, false)
+			u.sendRoomMsg(m, u.name, false)
 		default:
 			u.broadcast(m)
 		}
@@ -89,17 +89,16 @@ func (u *User) Reader() {
 }
 
 func (u *User) in() {
-	if _, ok := h.users[u.typ][u.name]; ok {
-		u.msg <- map[string]interface{}{
+	if user, ok := h.users[u.typ][u.name]; ok {
+		user.msg <- map[string]interface{}{
 			"type": "relogin",
 		}
-		return
 	}
 	h.users[u.typ][u.name] = u
 }
 
 func (u *User) out() {
-	//u.leaveRoom()
+	u.leaveRoom()
 	if h.users[u.typ][u.name] == u {
 		delete(h.users[u.typ], u.name)
 	}
@@ -108,6 +107,24 @@ func (u *User) out() {
 func (u *User) broadcast(m map[string]interface{}) {
 	m["from"] = u.name
 	// log.Println("broadcast: ", m)
+	for _, users := range h.users {
+		for _, user := range users {
+			if user.msg == nil {
+				log.Println("channel is nil")
+				user.out()
+			}
+			select {
+			case user.msg <- m:
+			default:
+				log.Println("channel is full !")
+				// delete(h.users, user.Name)
+				// close(user.Msg)
+			}
+		}
+	}
+}
+
+func broadcast(m map[string]interface{}) {
 	for _, users := range h.users {
 		for _, user := range users {
 			if user.msg == nil {

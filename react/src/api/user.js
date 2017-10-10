@@ -4,21 +4,16 @@ import actions from '../actions/actions.js'
 import constant from '../constant.js'
 import ws from '../websocket/index.js'
 
-// exports.checkLogin = () => {
-//     if (store.getState().user.type == constant.USER_UNLOGIN) {
-//         var url = '/api/checkLogin'
-//         ajax.Post(url).then(resp => {
-//             resp = JSON.parse(resp)
-//             if (resp.error) {
-//                 return
-//             }
-//             store.dispatch(actions.userSet(resp.data))
-//             ws.create()
-//         }).catch((err) => {
-//             console.error(err)
-//         })
-//     }
-// }
+exports.checkLogin = () => {
+    return new Promise(resolve => {
+        var url = '/api/checkLogin'
+        ajax.Post(url).then(resp => {
+            resolve(JSON.parse(resp))
+        }).catch((err) => {
+            console.error(err)
+        })
+    })
+}
 
 exports.login = (account, password) => {
     return new Promise(resolve => {
