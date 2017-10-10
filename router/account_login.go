@@ -17,9 +17,8 @@ import (
 
 const USER_UNLOGIN = -1
 const USER_VISITOR = 0
-const USER_MAIL = 1
-const USER_GITHUB = 2
-const USER_MAX = 3
+const USER_LOGIN = 1
+const USER_MAX = 2
 var userNames = make(map[string]bool)
 
 var SessionStore = session.NewSessionStore(session.DEFAULT_EXPIRE_TIME)
@@ -51,7 +50,7 @@ func login(k *koala.Params, w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	s := SessionStore.GetSession(r, w, CookieName)
-	user["type"] = USER_MAIL
+	user["type"] = USER_LOGIN
 	s.Set("user", user)
 	log.Println(s.Get("user"))
 	writeSuccessJSON(w, "登录成功", user)
@@ -143,7 +142,7 @@ func loginGithub(k *koala.Params, w http.ResponseWriter, r *http.Request) {
 		}
 	}
 	s := SessionStore.GetSession(r, w, CookieName)
-	user["type"] = USER_GITHUB
+	user["type"] = USER_LOGIN
 	s.Set("user", user)
 	writeSuccessJSON(w, "登录成功", user)
 }

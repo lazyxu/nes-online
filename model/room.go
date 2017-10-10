@@ -2,6 +2,7 @@ package model
 
 import (
 	"strconv"
+	"sync/atomic"
 )
 
 type Room struct {
@@ -9,10 +10,31 @@ type Room struct {
 	name     string
 	game     string
 	password string
-	state    string
-	players  []*User
+	state    int
+
+	playerCount   int32
+	players       []*User
+	playerNames   []string
+	playerAvatars []string
+	playerStates  []int
+	hostName      string
+	hostID        int
 	// keyboardsLog [][][]Keyboard // 玩家id，
 }
+
+const (
+	ROOM_STATE_NORMAL = iota
+	ROOM_STATE_IN_GAME
+)
+
+const (
+	ROOM_PLAYER_STATE_EMPTY   = iota
+	ROOM_PLAYER_STATE_UNREADY
+	ROOM_PLAYER_STATE_READY
+	ROOM_PLAYER_STATE_IN_GAME
+)
+
+const ROOM_AVATAR_TOPN = "/img/open.png"
 
 func (u *User) sendRoomList() {
 	u.msg <- map[string]interface{}{
@@ -21,98 +43,31 @@ func (u *User) sendRoomList() {
 	}
 }
 
-func sendRoomList() {
-	broadcast(map[string]interface{}{
-		"type":     "roomList",
-		"roomList": roomlist(),
-	})
-}
-
-func (r *Room) updateRoomState() {
-	if r.state == "游戏中" {
-		return
-	}
-	for _, p := range r.players {
-		if p != nil && p.state == "" {
-			r.state = "等待准备"
-			return
-		}
-	}
-	r.state = "等待开始"
-}
-
-func roomlist() []interface{} {
-	roomlistInfo := []interface{}{}
-	for _, r := range h.rooms {
-		count := 0
-		host := ""
-		for _, p := range r.players {
-			if p != nil {
-				count++
-				if p.state == "房主" {
-					host = p.name
-				}
-			}
-		}
-		r.updateRoomState()
-		roomlistInfo = append(roomlistInfo, map[string]interface{}{
-			"id":     r.id,
-			"name":   r.name,
-			"host":   host,
-			"game":   r.game,
-			"number": strconv.Itoa(count) + "/" + strconv.Itoa(len(r.players)),
-			"state":  r.state,
-		})
-	}
-	return roomlistInfo
-}
-
-func (r *Room) roomInfo() map[string]interface{} {
-	players := []interface{}{}
-	host := ""
-	for _, p := range r.players {
-		if p == nil {
-			players = append(players, nil)
-		} else {
-			if p.state == "房主" {
-				host = p.name
-			}
-			players = append(players, map[string]interface{}{
-				"name":   p.name,
-				"avatar": p.avatar,
-				"state":  p.state,
-			})
-		}
-	}
-	r.updateRoomState()
-	return map[string]interface{}{
-		"id":      r.id,
-		"game":    r.game,
-		"name":    r.name,
-		"host":    host,
-		"players": players,
-		"state":   r.state,
-	}
-}
-
 // createRoom - "type": "createRoom", "game": game
 func (u *User) createRoom(m map[string]interface{}) {
 	h.roomCount++
 	roomID := h.roomCount
+	game := m["game"].(string)
+	u.state = "房间中，" + game
+	u.idInRoom = 0
 	h.rooms[roomID] = &Room{
-		id:       roomID,
-		game:     m["game"].(string),
-		name:     u.name,
-		password: "",
-		state:    "初始化",
-		players:  []*User{u, nil},
+		id:            roomID,
+		name:          u.name,
+		game:          game,
+		password:      "",
+		state:         ROOM_STATE_NORMAL,
+		playerCount:   1,
+		players:       []*User{u, nil},
+		playerNames:   []string{u.name, ""},
+		playerAvatars: []string{u.avatar, ROOM_AVATAR_TOPN},
+		playerStates:  []int{ROOM_PLAYER_STATE_UNREADY, ROOM_PLAYER_STATE_EMPTY},
+		hostName:      u.name,
+		hostID:        u.idInRoom,
 	}
 	u.room = h.rooms[roomID]
-	u.state = "房主"
-	u.idInRoom = 0
 	u.msg <- map[string]interface{}{
 		"type": "createRoom",
-		"room": h.rooms[roomID].roomInfo(),
+		"room": roomInfo(u.room),
 	}
 }
 
@@ -121,37 +76,42 @@ func (u *User) enterRoom(m map[string]interface{}) {
 	roomID, _ := strconv.Atoi(sroomID)
 	if _, ok := h.rooms[roomID]; !ok {
 		u.msg <- map[string]interface{}{
-			"type": "roomMsg",
+			"type":   "roomMsg",
 			"errMsg": "房间不存在",
 		}
 		return
 	}
-	flag := false
-	for index, user := range h.rooms[roomID].players {
-		if user == u {
-			flag = true
-			break
-		} else if user == nil {
-			flag = true
-			u.idInRoom = index
-			u.room = h.rooms[roomID]
-			u.state = ""
-			h.rooms[roomID].players[index] = u
-			break
-		}
-	}
-	if flag {
+	if u.idInRoom != -1 {
 		u.sendRoomMsg(map[string]interface{}{
 			"type": "roomMsg",
 			"msg":  "玩家 " + u.name + " 进入了房间",
-			"room": u.room.roomInfo(),
+			"room": roomInfo(u.room),
 		}, "系统消息", true)
 		sendRoomList()
-	} else {
-		u.msg <- map[string]interface{}{
-			"type": "roomMsg",
-			"errMsg": "房间已满",
+		return
+	}
+	for id, user := range h.rooms[roomID].players {
+		if user == nil {
+			u.idInRoom = id
+			u.room = h.rooms[roomID]
+			atomic.AddInt32(&u.room.playerCount, 1)
+			u.state = "房间中，" + u.room.game
+			u.room.players[id] = u
+			u.room.playerNames[id] = u.name
+			u.room.playerAvatars[id] = u.avatar
+			u.room.playerStates[id] = ROOM_PLAYER_STATE_UNREADY
+			u.sendRoomMsg(map[string]interface{}{
+				"type": "roomMsg",
+				"msg":  "玩家 " + u.name + " 进入了房间",
+				"room": roomInfo(u.room),
+			}, "系统消息", true)
+			sendRoomList()
+			return
 		}
+	}
+	u.msg <- map[string]interface{}{
+		"type":   "roomMsg",
+		"errMsg": "房间已满",
 	}
 }
 
@@ -159,67 +119,61 @@ func (u *User) leaveRoom() {
 	if u.room == nil {
 		return
 	}
-	for index, p := range u.room.players {
-		if p == u {
-			u.room.players[index] = nil
-			break
-		}
-	}
-	empty := true
-	for _, p := range u.room.players {
-		if p != nil {
-			if u.state == "房主" {
-				p.state = "房主"
+	u.room.players[u.idInRoom] = nil
+	atomic.AddInt32(&u.room.playerCount, -1)
+	u.room.playerNames[u.idInRoom] = ""
+	u.room.playerAvatars[u.idInRoom] = ROOM_AVATAR_TOPN
+	u.room.playerStates[u.idInRoom] = ROOM_PLAYER_STATE_EMPTY
+	if u.room.hostID == u.idInRoom {
+		for id, user := range u.room.players {
+			if user != nil {
+				u.room.hostID = id
+				u.room.hostName = user.name
+				break
 			}
-			empty = false
-			break
 		}
 	}
-	if empty {
+	if atomic.LoadInt32(&u.room.playerCount) == 0 {
 		delete(h.rooms, u.room.id)
 	}
 	u.sendRoomMsg(map[string]interface{}{
 		"type": "roomMsg",
 		"msg":  "玩家 " + u.name + " 离开了房间",
-		"room": u.room.roomInfo(),
+		"room": roomInfo(u.room),
 	}, "系统消息", true)
 	sendRoomList()
 	u.room = nil
+	u.idInRoom = -1
 }
 
 func (u *User) ready() {
-	u.state = "已准备"
+	u.room.playerStates[u.idInRoom] = ROOM_PLAYER_STATE_READY
 	u.sendRoomMsg(map[string]interface{}{
 		"type": "roomMsg",
-		"room":     u.room.roomInfo(),
+		"room": roomInfo(u.room),
 	}, u.name, true)
 	sendRoomList()
 }
 
 func (u *User) unready() {
-	u.state = ""
+	u.room.playerStates[u.idInRoom] = ROOM_PLAYER_STATE_UNREADY
 	u.sendRoomMsg(map[string]interface{}{
 		"type": "roomMsg",
-		"room":     u.room.roomInfo(),
+		"room": roomInfo(u.room),
 	}, u.name, true)
 	sendRoomList()
 }
 
 func (u *User) start() {
-	u.room.state = "游戏中"
-	var keyboard []interface{}
-	// for _, p := range u.Room.players {
-	// 	if p != nil {
-	// 		keyboard = append(keyboard, getKeyboard(p.Name))
-	// 	} else {
-	// 		keyboard = append(keyboard, nil)
-	// 	}
-	// }
-	u.broadcast(map[string]interface{}{
-		"type":     "start",
-		"room":     u.room.roomInfo(),
-		"keyboard": keyboard,
-	})
+	u.room.state = ROOM_STATE_IN_GAME
+	for id, user := range u.room.players {
+		u.room.playerStates[id] = ROOM_PLAYER_STATE_IN_GAME
+		user.state = "游戏中，" + u.room.name
+	}
+	u.sendRoomMsg(map[string]interface{}{
+		"type": "roomMsg",
+		"room": roomInfo(u.room),
+	}, u.name, true)
 	sendRoomList()
 }
 
@@ -238,9 +192,17 @@ func (u *User) sendRoomMsg(m map[string]interface{}, from string, sendToSelf boo
 		}
 		select {
 		case user.msg <- m:
+			user.updateIdInRoom()
 		default:
 			delete(h.users[u.typ], user.name)
 			close(user.msg)
 		}
+	}
+}
+
+func (u *User) updateIdInRoom() {
+	u.msg <-map[string]interface{}{
+		"type": "roomMsg",
+		"idInRoom": u.idInRoom,
 	}
 }

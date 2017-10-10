@@ -10,3 +10,14 @@ exports.getGameList = () => {
     })
   })
 }
+
+exports.getRom = (rom) => {
+  return new Promise(resolve => {
+    var url = '/roms/'+rom+'.nes'
+    ajax.Get(url).then(resp => {
+      resolve(resp)
+    }).catch(err => {
+      console.error(err)
+    })
+  })
+}

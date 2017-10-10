@@ -1,0 +1,152 @@
+.Game {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  background: black;
+  z-index: 100;
+}
+.Game > .buttons {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 30px;
+  right: 0;
+  text-align: left;
+  z-index: 100;
+  background: #7a7f7b;
+}
+.Game > .buttons > button {
+  background: #001f41;
+  border: 1px solid #a4821a;
+  color: #fff;
+  border-radius: 7px;
+  width: 20%;
+  height: 28px;
+  margin: 1px 0;
+  font-size: 16px;
+  line-height: 22px;
+  outline: 0;
+}
+.Game > .buttons > button:disabled {
+  background: #1e2021;
+  border: 1px solid #796520;
+  color: #5a6060;
+}
+.Game > .buttons > input {
+  background: #000;
+  border: 2px solid #293232;
+  border-radius: 7px;
+  color: #ffffff;
+  left: 40%;
+  width: 20%;
+  height: 28px;
+  margin: 1px 0;
+  font-size: 16px;
+  line-height: 22px;
+  outline: 0;
+  text-align: center;
+  box-sizing:border-box;
+  -moz-box-sizing:border-box;
+  -webkit-box-sizing:border-box;
+}
+.Game > .window {
+  position: absolute;
+  top: 30px;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  z-index: 1;
+}
+.Game > .window > .status {
+  position: absolute;
+  right: 0;
+  color: white;
+  z-index: 1;
+}
+.Game > .window > .frame {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  color: white;
+  z-index: 1;
+}
+.Game > .window > .emulator {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  text-align: center;
+  z-index: 0;
+}
+.Game > .window > .chatHistory {
+  position: absolute;
+  bottom: 200px;
+  left: 10px;
+  width: 90%;
+  z-index: 1000;
+}
+.Game > .chatBox {
+  z-index: 100;
+  position: fixed;
+  bottom: 120px;
+  left: 25%;
+  width: 50%;
+  height: 30px;
+  line-height: 30px;
+  opacity: 0.9;
+}
+.Game > .chatBox > .chatInfo {
+  position: absolute;
+  z-index: 100;
+  left: 7px;
+  color: #efc41d;
+  font-size: 16px;
+}
+.Game > .chatBox > .chat {
+  position: absolute;
+  font-size: 16px;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  outline: 0;
+  background: #161b1f;
+  border: 1px solid #efc41d;
+  border-radius: 4px;
+  color: #dfdfdf;
+  padding: 2px 2px 2px 85px;
+  text-align: left;
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+}
+.GameTab { 
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 100%; 
+  height: 100%; 
+  background-color: #444;
+  opacity: 0.9; 
+  -moz-opacity: 0.9; 
+  filter: alpha(opacity=90);
+  z-index: 100;
+  font-family: arial;
+}
+
+.GameTab > .window {
+  width: auto;
+  position: absolute;
+  left: 20%;
+  right: 20%;
+  top: 10%;
+  bottom: 10%;
+  padding: 33px 30px;
+  color: #ffd700;
+  background: #111;
+  border: 2px solid #b09528;
+  border-radius: 3px;
+  opacity: 0.8;
+}

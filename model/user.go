@@ -17,15 +17,15 @@ type User struct {
 }
 
 func UserHandler(ws *websocket.Conn, user map[string]interface{}) {
-	var u *User
-	u = &User{
-		msg:    make(chan map[string]interface{}, 256),
-		ws:     ws,
-		name:   user["name"].(string),
+	u := &User{
 		typ:    user["type"].(int),
+		name:   user["name"].(string),
 		avatar: user["avatar"].(string),
 		room:   nil,
+		ws:     ws,
+		msg:    make(chan map[string]interface{}, 256),
 		state:  "在线",
+		idInRoom: -1,
 	}
 	u.in()
 	defer func() {
@@ -107,24 +107,6 @@ func (u *User) out() {
 func (u *User) broadcast(m map[string]interface{}) {
 	m["from"] = u.name
 	// log.Println("broadcast: ", m)
-	for _, users := range h.users {
-		for _, user := range users {
-			if user.msg == nil {
-				log.Println("channel is nil")
-				user.out()
-			}
-			select {
-			case user.msg <- m:
-			default:
-				log.Println("channel is full !")
-				// delete(h.users, user.Name)
-				// close(user.Msg)
-			}
-		}
-	}
-}
-
-func broadcast(m map[string]interface{}) {
 	for _, users := range h.users {
 		for _, user := range users {
 			if user.msg == nil {
