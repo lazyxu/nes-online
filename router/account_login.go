@@ -13,12 +13,14 @@ import (
 	"gopkg.in/mgo.v2/bson"
 	"github.com/MeteorKL/koala/session"
 	"log"
+	"net/url"
 )
 
 const USER_UNLOGIN = -1
 const USER_VISITOR = 0
 const USER_LOGIN = 1
 const USER_MAX = 2
+
 var userNames = make(map[string]bool)
 
 var SessionStore = session.NewSessionStore(session.DEFAULT_EXPIRE_TIME)
@@ -65,21 +67,11 @@ func checkLogin(k *koala.Params, w http.ResponseWriter, r *http.Request) {
 	writeSuccessJSON(w, "用户已经登录", s.Get("user"))
 }
 
-var clientInfo map[string]string
-
 // loginGithub 根据用户名查看用户公开信息 https://api.github.com/users/meteorkl
 func loginGithub(k *koala.Params, w http.ResponseWriter, r *http.Request) {
-	if clientInfo == nil {
-		var err error
-		clientInfo, err = koala.ReadJSONFile("util_github.json")
-		if err != nil {
-			writeErrJSON(w, "读取配置信息失败，请联系管理员")
-			return
-		}
-	}
 	_, res := koala.PostRequest("https://github.com/login/oauth/access_token", map[string]string{
-		"client_id":     clientInfo["client_id"],
-		"client_secret": clientInfo["client_secret"],
+		"client_id":     config.Github.Client_id,
+		"client_secret": config.Github.Client_secret,
 		"code":          k.ParamGet["code"][0],
 	})
 	tokenParam := strings.Split(string(res), "&")[0]
@@ -105,18 +97,7 @@ func loginGithub(k *koala.Params, w http.ResponseWriter, r *http.Request) {
 				"avatar":     user["avatar_url"],
 				"created_at": time.Now().Unix(),
 				"updated_at": time.Now().Unix(),
-				"keyboard": map[string]interface{}{
-					"up":     87,
-					"down":   83,
-					"left":   65,
-					"right":  68,
-					"select": 86,
-					"start":  66,
-					"A":      75,
-					"B":      74,
-					"X":      73,
-					"Y":      85,
-				},
+				"keyboard":   DEFAULT_KEYBOARD,
 			})
 			return nil, err
 		})
@@ -147,6 +128,47 @@ func loginGithub(k *koala.Params, w http.ResponseWriter, r *http.Request) {
 	writeSuccessJSON(w, "登录成功", user)
 }
 
+func loginQQ(k *koala.Params, w http.ResponseWriter, r *http.Request) {
+	URL := "https://graph.qq.com/oauth2.0/token?grant_type=authorization_code"
+	URL += "&client_id=" + config.QQ.Appid
+	URL += "&client_secret=" + config.QQ.Appkey
+	URL += "&code=" + k.ParamGet["code"][0]
+	URL += "&redirect_uri=" + k.ParamGet["redirect_uri"][0]
+	log.Println(k.ParamGet["code"][0])
+	log.Println(k.ParamGet["redirect_uri"][0])
+	log.Println(config.QQ.Appid)
+	log.Println(config.QQ.Appkey)
+	_, _res := koala.GetRequest(URL)
+	res := string(_res)
+	log.Println(res)
+	if strings.Contains(res, "callback") {
+		w.Write([]byte("抱歉，当前存在网络问题或服务器繁忙，详细错误：+"+res+" 请稍后再试，谢谢。"))
+	}
+	param := strings.Split(res, "&")[0]
+	access_token := strings.Split(param, "=")[0]
+	_, _res = koala.GetRequest("https://graph.qq.com/oauth2.0/me?access_token=" + access_token)
+	res = string(_res)
+	param = strings.Split(res, "&")[0]
+	openid := strings.Split(param, "=")[1]
+	URL = "https://graph.qq.com/user/get_user_info?"
+	URL+="&access_token="+access_token
+	URL+="&oauth_consumer_key="+config.QQ.Appid
+	URL+="&openid="+openid
+	_, jsondata := koala.GetRequest(URL)
+	user := make(map[string]interface{})
+	err := json.Unmarshal(jsondata, &user)
+	if err != nil || user == nil {
+		writeErrJSON(w, "获取用户qq信息失败")
+		return
+	}
+  	log.Println(user)
+}
+
+func qqLoginRedirect(k *koala.Params, w http.ResponseWriter, r *http.Request) {
+	redirect_uri := url.QueryEscape("http://nes.meteorkl.com")
+	koala.Relocation(w, "https://graph.qq.com/oauth2.0/authorize?response_type=code&client_id=101428613&state=666&redirect_uri="+redirect_uri)
+}
+
 func visitorLogin(k *koala.Params, w http.ResponseWriter, r *http.Request) {
 	name := k.ParamPost["name"][0]
 	if _, exist := userNames[name]; exist {
@@ -168,6 +190,8 @@ func apiLogin() {
 	koala.Post("/api/visitorLogin", visitorLogin)
 	koala.Post("/api/checkLogin", checkLogin)
 	koala.Get("/api/loginGithub", loginGithub)
+	koala.Get("/api/loginQQ", loginQQ)
+	koala.Get("/api/qqLoginRedirect", qqLoginRedirect)
 	koala.Post("/api/logout", func(k *koala.Params, w http.ResponseWriter, r *http.Request) {
 		SessionStore.DelSession(r, w, CookieName)
 	})

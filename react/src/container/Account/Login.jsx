@@ -10,6 +10,7 @@ import utils from './utils'
 import userApi from '../../api/user.js'
 import { userSet, tabSet } from '../../actions/actions'
 import ws from '../../websocket/index.js'
+import constant from '../../constant.js'
 
 class Login extends React.Component {
   constructor(props) {
@@ -52,6 +53,9 @@ class Login extends React.Component {
           <p>快捷登录</p>
           <a href='https://github.com/login/oauth/authorize?client_id=2443d910b04cd68c5a66&scope='>
             <img src="/img/github.png" />
+          </a>
+          <a href='/api/qqLoginRedirect'>
+            <img src="/img/qq.png" />
           </a>
         </div>
       </div>

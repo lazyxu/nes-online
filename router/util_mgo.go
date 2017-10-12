@@ -1,29 +1,25 @@
 package router
 
 import (
-	"github.com/MeteorKL/koala"
 	"time"
 
 	"gopkg.in/mgo.v2"
+	"log"
 )
 
 var mgoSession *mgo.Session
 
-var dialInfo map[string]string
-
 func getSession() *mgo.Session {
-	if dialInfo == nil {
-		dialInfo, _ = koala.ReadJSONFile("util_mgo.json")
-	}
+	log.Println(config.Mgo)
 	if mgoSession == nil {
 		var err error
 		mongoDBDialInfo := &mgo.DialInfo{
-			Addrs:     []string{dialInfo["addr"]},
-			Username:  dialInfo["username"],
-			Password:  dialInfo["password"],
-			Database:  dialInfo["database"],
-			Source:    dialInfo["source"],
-			Mechanism: dialInfo["mechanism"],
+			Addrs:     config.Mgo.Addrs,
+			Username:  config.Mgo.Username,
+			Password:  config.Mgo.Password,
+			Database:  config.Mgo.Database,
+			Source:    config.Mgo.Source,
+			Mechanism: config.Mgo.Mechanism,
 			Timeout:   60 * time.Second,
 		}
 		mgoSession, err = mgo.DialWithInfo(mongoDBDialInfo) //连接数据库
@@ -37,20 +33,20 @@ func getSession() *mgo.Session {
 func queryInCollection(collection string, query func(*mgo.Collection) (interface{}, error)) (interface{}, error) {
 	session := getSession()
 	defer session.Close()
-	c := session.DB(dialInfo["database"]).C(collection)
+	c := session.DB(config.Mgo.Database).C(collection)
 	return query(c)
 }
 
 func getCountFromCollection(collection string, query func(*mgo.Collection) (int, error)) (int, error) {
 	session := getSession()
 	defer session.Close()
-	c := session.DB(dialInfo["database"]).C(collection)
+	c := session.DB(config.Mgo.Database).C(collection)
 	return query(c)
 }
 
 func selectFromCollection(collection string, query func(*mgo.Collection) (map[string]interface{}, error)) (map[string]interface{}, error) {
 	session := getSession()
 	defer session.Close()
-	c := session.DB(dialInfo["database"]).C(collection)
+	c := session.DB(config.Mgo.Database).C(collection)
 	return query(c)
 }

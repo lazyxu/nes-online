@@ -11,6 +11,18 @@ import (
 )
 
 const DEFAULT_AVATAR_URL = "/img/avatar/questionMark.jpg"
+var DEFAULT_KEYBOARD = map[string]interface{}{
+	"up":     87,
+	"down":   83,
+	"left":   65,
+	"right":  68,
+	"select": 86,
+	"start":  66,
+	"A":      75,
+	"B":      74,
+	"X":      73,
+	"Y":      85,
+}
 
 func existMail(mail string) bool {
 	n, _ := getCountFromCollection("user", func(c *mgo.Collection) (int, error) {
@@ -51,18 +63,7 @@ func register(k *koala.Params, w http.ResponseWriter, r *http.Request) {
 				"avatar":      DEFAULT_AVATAR_URL,
 				"created_at":  time.Now().Unix(),
 				"updated_at":  time.Now().Unix(),
-				"keyboard": map[string]interface{}{
-					"up":     87,
-					"down":   83,
-					"left":   65,
-					"right":  68,
-					"select": 86,
-					"start":  66,
-					"A":      75,
-					"B":      74,
-					"X":      73,
-					"Y":      85,
-				},
+				"keyboard": DEFAULT_KEYBOARD,
 			})
 			return nil, err
 		})

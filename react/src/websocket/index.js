@@ -12,7 +12,7 @@ exports.create = () => {
     return
   }
 
-  ws = new WebSocket('ws://' + document.location.hostname + ':' + document.location.port + '/ws')
+  ws = new WebSocket(constant.wsServer)
 
   ws.onopen = () => {
     console.log("WebSocket已经打开...")

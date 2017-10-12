@@ -4,6 +4,6 @@ if (port != "") {
   host = host + ':' + port;
 }
 module.exports = {
-  wsServer: 'ws://' + host + '/ws'
-  // wsServer: 'ws://localhost:8080/ws'
+  wsServer: 'ws://' + host + '/ws',
+  qqRedirectURL: 'http://'+host+'/loginQQ',
 }
