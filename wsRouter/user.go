@@ -2,7 +2,7 @@ package wsRouter
 
 import (
 	"github.com/gorilla/websocket"
-	"github.com/MeteorKL/nes-online/util/logger"
+	"github.com/MeteorKL/koala/logger"
 )
 
 type User struct {
@@ -35,6 +35,7 @@ func UserHandler(ws *websocket.Conn, user map[string]interface{}) {
 	// server send Msg to client
 	go func(u *User) {
 		for m := range u.msg {
+			logger.Debug(m)
 			err := u.ws.WriteJSON(m)
 			if err != nil {
 				break

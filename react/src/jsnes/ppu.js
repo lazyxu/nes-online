@@ -540,7 +540,7 @@ PPU.prototype = {
       }
     }
 
-    this.nes.ui.writeFrame(buffer);
+    this.nes.opts.onFrame(buffer);
   },
 
   updateControlReg1: function(value) {

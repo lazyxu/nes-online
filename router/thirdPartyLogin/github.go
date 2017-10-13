@@ -5,7 +5,7 @@ import (
 	"strings"
 	"encoding/json"
 	"github.com/MeteorKL/nes-online/util/config"
-	"github.com/MeteorKL/nes-online/util/logger"
+	"github.com/MeteorKL/koala/logger"
 )
 
 func Github(code string) map[string]interface{} {

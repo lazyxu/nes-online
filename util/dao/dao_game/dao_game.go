@@ -2,7 +2,7 @@ package dao_game
 
 import (
 	"github.com/MeteorKL/nes-online/util/config"
-	"github.com/MeteorKL/nes-online/util/logger"
+	"github.com/MeteorKL/koala/logger"
 	"github.com/MeteorKL/nes-online/util/mgo_session"
 )
 

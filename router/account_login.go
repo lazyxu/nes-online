@@ -11,7 +11,7 @@ import (
 	"github.com/MeteorKL/nes-online/util/constant"
 	"github.com/MeteorKL/nes-online/util/dao/dao_user"
 	"github.com/MeteorKL/nes-online/router/thirdPartyLogin"
-	"github.com/MeteorKL/nes-online/util/logger"
+	"github.com/MeteorKL/koala/logger"
 )
 
 var userNames = make(map[string]bool)

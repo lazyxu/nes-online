@@ -20,7 +20,6 @@ var DEFAULT_KEYBOARD = map[string]interface{}{
 	"Y":      85,
 }
 
-
 const (
 	ROOM_STATE_NORMAL  = iota
 	ROOM_STATE_IN_GAME

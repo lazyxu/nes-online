@@ -11,7 +11,7 @@ import (
 
 	"gopkg.in/mgo.v2/bson"
 	"github.com/MeteorKL/nes-online/util/dao/dao_game"
-	"github.com/MeteorKL/nes-online/util/logger"
+	"github.com/MeteorKL/koala/logger"
 )
 
 var gameList []interface{}

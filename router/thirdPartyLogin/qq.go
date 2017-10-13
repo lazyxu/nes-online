@@ -3,7 +3,7 @@ package thirdPartyLogin
 import (
 	"github.com/MeteorKL/koala"
 	"strings"
-	"github.com/MeteorKL/nes-online/util/logger"
+	"github.com/MeteorKL/koala/logger"
 	"github.com/MeteorKL/nes-online/util/config"
 	"encoding/json"
 )

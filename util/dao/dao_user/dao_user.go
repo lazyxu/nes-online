@@ -5,7 +5,7 @@ import (
 	"gopkg.in/mgo.v2/bson"
 	"github.com/MeteorKL/nes-online/util/constant"
 	"regexp"
-	"github.com/MeteorKL/nes-online/util/logger"
+	"github.com/MeteorKL/koala/logger"
 	"github.com/MeteorKL/nes-online/util/config"
 	"github.com/MeteorKL/nes-online/util/mgo_session"
 )

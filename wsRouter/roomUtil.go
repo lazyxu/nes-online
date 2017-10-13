@@ -1,7 +1,7 @@
 package wsRouter
 
 import (
-	"github.com/MeteorKL/nes-online/util/logger"
+	"github.com/MeteorKL/koala/logger"
 	"strconv"
 )
 

@@ -4,7 +4,7 @@ import (
 	"io/ioutil"
 	"log"
 	"encoding/json"
-	"github.com/MeteorKL/nes-online/util/logger"
+	"github.com/MeteorKL/koala/logger"
 )
 
 type Config struct {
@@ -38,7 +38,7 @@ var Conf Config
 func Load() {
 	if bytes, err := ioutil.ReadFile("config.json"); err == nil {
 		if err := json.Unmarshal(bytes, &Conf); err != nil {
-			logger.Fatal("error in json.Unmarshal, ")
+			logger.Error("error in json.Unmarshal, ")
 		}
 	} else {
 		log.Panic("error in ioutil.ReadFile, ", err.Error())

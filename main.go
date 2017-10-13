@@ -6,7 +6,7 @@ import (
 	"github.com/MeteorKL/koala"
 	"github.com/MeteorKL/nes-online/router"
 	"github.com/MeteorKL/nes-online/wsRouter"
-	"github.com/MeteorKL/nes-online/util/logger"
+	"github.com/MeteorKL/koala/logger"
 	"github.com/MeteorKL/nes-online/util/config"
 )
 

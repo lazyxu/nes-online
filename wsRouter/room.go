@@ -3,7 +3,7 @@ package wsRouter
 import (
 	"strconv"
 	"sync"
-	"github.com/MeteorKL/nes-online/util/logger"
+	"github.com/MeteorKL/koala/logger"
 	"github.com/MeteorKL/nes-online/util/constant"
 )
 
@@ -85,8 +85,10 @@ func start(u *User) {
 	u.room.mutex.Lock()
 	u.room.state = constant.ROOM_STATE_IN_GAME
 	for id, user := range u.room.players {
-		u.room.playerStates[id] = constant.ROOM_PLAYER_STATE_IN_GAME
-		user.state = "游戏中，" + u.room.name
+		if user!=nil {
+			u.room.playerStates[id] = constant.ROOM_PLAYER_STATE_IN_GAME
+			user.state = "游戏中，" + u.room.name
+		}
 	}
 	u.room.mutex.Unlock()
 }

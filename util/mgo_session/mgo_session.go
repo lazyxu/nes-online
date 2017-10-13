@@ -5,7 +5,7 @@ import (
 
 	"gopkg.in/mgo.v2"
 	"github.com/MeteorKL/nes-online/util/config"
-	"github.com/MeteorKL/nes-online/util/logger"
+	"github.com/MeteorKL/koala/logger"
 )
 
 var mgoSession *mgo.Session

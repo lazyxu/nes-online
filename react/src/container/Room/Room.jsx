@@ -103,6 +103,10 @@ class Room extends React.Component {
     var userlist = []
     var button = this.state.loadingState == this.LOADINGROOM ? '正在加载房间信息' : '正在下载地图...'
     if (this.state.loadingState == this.LOADED) {
+      if (this.state.room.state==constant.ROOM_STATE_IN_GAME) {
+        location.href = '#/room/' + this.state.room.id + '/play'
+        return
+      }
       var existUnready = false
       for (var i = 0; i < this.state.room.playerNames.length; i++) {
         var playerName = this.state.room.playerNames[i]
@@ -123,7 +127,6 @@ class Room extends React.Component {
         )
       }
       var id = this.state.idInRoom
-      console.log(id, this.state.room.hostID)
       if (id == this.state.room.hostID) {
         if (existUnready) {
           button = "等待准备"

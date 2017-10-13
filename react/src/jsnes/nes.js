@@ -27,10 +27,6 @@ var NES = function(opts) {
 
   this.frameTime = 1000 / this.opts.preferredFrameRate;
 
-  this.ui = {
-    writeFrame: this.opts.onFrame,
-    updateStatus: this.opts.onStatusUpdate
-  };
   this.cpu = new CPU(this);
   this.ppu = new PPU(this);
   this.papu = new PAPU(this);
@@ -40,7 +36,7 @@ var NES = function(opts) {
     2: new Controller(),
   };
 
-  this.ui.updateStatus("Ready to load a ROM.");
+  this.opts.onStatusUpdate("Ready to load a ROM.");
 
   this.frame = this.frame.bind(this);
   this.buttonDown = this.buttonDown.bind(this);

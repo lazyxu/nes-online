@@ -9,15 +9,11 @@ type hub struct {
 	userMutex sync.RWMutex
 	users     [constant.USER_MAX]map[string]*User
 
-	roomMutex sync.RWMutex
-	rooms     map[int]*Room
-	roomCount int
+	roomMutex       sync.RWMutex
+	rooms           map[int]*Room
+	roomCount       int
+	roomUpdateCount int
 }
-
-// type Keyboard struct {
-// 	key   int
-// 	value int
-// }
 
 var h *hub
 
@@ -74,20 +70,6 @@ func delRoom(id int) {
 	delete(h.rooms, id)
 	h.roomCount--
 	h.roomMutex.Unlock()
-}
-
-func getRoomCount() int {
-	h.roomMutex.RLock()
-	roomCount := h.roomCount
-	h.roomMutex.RUnlock()
-	return roomCount
-}
-
-func getUser(typ int, name string) *User {
-	h.userMutex.RLock()
-	user := h.users[typ][name]
-	h.userMutex.RUnlock()
-	return user
 }
 
 func addUser(u *User) (*User, bool) {
