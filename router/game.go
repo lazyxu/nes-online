@@ -2,7 +2,6 @@ package router
 
 import (
 	"io/ioutil"
-	"log"
 	"net/http"
 	"strings"
 	"sync"
@@ -10,25 +9,20 @@ import (
 
 	"github.com/MeteorKL/koala"
 
-	"fmt"
-
-	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
+	"github.com/MeteorKL/nes-online/util/dao/dao_game"
+	"github.com/MeteorKL/nes-online/util/logger"
 )
 
-var gameList interface{}
-var gameListErr error
+var gameList []interface{}
 var updateGameListCount int32
 var gameListMutex sync.RWMutex
 
 func updateGameList() {
 	if atomic.LoadInt32(&updateGameListCount)%100 == 0 {
+		logger.Info("更新游戏列表")
 		gameListMutex.Lock()
-		gameList, gameListErr = queryInCollection("game", func(c *mgo.Collection) (interface{}, error) {
-			var gameList []interface{}
-			err := c.Find(nil).All(&gameList)
-			return gameList, err
-		})
+		gameList = dao_game.GetAll()
 		gameListMutex.Unlock()
 	}
 	atomic.AddInt32(&updateGameListCount, 1)
@@ -40,39 +34,27 @@ func getGameList(k *koala.Params, w http.ResponseWriter, r *http.Request) {
 	} else {
 		go updateGameList()
 	}
-	if gameListErr != nil {
-		writeErrJSON(w, gameListErr.Error())
-		return
-	}
 	writeSuccessJSON(w, "", gameList)
 }
 
-func initGame(dirPth string) (interface{}, error) {
+func initGame(dirPth string) {
 	dir, err := ioutil.ReadDir(dirPth)
 	if err != nil {
-		return nil, err
+		logger.Error("读取nes文件夹失败")
 	}
+	var gameList []bson.M
 	for _, fi := range dir {
 		if fi.IsDir() { // 忽略目录
 			continue
 		}
 		if strings.HasSuffix(fi.Name(), ".nes") { //匹配文件
 			name := strings.TrimSuffix(fi.Name(), ".nes")
-			info, err := queryInCollection("game", func(c *mgo.Collection) (interface{}, error) {
-				info, err := c.Upsert(map[string]interface{}{
-					"name": name,
-				}, bson.M{
-					"$set": map[string]interface{}{
-						"name": name,
-					},
-				})
-				return info, err
+			gameList = append(gameList, bson.M{
+				"name": name,
 			})
-			fmt.Println(info, name)
-			if err != nil {
-				log.Println(err)
-			}
 		}
 	}
-	return nil, err
+	if !dao_game.Insert(gameList) {
+		logger.Error("更新游戏列表失败")
+	}
 }

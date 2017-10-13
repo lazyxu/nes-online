@@ -1,13 +1,12 @@
-package model
+package wsRouter
 
 import (
+	"github.com/MeteorKL/nes-online/util/logger"
 	"strconv"
-	"log"
 )
 
-
 func roomInfo(r *Room) map[string]interface{} {
-	if r==nil {
+	if r == nil {
 		return nil
 	}
 	return map[string]interface{}{
@@ -23,7 +22,9 @@ func roomInfo(r *Room) map[string]interface{} {
 }
 
 func roomlist() (roomlist []interface{}) {
+	h.roomMutex.RLock()
 	for _, r := range h.rooms {
+		r.mutex.RLock()
 		roomlist = append(roomlist, map[string]interface{}{
 			"id":     r.id,
 			"name":   r.name,
@@ -32,15 +33,18 @@ func roomlist() (roomlist []interface{}) {
 			"number": strconv.FormatInt(int64(r.playerCount), 10) + "/" + strconv.Itoa(len(r.players)),
 			"state":  r.state,
 		})
+		r.mutex.RUnlock()
 	}
+	h.roomMutex.RUnlock()
 	return
 }
 
 func sendRoomList() {
+	h.userMutex.RLock()
 	for _, users := range h.users {
 		for _, user := range users {
 			if user.msg == nil {
-				log.Println("channel is nil")
+				logger.Info("channel is nil")
 				user.out()
 			}
 			if user.state == "在线" {
@@ -50,11 +54,10 @@ func sendRoomList() {
 					"roomList": roomlist(),
 				}:
 				default:
-					log.Println("channel is full !")
-					// delete(h.users, user.Name)
-					// close(user.Msg)
+					logger.Warn("channel is full !")
 				}
 			}
 		}
 	}
+	h.userMutex.RUnlock()
 }

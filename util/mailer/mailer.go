@@ -1,15 +1,16 @@
-package router
+package mailer
 
 import (
 	"gopkg.in/gomail.v1"
+	"github.com/MeteorKL/nes-online/util/config"
 )
 
 // SendToMail http://blog.csdn.net/u012210379/article/details/44224497
-func SendToMail(to, subject, body, mailtype string) error {
-	user := config.Mail.User
-	password := config.Mail.Password
-	host := config.Mail.Host
-	port := config.Mail.Port
+func Send(to, subject, body, mailtype string) error {
+	user := config.Conf.Mail.User
+	password := config.Conf.Mail.Password
+	host := config.Conf.Mail.Host
+	port := config.Conf.Mail.Port
 	msg := gomail.NewMessage()
 	msg.SetHeader("From", user)
 	msg.SetHeader("To", to)

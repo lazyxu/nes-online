@@ -4,10 +4,10 @@ import (
 	"net/http"
 
 	"github.com/MeteorKL/nes-online/router"
-	"github.com/MeteorKL/nes-online/model"
 
 	"github.com/gorilla/websocket"
-	"log"
+	"github.com/MeteorKL/nes-online/wsRouter"
+	"github.com/MeteorKL/nes-online/util/logger"
 )
 
 var upgrader = &websocket.Upgrader{ReadBufferSize: 1024, WriteBufferSize: 1024}
@@ -17,10 +17,10 @@ func wsHandler(w http.ResponseWriter, r *http.Request) {
 	if user, ok := s.Get("user").(map[string]interface{}); ok {
 		ws, err := upgrader.Upgrade(w, r, nil)
 		if err != nil {
-			log.Println(err)
+			logger.Error(err)
 			ws.Close()
 			return
 		}
-		model.UserHandler(ws, user)
+		wsRouter.UserHandler(ws, user)
 	}
 }

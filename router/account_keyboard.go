@@ -5,32 +5,32 @@ import (
 	"github.com/MeteorKL/koala"
 	"net/http"
 
-	mgo "gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
+	"github.com/MeteorKL/nes-online/util/dao/dao_user"
 )
 
 func getKeyboard(name string) interface{} {
-	user, _ := selectFromCollection("user", func(c *mgo.Collection) (map[string]interface{}, error) {
-		user := make(map[string]interface{})
-		err := c.Find(map[string]interface{}{
+	user := dao_user.Get(
+		bson.M{
 			"name": name,
-		}).One(&user)
-		return user, err
-	})
+		},
+		bson.M{
+			"_id":      0,
+			"keyboard": 1,
+		},
+	)
 	return user["keyboard"]
 }
 
 func setKeyboard(name string, keyboard map[string]int) {
-	queryInCollection("user", func(c *mgo.Collection) (interface{}, error) {
-		err := c.Update(map[string]interface{}{
+	dao_user.Update(
+		bson.M{
 			"name": name,
 		}, bson.M{
-			"$set": bson.M{
-				"keyboard": keyboard,
-			},
-		})
-		return nil, err
-	})
+			"keyboard": keyboard,
+		},
+		nil,
+	)
 }
 
 func apiKeyboard() {

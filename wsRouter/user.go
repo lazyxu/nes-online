@@ -1,8 +1,8 @@
-package model
+package wsRouter
 
 import (
 	"github.com/gorilla/websocket"
-	"log"
+	"github.com/MeteorKL/nes-online/util/logger"
 )
 
 type User struct {
@@ -18,13 +18,13 @@ type User struct {
 
 func UserHandler(ws *websocket.Conn, user map[string]interface{}) {
 	u := &User{
-		typ:    user["type"].(int),
-		name:   user["name"].(string),
-		avatar: user["avatar"].(string),
-		room:   nil,
-		ws:     ws,
-		msg:    make(chan map[string]interface{}, 256),
-		state:  "在线",
+		typ:      user["type"].(int),
+		name:     user["name"].(string),
+		avatar:   user["avatar"].(string),
+		room:     nil,
+		ws:       ws,
+		msg:      make(chan map[string]interface{}, 256),
+		state:    "在线",
 		idInRoom: -1,
 	}
 	u.in()
@@ -54,13 +54,25 @@ func (u *User) Reader() {
 			break
 		}
 		if m["type"] != "keyboard" {
-			log.Println(m["type"], ": ", m)
+			logger.Debug(m["type"])
+			logger.Debug(m)
 		}
 		switch m["type"] {
 		case "getRoomList":
-			u.sendRoomList()
+			u.msg <- map[string]interface{}{
+				"type":     "roomList",
+				"roomList": roomlist(),
+			}
 		case "createRoom":
-			u.createRoom(m)
+			if game, ok := m["game"].(string); !ok {
+				logger.Warn(u.name + ", expect game in createRoom")
+			} else {
+				createRoom(u, game)
+				u.msg <- map[string]interface{}{
+					"type": "createRoom",
+					"room": roomInfo(u.room),
+				}
+			}
 		case "leaveRoom":
 			u.leaveRoom()
 		case "enterRoom":
@@ -89,37 +101,35 @@ func (u *User) Reader() {
 }
 
 func (u *User) in() {
-	if user, ok := h.users[u.typ][u.name]; ok {
+	if user, ok :=addUser(u);!ok {
 		user.msg <- map[string]interface{}{
 			"type": "relogin",
 		}
 	}
-	h.users[u.typ][u.name] = u
 }
 
 func (u *User) out() {
 	u.leaveRoom()
-	if h.users[u.typ][u.name] == u {
-		delete(h.users[u.typ], u.name)
-	}
+	delUser(u)
 }
 
 func (u *User) broadcast(m map[string]interface{}) {
 	m["from"] = u.name
-	// log.Println("broadcast: ", m)
+	h.userMutex.RLock()
 	for _, users := range h.users {
 		for _, user := range users {
 			if user.msg == nil {
-				log.Println("channel is nil")
+				logger.Info("channel is nil")
 				user.out()
 			}
 			select {
 			case user.msg <- m:
 			default:
-				log.Println("channel is full !")
+				logger.Warn("channel is full !")
 				// delete(h.users, user.Name)
 				// close(user.Msg)
 			}
 		}
 	}
+	h.userMutex.Unlock()
 }

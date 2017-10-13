@@ -34,18 +34,13 @@ class VisitorLogin extends React.Component {
     })
   }
 
-  enter(e) {
-    if (e.keyCode == 13)
-      this.login()
-  }
-
   render() {
     return (
       <div className="MaskLayer">
         <div className='Form'>
           <span className="Close" onClick={()=>this.props.tabSet('')}>X</span>
           <h1>请先登录</h1>
-          <input type='text' placeholder='为自己取个昵称吧' ref='name' autoComplete="off" autoFocus />
+          <input type='text' placeholder='为自己取个昵称吧' ref='name' autoComplete="off" autoFocus onKeyUp={e => { if (e.keyCode == 13) this.login() }}/>
           <div className='link'>
             <a onClick={()=>this.props.tabSet('Register')}  className='leftLink'>注册账号</a>
             <a onClick={()=>this.props.tabSet('Login')}  className='rightLink'>已有账号,登录</a>

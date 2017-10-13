@@ -8,9 +8,10 @@ import (
 	"strconv"
 
 	"github.com/MeteorKL/koala/util"
-	mgo "gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 	"github.com/MeteorKL/koala"
+	"github.com/MeteorKL/nes-online/util/mailer"
+	"github.com/MeteorKL/nes-online/util/dao/dao_user"
 )
 
 func generateVerifyCode(mail string) string {
@@ -25,22 +26,20 @@ func forgetPassword(k *koala.Params, w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	verifyCode := generateVerifyCode(mail)
-	queryInCollection("user", func(c *mgo.Collection) (interface{}, error) {
-		err := c.Update(map[string]interface{}{
+	dao_user.Update(
+		bson.M{
 			"mail": mail,
 		}, bson.M{
-			"$set": bson.M{
-				"verify_code": verifyCode,
-				"updated_at":  time.Now().Unix(),
-			},
-		})
-		return nil, err
-	})
+			"verify_code": verifyCode,
+			"updated_at":  time.Now().Unix(),
+		},
+		nil,
+	)
 	url := "http://nes.MeteorKL.com/#/resetPassword/" + verifyCode
 	subject := "NES游戏平台重置密码"
 	content := "请在1h内点击以下链接来重置你的密码<br>" +
 		"<a href='" + url + "'>" + url + "</a>"
-	err := SendToMail(k.ParamPost["mail"][0], subject, content, "text/html")
+	err := mailer.Send(k.ParamPost["mail"][0], subject, content, "text/html")
 	if err != nil {
 		writeErrJSON(w, "发送邮件失败，请确认你的邮箱地址后重试")
 		return
@@ -52,20 +51,18 @@ func resetPassword(k *koala.Params, w http.ResponseWriter, r *http.Request) {
 	verifyCode := k.ParamPost["verify_code"][0]
 	mail := k.ParamPost["mail"][0]
 	password := k.ParamPost["password"][0]
-	_, err := queryInCollection("user", func(c *mgo.Collection) (interface{}, error) {
-		err := c.Update(map[string]interface{}{
+
+	if !dao_user.Update(
+		bson.M{
 			"mail":        mail,
 			"verify_code": verifyCode,
 		}, bson.M{
-			"$set": bson.M{
-				"password":    password,
-				"verify_code": generateVerifyCode(mail),
-				"updated_at":  time.Now().Unix(),
-			},
-		})
-		return nil, err
-	})
-	if err != nil {
+			"password":    password,
+			"verify_code": generateVerifyCode(mail),
+			"updated_at":  time.Now().Unix(),
+		},
+		nil,
+	) {
 		writeErrJSON(w, "重置密码失败")
 		return
 	}
@@ -82,21 +79,17 @@ func changePassword(k *koala.Params, w http.ResponseWriter, r *http.Request) {
 		if mail, ok := u["mail"]; ok {
 			oldPassword := k.ParamPost["oldPassword"][0]
 			password := k.ParamPost["password"][0]
-
-			_, err := queryInCollection("user", func(c *mgo.Collection) (interface{}, error) {
-				err := c.Update(map[string]interface{}{
+			if !dao_user.Update(
+				bson.M{
 					"mail":     mail,
 					"password": oldPassword,
 				}, bson.M{
-					"$set": bson.M{
-						"password":    password,
-						"verify_code": generateVerifyCode(mail.(string)),
-						"updated_at":  time.Now().Unix(),
-					},
-				})
-				return nil, err
-			})
-			if err != nil {
+					"password":    password,
+					"verify_code": generateVerifyCode(mail.(string)),
+					"updated_at":  time.Now().Unix(),
+				},
+				nil,
+			) {
 				writeErrJSON(w, "密码错误")
 				return
 			}
@@ -116,18 +109,15 @@ func changeName(k *koala.Params, w http.ResponseWriter, r *http.Request) {
 	if u, ok := s.Get("user").(map[string]interface{}); ok {
 		if oldName, ok := u["name"]; ok {
 			name := k.ParamPost["name"][0]
-			_, err := queryInCollection("user", func(c *mgo.Collection) (interface{}, error) {
-				err := c.Update(map[string]interface{}{
+			if !dao_user.Update(
+				bson.M{
 					"name": oldName,
 				}, bson.M{
-					"$set": bson.M{
-						"name":       name,
-						"updated_at": time.Now().Unix(),
-					},
-				})
-				return nil, err
-			})
-			if err != nil {
+					"name":       name,
+					"updated_at": time.Now().Unix(),
+				},
+				nil,
+			) {
 				writeErrJSON(w, "你的账户不存在？请联系管理员")
 				return
 			}

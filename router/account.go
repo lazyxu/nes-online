@@ -6,8 +6,8 @@ import (
 
 	"github.com/MeteorKL/koala"
 
-	mgo "gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
+	"github.com/MeteorKL/nes-online/util/dao/dao_user"
 )
 
 func apiUser() {
@@ -23,17 +23,14 @@ func apiUser() {
 		}
 		keyboard := make(map[string]int)
 		json.Unmarshal([]byte(k.ParamPost["keyboard"][0]), &keyboard)
-		queryInCollection("user", func(c *mgo.Collection) (interface{}, error) {
-			err := c.Update(map[string]interface{}{
+		dao_user.Update(
+			bson.M{
 				"name": oldName,
 			}, bson.M{
-				"$set": bson.M{
-					"name":     name,
-					"keyboard": keyboard,
-				},
-			})
-			return nil, err
-		})
+				"name":     name,
+				"keyboard": keyboard,
+			}, nil,
+		)
 		koala.WriteJSON(w, map[string]interface{}{
 			"state":    true,
 			"msg":      "修改成功",

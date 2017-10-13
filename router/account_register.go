@@ -6,41 +6,26 @@ import (
 
 	"github.com/MeteorKL/koala"
 
-	mgo "gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
+	"github.com/MeteorKL/nes-online/util/dao/dao_user"
+	"github.com/MeteorKL/nes-online/util/constant"
+	"github.com/MeteorKL/nes-online/util/mailer"
 )
 
-const DEFAULT_AVATAR_URL = "/img/avatar/questionMark.jpg"
-var DEFAULT_KEYBOARD = map[string]interface{}{
-	"up":     87,
-	"down":   83,
-	"left":   65,
-	"right":  68,
-	"select": 86,
-	"start":  66,
-	"A":      75,
-	"B":      74,
-	"X":      73,
-	"Y":      85,
-}
-
 func existMail(mail string) bool {
-	n, _ := getCountFromCollection("user", func(c *mgo.Collection) (int, error) {
-		return c.Find(bson.M{
+	return dao_user.Exist(
+		bson.M{
 			"mail": mail,
-		}).Count()
-	})
-	return n != 0
+		},
+	)
 }
 
 func existName(name string) bool {
-	n, _ := getCountFromCollection("user", func(c *mgo.Collection) (int, error) {
-		n, err := c.Find(bson.M{
+	return dao_user.Exist(
+		bson.M{
 			"name": name,
-		}).Count()
-		return n, err
-	})
-	return n != 0
+		},
+	)
 }
 
 func register(k *koala.Params, w http.ResponseWriter, r *http.Request) {
@@ -48,38 +33,26 @@ func register(k *koala.Params, w http.ResponseWriter, r *http.Request) {
 	name := k.ParamPost["name"][0]
 	password := k.ParamPost["password"][0]
 	activeCode := generateVerifyCode(mail)
-	n, _ := getCountFromCollection("user", func(c *mgo.Collection) (int, error) {
-		return c.Find(bson.M{
-			"mail": mail,
-		}).Count()
-	})
-	if n == 0 { // 没有被注册过
-		_, err := queryInCollection("user", func(c *mgo.Collection) (interface{}, error) {
-			err := c.Insert(map[string]interface{}{
-				"mail":        mail,
-				"name":        name,
-				"password":    password,
-				"active_code": activeCode,
-				"avatar":      DEFAULT_AVATAR_URL,
-				"created_at":  time.Now().Unix(),
-				"updated_at":  time.Now().Unix(),
-				"keyboard": DEFAULT_KEYBOARD,
-			})
-			return nil, err
-		})
-		if err != nil {
-			writeErrJSON(w, err.Error())
-			return
-		}
-	} else {
-		writeErrJSON(w, "该邮箱已经被注册或用户昵称已经被使用")
+	now := time.Now().Unix()
+	if !dao_user.Insert(bson.M{
+		"mail":        mail,
+		"name":        name,
+		"password":    password,
+		"active_code": activeCode,
+		"avatar":      constant.DEFAULT_AVATAR_URL,
+		"created_at":  now,
+		"updated_at":  now,
+		"keyboard":    constant.DEFAULT_KEYBOARD,
+	}) {
+		writeErrJSON(w, "发生未知错误，请联系管理员")
 		return
 	}
+
 	url := "http://nes.MeteorKL.com/#/active/" + activeCode
 	subject := "NES游戏平台帐号激活"
 	content := "欢迎注册NES游戏平台，请在1h内点击以下链接来激活你的帐号,如果超过时间没有激活就去重新注册趴<br>" +
 		"<a href='" + url + "'>" + url + "</a>"
-	err := SendToMail(mail, subject, content, "text/html")
+	err := mailer.Send(mail, subject, content, "text/html")
 	if err != nil {
 		println(err.Error())
 		writeErrJSON(w, "发送邮件失败，请确认你的邮箱地址后重试")

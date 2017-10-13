@@ -54,7 +54,7 @@ class Login extends React.Component {
           <a href='https://github.com/login/oauth/authorize?client_id=2443d910b04cd68c5a66&scope='>
             <img src="/img/github.png" />
           </a>
-          <a href='/api/qqLoginRedirect'>
+          <a href={'/api/qqLoginRedirect?redirect_uri='+document.location.href}>
             <img src="/img/qq.png" />
           </a>
         </div>
