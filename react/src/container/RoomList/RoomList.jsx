@@ -3,6 +3,7 @@ import { connect } from 'react-redux'
 
 import './RoomList.scss'
 import ws from '../../websocket/index.js'
+import constant from '../../constant.js'
 import Scroll from '../../components/Scroll.jsx'
 import { roomListSet } from '../../actions/actions.js'
 
@@ -11,7 +12,7 @@ class RoomList extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      roomList: null
+      roomList: {}
     }
     this.interval = null
   }
@@ -30,27 +31,24 @@ class RoomList extends React.Component {
   }
 
   enter(id) {
-    if (this.state.roomList[id].state != "游戏中") {
-      location.href = '#/room/' + this.state.roomList[id].id
-    }
+    location.href = '#/room/' + this.state.roomList[id].id
   }
 
   render() {
     var roomList = []
-    if (this.state.roomList != null) {
-      this.state.roomList.forEach((room, i)=> {
-        roomList.push(
-          <tbody key={i} onClick={() => this.enter(i)}>
-            <tr className={i & 1 ? 'even' : 'odd'}>
-              <td>{room.id}</td>
-              <td>{room.host}</td>
-              <td>{room.game}</td>
-              <td>{room.number}</td>
-              <td>{room.state}</td>
-            </tr>
-          </tbody>
-        )
-      })
+    for (var i in this.state.roomList) {
+      var room = this.state.roomList[i]
+      roomList.push(
+        <tbody key={i} onClick={() => this.enter(i)}>
+          <tr className={i & 1 ? 'even' : 'odd'}>
+            <td>{room.id}</td>
+            <td>{room.players[room.host_id].name}</td>
+            <td>{room.game}</td>
+            <td>{room.player_count+'/'+room.players.length}</td>
+            <td>{constant.ROOM_STATE_TEXT[room.state]}</td>
+          </tr>
+        </tbody>
+      )
     }
 
     return (

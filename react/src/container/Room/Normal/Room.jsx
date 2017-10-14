@@ -67,33 +67,42 @@ class Room extends React.Component {
         return
       }
       var existUnready = false
-      for (var i = 0; i < this.props.room.playerNames.length; i++) {
-        var playerName = this.props.room.playerNames[i]
-        var playerAvatar = this.props.room.playerAvatars[i]
-        var playerState = this.props.room.playerStates[i]
-        var hostID = this.props.room.hostID
-        if (playerState == constant.ROOM_PLAYER_STATE_UNREADY && hostID != i) {
-          existUnready = true
+      for (var i = 0; i < this.props.room.players.length; i++) {
+        if (this.props.room.players[i]!=null) {
+          var playerName = this.props.room.players[i].name
+          var playerAvatar = this.props.room.players[i].avatar
+          var playerState = this.props.room.players[i].state_in_room
+          var host_id = this.props.room.host_id
+          if (playerState == constant.ROOM_PLAYER_STATE_UNREADY && host_id != i) {
+            existUnready = true
+          }
+          userlist.push(
+            <tbody key={i}><tr className={i & 1 ? 'even' : 'odd'}>
+              <td><img src={playerAvatar} /><span>{playerName}</span></td>
+              <td>{i == host_id ?
+                <div style={{ color: 'red' }}>房主</div> :
+                <div style={{ color: 'green' }}>{constant.ROOM_PLAYER_STATE_TEXT[playerState]}</div>
+              }</td>
+            </tr></tbody>
+          )
+        } else {
+          userlist.push(
+            <tbody key={i}><tr className={i & 1 ? 'even' : 'odd'}>
+              <td><img src={constant.ROOM_AVATAR_TOPN} /><span></span></td>
+              <td></td>
+            </tr></tbody>
+          )
         }
-        userlist.push(
-          <tbody key={i}><tr className={i & 1 ? 'even' : 'odd'}>
-            <td><img src={playerAvatar} /><span>{playerName}</span></td>
-            <td>{i == hostID ?
-              <div style={{ color: 'red' }}>房主</div> :
-              <div style={{ color: 'green' }}>{constant.ROOM_PLAYER_STATE_TEXT[playerState]}</div>
-            }</td>
-          </tr></tbody>
-        )
       }
-      var id = this.props.idInRoom
-      if (id == this.props.room.hostID) {
+      var id = this.props.id_in_room
+      if (id == this.props.room.host_id) {
         if (existUnready) {
           button = "等待准备"
         } else {
           button = "开始"
         }
       } else {
-        switch (this.props.room.playerStates[id]) {
+        switch (this.props.room.players[id].state_in_room) {
           case constant.ROOM_PLAYER_STATE_UNREADY:
             button = "准备"
             break;

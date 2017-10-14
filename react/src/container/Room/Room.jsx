@@ -18,15 +18,16 @@ class Room extends React.Component {
         this.state = {
             room: {
                 id: this.props.params.roomID,
+                state: constant.ROOM_STATE_NORMAL,
             },
-            idInRoom: -1,
+            id_in_room: -1,
             loadingState: constant.LOADINGROOM,
         }
     }
 
     componentWillMount() {
-        ws.addOnmessage('idInRoom', data => {
-            this.setState({idInRoom: data.idInRoom})
+        ws.addOnmessage('id_in_room', data => {
+            this.setState({id_in_room: data.id_in_room})
         })
         ws.addOnmessage('roomErrMsg', data => {
             alert(data.roomErrMsg)
@@ -53,7 +54,7 @@ class Room extends React.Component {
     }
 
     componentWillUnmount() {
-        ws.removeOnmessage("idInRoom")
+        ws.removeOnmessage("id_in_room")
         ws.removeOnmessage("roomErrMsg")
         ws.removeOnmessage("roomStateChange")
     }
@@ -67,13 +68,13 @@ class Room extends React.Component {
                 {this.state.room.state == constant.ROOM_STATE_NORMAL ?
                     <Normal
                         room={this.state.room}
-                        idInRoom={this.state.idInRoom}
+                        id_in_room={this.state.id_in_room}
                         loadingState={this.state.loadingState}
                     /> :
                     (this.state.room.state == constant.ROOM_STATE_IN_GAME ?
                         <InGame
                             room={this.state.room}
-                            idInRoom={this.state.idInRoom}
+                            id_in_room={this.state.id_in_room}
                         /> :
                         <div />)
                 }

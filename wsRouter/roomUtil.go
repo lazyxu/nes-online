@@ -2,42 +2,7 @@ package wsRouter
 
 import (
 	"github.com/MeteorKL/koala/logger"
-	"strconv"
 )
-
-func roomInfo(r *Room) map[string]interface{} {
-	if r == nil {
-		return nil
-	}
-	return map[string]interface{}{
-		"id":            r.id,
-		"game":          r.game,
-		"name":          r.name,
-		"hostID":        r.hostID,
-		"playerNames":   r.playerNames,
-		"playerAvatars": r.playerAvatars,
-		"playerStates":  r.playerStates,
-		"state":         r.state,
-	}
-}
-
-func roomlist() (roomlist []interface{}) {
-	h.roomMutex.RLock()
-	defer h.roomMutex.RUnlock()
-	for _, r := range h.rooms {
-		r.mutex.RLock()
-		defer r.mutex.RUnlock()
-		roomlist = append(roomlist, map[string]interface{}{
-			"id":     r.id,
-			"name":   r.name,
-			"host":   r.hostName,
-			"game":   r.game,
-			"number": strconv.FormatInt(int64(r.playerCount), 10) + "/" + strconv.Itoa(len(r.players)),
-			"state":  r.state,
-		})
-	}
-	return
-}
 
 func sendRoomList() {
 	h.userMutex.RLock()
@@ -48,11 +13,11 @@ func sendRoomList() {
 				logger.Info("channel is nil")
 				user.out()
 			}
-			if user.state == "在线" {
+			if user.State == "在线" {
 				select {
 				case user.msg <- map[string]interface{}{
 					"type":     "roomList",
-					"roomList": roomlist(),
+					"roomList": h.rooms,
 				}:
 				default:
 					logger.Warn("channel is full !")

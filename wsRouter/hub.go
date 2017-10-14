@@ -42,21 +42,17 @@ func getRoom(id int) *Room {
 func createRoom(u *User, game string) int {
 	h.roomMutex.Lock()
 	id := h.roomCount
-	u.state = "房间中，" + game
-	u.idInRoom = 0
+	u.State = "房间中，" + game
+	u.IdInRoom = 0
 	r := &Room{
-		id:            id,
-		name:          u.name,
-		game:          game,
-		password:      "",
-		state:         constant.ROOM_STATE_NORMAL,
-		playerCount:   1,
-		players:       []*User{u, nil},
-		playerNames:   []string{u.name, ""},
-		playerAvatars: []string{u.avatar, constant.ROOM_AVATAR_TOPN},
-		playerStates:  []int{constant.ROOM_PLAYER_STATE_UNREADY, constant.ROOM_PLAYER_STATE_EMPTY},
-		hostName:      u.name,
-		hostID:        u.idInRoom,
+		ID:          id,
+		Name:        u.Name,
+		Game:        game,
+		password:    "",
+		State:       constant.ROOM_STATE_NORMAL,
+		PlayerCount: 1,
+		Players:     []*User{u, nil},
+		HostID:      u.IdInRoom,
 	}
 	h.rooms[id] = r
 	u.room = r
@@ -74,17 +70,26 @@ func delRoom(id int) {
 func addUser(u *User) (*User, bool) {
 	h.userMutex.Lock()
 	defer h.userMutex.Unlock()
-	if user, exist := h.users[u.typ][u.name]; exist {
+	if user, exist := h.users[u.Typ][u.Name]; exist {
 		return user, false
 	}
-	h.users[u.typ][u.name] = u
+	h.users[u.Typ][u.Name] = u
 	return nil, true
+}
+
+func checkUser(u *User) bool {
+	h.userMutex.Lock()
+	defer h.userMutex.Unlock()
+	if user, exist := h.users[u.Typ][u.Name]; exist {
+		return user == u
+	}
+	return false
 }
 
 func delUser(u *User) {
 	h.userMutex.Lock()
 	defer h.userMutex.Unlock()
-	if h.users[u.typ][u.name] == u {
-		delete(h.users[u.typ], u.name)
+	if h.users[u.Typ][u.Name] == u {
+		delete(h.users[u.Typ], u.Name)
 	}
 }

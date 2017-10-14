@@ -6,26 +6,27 @@ import (
 )
 
 type User struct {
-	typ      int
-	name     string
-	avatar   string
-	room     *Room
-	ws       *websocket.Conn
-	msg      chan map[string]interface{}
-	state    string
-	idInRoom int
+	Typ         int    `json:"type"`
+	Name        string `json:"name"`
+	Avatar      string `json:"avatar"`
+	room        *Room
+	ws          *websocket.Conn
+	msg         chan map[string]interface{}
+	State       string `json:"state"`
+	StateInRoom int    `json:"state_in_room"`
+	IdInRoom    int    `json:"id_in_room"`
 }
 
 func UserHandler(ws *websocket.Conn, user map[string]interface{}) {
 	u := &User{
-		typ:      user["type"].(int),
-		name:     user["name"].(string),
-		avatar:   user["avatar"].(string),
+		Typ:      user["type"].(int),
+		Name:     user["name"].(string),
+		Avatar:   user["avatar"].(string),
 		room:     nil,
 		ws:       ws,
 		msg:      make(chan map[string]interface{}, 256),
-		state:    "在线",
-		idInRoom: -1,
+		State:    "在线",
+		IdInRoom: -1,
 	}
 	if _, ok := addUser(u); !ok {
 		u.msg <- map[string]interface{}{
@@ -67,7 +68,7 @@ func (u *User) Reader() {
 		case "getRoomList":
 			u.msg <- map[string]interface{}{
 				"type":     "roomList",
-				"roomList": roomlist(),
+				"roomList": h.rooms,
 			}
 		case "createRoom":
 			u.createRoom(m)
@@ -84,13 +85,13 @@ func (u *User) Reader() {
 		case "keyboard":
 			u.keyboard(m)
 		case "roomMsg":
-			u.sendRoomMsg(m, u.name, true)
+			u.sendRoomMsg(m, u.Name, true)
 		case "__offer":
-			u.sendRoomMsg(m, u.name, false)
+			u.sendRoomMsg(m, u.Name, false)
 		case "__answer":
-			u.sendRoomMsg(m, u.name, false)
+			u.sendRoomMsg(m, u.Name, false)
 		case "__ice_candidate":
-			u.sendRoomMsg(m, u.name, false)
+			u.sendRoomMsg(m, u.Name, false)
 		default:
 			u.broadcast(m)
 		}
@@ -104,7 +105,7 @@ func (u *User) out() {
 }
 
 func (u *User) broadcast(m map[string]interface{}) {
-	m["from"] = u.name
+	m["from"] = u.Name
 	h.userMutex.RLock()
 	defer h.userMutex.Unlock()
 	for _, users := range h.users {

@@ -12,6 +12,8 @@ exports.ROOM_PLAYER_STATE_TEXT = ['','','已准备','游戏中']
 exports.ROOM_STATE_NORMAL = 0
 exports.ROOM_STATE_IN_GAME = 1
 
+exports.ROOM_STATE_TEXT = ['等待开始','游戏中']
+
 exports.INIT_USER_STATE = {
   type: exports.USER_UNLOGIN
 }
@@ -35,3 +37,6 @@ exports.DEFAULT_KEYBOARD = {
 exports.LOADINGROOM = 0
 exports.LOADINGMAP = 1
 exports.LOADED = 2
+
+
+exports.ROOM_AVATAR_TOPN = "/img/open.png"
