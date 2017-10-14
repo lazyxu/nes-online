@@ -14,7 +14,6 @@ import Active from './container/Account/Active'
 import ResetPassword from './container/Account/ResetPassword'
 import SettingAccount from './container/Setting/Account'
 import Room from './container/Room/Room'
-import Game from './container/Game/Game'
 import actions from './actions/actions'
 import store from './store.js'
 
@@ -41,7 +40,6 @@ ReactDOM.render(
           <Route path="/resetPassword/:verifyCode" component={ResetPassword} />
           <Route path="/settings/account" component={SettingAccount} />
           <Route path="/room/:roomID" component={Room} />
-          <Route path="/room/:roomID/play" component={Game} />
         </Route>
       </Router>
     </Provider>

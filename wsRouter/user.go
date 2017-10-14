@@ -27,10 +27,15 @@ func UserHandler(ws *websocket.Conn, user map[string]interface{}) {
 		state:    "在线",
 		idInRoom: -1,
 	}
-	u.in()
+	if _, ok := addUser(u); !ok {
+		u.msg <- map[string]interface{}{
+			"type": "relogin",
+		}
+	}
 	defer func() {
-		u.out()
-		close(u.msg)
+		if u != nil {
+			u.out()
+		}
 	}()
 	// server send Msg to client
 	go func(u *User) {
@@ -65,15 +70,7 @@ func (u *User) Reader() {
 				"roomList": roomlist(),
 			}
 		case "createRoom":
-			if game, ok := m["game"].(string); !ok {
-				logger.Warn(u.name + ", expect game in createRoom")
-			} else {
-				createRoom(u, game)
-				u.msg <- map[string]interface{}{
-					"type": "createRoom",
-					"room": roomInfo(u.room),
-				}
-			}
+			u.createRoom(m)
 		case "leaveRoom":
 			u.leaveRoom()
 		case "enterRoom":
@@ -100,23 +97,16 @@ func (u *User) Reader() {
 	}
 	u.ws.Close()
 }
-
-func (u *User) in() {
-	if user, ok :=addUser(u);!ok {
-		user.msg <- map[string]interface{}{
-			"type": "relogin",
-		}
-	}
-}
-
 func (u *User) out() {
 	u.leaveRoom()
 	delUser(u)
+	close(u.msg)
 }
 
 func (u *User) broadcast(m map[string]interface{}) {
 	m["from"] = u.name
 	h.userMutex.RLock()
+	defer h.userMutex.Unlock()
 	for _, users := range h.users {
 		for _, user := range users {
 			if user.msg == nil {
@@ -127,10 +117,7 @@ func (u *User) broadcast(m map[string]interface{}) {
 			case user.msg <- m:
 			default:
 				logger.Warn("channel is full !")
-				// delete(h.users, user.Name)
-				// close(user.Msg)
 			}
 		}
 	}
-	h.userMutex.Unlock()
 }

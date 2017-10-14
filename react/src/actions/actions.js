@@ -81,6 +81,14 @@ exports.gameTabSet = gameTab => {
     gameTab: gameTab
   }
 }
+
+exports.roomTabSet = roomTab => {
+  return {
+    type: "roomTabSet",
+    roomTab: roomTab
+  }
+}
+
 exports.tabSet = (tab, force = false) => {
   if (!force && store.getState().tab=="Room") {
     alert("你在房间中，请退出房间后再进行操作！");

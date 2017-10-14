@@ -23,19 +23,19 @@ func NewHub() *hub {
 		roomCount: 10000,
 	}
 	h.userMutex.Lock()
+	defer h.userMutex.Unlock()
 	for i := 0; i < constant.USER_MAX; i++ {
 		h.users[i] = make(map[string]*User)
 	}
-	h.userMutex.Unlock()
 	return h
 }
 
 func getRoom(id int) *Room {
 	h.roomMutex.RLock()
+	defer h.roomMutex.RUnlock()
 	if room, exist := h.rooms[id]; exist {
 		return room
 	}
-	h.roomMutex.RUnlock()
 	return nil
 }
 
@@ -67,9 +67,8 @@ func createRoom(u *User, game string) int {
 
 func delRoom(id int) {
 	h.roomMutex.Lock()
+	defer h.roomMutex.Unlock()
 	delete(h.rooms, id)
-	h.roomCount--
-	h.roomMutex.Unlock()
 }
 
 func addUser(u *User) (*User, bool) {
@@ -83,10 +82,9 @@ func addUser(u *User) (*User, bool) {
 }
 
 func delUser(u *User) {
-	h.roomMutex.Lock()
+	h.userMutex.Lock()
+	defer h.userMutex.Unlock()
 	if h.users[u.typ][u.name] == u {
 		delete(h.users[u.typ], u.name)
 	}
-	h.roomCount--
-	h.roomMutex.Unlock()
 }

@@ -1,0 +1,72 @@
+.Room-InGame {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  background: black;
+  z-index: 100;
+}
+.Room-InGame > .buttons {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 30px;
+  right: 0;
+  text-align: left;
+  z-index: 100;
+  background: #7a7f7b;
+}
+.Room-InGame > .buttons > button {
+  background: #001f41;
+  border: 1px solid #a4821a;
+  color: #fff;
+  border-radius: 7px;
+  width: 20%;
+  height: 28px;
+  margin: 1px 0;
+  font-size: 16px;
+  line-height: 22px;
+  outline: 0;
+}
+.Room-InGame > .buttons > button:disabled {
+  background: #1e2021;
+  border: 1px solid #796520;
+  color: #5a6060;
+}
+.Room-InGame > .window {
+  position: absolute;
+  top: 30px;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  z-index: 1;
+}
+.GameTab { 
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 100%; 
+  height: 100%; 
+  background-color: #444;
+  opacity: 0.9; 
+  -moz-opacity: 0.9; 
+  filter: alpha(opacity=90);
+  z-index: 100;
+  font-family: arial;
+}
+
+.GameTab > .window {
+  width: auto;
+  position: absolute;
+  left: 20%;
+  right: 20%;
+  top: 10%;
+  bottom: 10%;
+  padding: 33px 30px;
+  color: #ffd700;
+  background: #111;
+  border: 2px solid #b09528;
+  border-radius: 3px;
+  opacity: 0.8;
+}

@@ -21,7 +21,7 @@ class Index extends React.Component {
 
   componentWillMount() {
     ws.addOnmessage('relogin', data => {
-      alert("你的账号在异地登录，如果不是你本人操作，请及时修改密码");
+      alert("您已登录 不能重复登录");
       this.props.userSet(constant.INIT_USER_STATE)
     })
     if ((this.props.tab == null || this.props.tab == '') && this.props.user.type == constant.USER_UNLOGIN) {

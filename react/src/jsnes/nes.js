@@ -125,10 +125,12 @@ NES.prototype = {
   },
 
   buttonDown: function(controller, button) {
+    console.log(controller, button)
     this.controllers[controller].buttonDown(button);
   },
 
   buttonUp: function(controller, button) {
+    console.log(controller, button)
     this.controllers[controller].buttonUp(button);
   },
 

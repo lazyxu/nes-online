@@ -1,4 +1,4 @@
-.Room {position: fixed;
+.Room-Normal {position: fixed;
   top: 0;
   left: 0;
   width: 100%;
@@ -6,7 +6,7 @@
   border: 1px solid #eaecef;
   text-align: center;
 }
-.Room > .game-info {
+.Room-Normal > .game-info {
   position: absolute;
   top: 0; 
   left: 0;
@@ -15,38 +15,38 @@
   background: #515765;
   text-align: center;
 }
-.Room > .game-info > .id {
+.Room-Normal > .game-info > .id {
   margin-top: 8px;
   margin-bottom: 4px;
   color: white;
   font-size: 17px;
 }
-.Room > .game-info > span {
+.Room-Normal > .game-info > span {
   color: #bfbfbf;
   font-size: 16px;
 }
-.Room > .game-info > input[type="text"],
-.Room > .game-info > input[type="text"]:disabled {
+.Room-Normal > .game-info > input[type="text"],
+.Room-Normal > .game-info > input[type="text"]:disabled {
   width: 130px;
   outline: none;
   color: #dfdfdf;
   font-size: 16px;
   margin-top: 8px;
 }
-.Room > .game-info > input[type="text"] {
+.Room-Normal > .game-info > input[type="text"] {
   border: 1px solid #999999;
   background: black;
 }
-.Room > .game-info > input[type="text"]:disabled {
+.Room-Normal > .game-info > input[type="text"]:disabled {
   border: 1px solid #515765;
   background: #515765;
 }
-.Room > .game-info > img {
+.Room-Normal > .game-info > img {
   width: 128px; 
   height: 120px;
   margin: 0 36px;
 }
-.Room > .game-info > button {
+.Room-Normal > .game-info > button {
   width: 112px; 
   height: 25px;
   border-radius: 4px;
@@ -58,7 +58,7 @@
   font-size: 16px;
 }
 
-.Room > .users {
+.Room-Normal > .users {
   position: absolute;
   background: #303940;
   top: 0; 
@@ -67,49 +67,49 @@
   right: 0;
   text-align: center;
 }
-.Room > .users > table {
+.Room-Normal > .users > table {
   width: 100%;
   border-spacing:0;
 }
-.Room > .users > table > thead > tr {
+.Room-Normal > .users > table > thead > tr {
   height: 32px;
   color: #adb6cd;
   background: #15385f;
 }
-.Room > .users > table > tbody > tr > td {
+.Room-Normal > .users > table > tbody > tr > td {
   padding: 5px 16px;
 }
-.Room > .users > table > tbody > tr > td > img{    
+.Room-Normal > .users > table > tbody > tr > td > img{    
   height: 35px;
   width: 35px;
   float: left;
   border: 1px solid #a0a0a0;
   margin-right: 12px;
 }
-.Room > .users > table > tbody > tr > td > span{
+.Room-Normal > .users > table > tbody > tr > td > span{
   float: left;
   font-size: 16px;
   padding: 3px;
 }
-.Room > .users > table > tbody > .odd {
+.Room-Normal > .users > table > tbody > .odd {
   height: 32px;
   color: #adb6cd;
   background: #02050e;
 }
-.Room > .users > table > tbody > .even{
+.Room-Normal > .users > table > tbody > .even{
   height: 32px;
   color: #adb6cd;
   background: #1f2126;
 }
 
-.Room > .controls {
+.Room-Normal > .controls {
   position: absolute;
   background: #3d3f3e;
   top: 300px;
   height: 32px;
   width: 100%;
 }
-.Room > .controls > button {
+.Room-Normal > .controls > button {
   float: right;
   width: 100px;
   height: 24px;
@@ -121,7 +121,7 @@
   border-radius: 4px;
 }
 
-.Room > .chatHistory {
+.Room-Normal > .chatHistory {
   background: #161b1f;
   position: absolute;
   top: 332px;
@@ -130,13 +130,13 @@
   right: 0;
   overflow: scroll;
 }
-.Room > .chatHistory > .list {
+.Room-Normal > .chatHistory > .list {
   padding: 0;
   border: 0;
   text-align: left;
 }
 
-.Room > .chat {
+.Room-Normal > .chat {
   position: absolute;
   background: #161b1f;
   height: 32px;
@@ -145,7 +145,7 @@
   right: 0;
 }
 
-.Room > .chat > input {
+.Room-Normal > .chat > input {
   width: 80%;
   height: 24px;
   outline: 0;
@@ -160,7 +160,7 @@
   -webkit-box-sizing:border-box;
 }
 
-.Room > .chat > button {
+.Room-Normal > .chat > button {
   width: 15%;
   height: 24px;
   outline: 0;

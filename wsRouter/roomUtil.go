@@ -23,8 +23,10 @@ func roomInfo(r *Room) map[string]interface{} {
 
 func roomlist() (roomlist []interface{}) {
 	h.roomMutex.RLock()
+	defer h.roomMutex.RUnlock()
 	for _, r := range h.rooms {
 		r.mutex.RLock()
+		defer r.mutex.RUnlock()
 		roomlist = append(roomlist, map[string]interface{}{
 			"id":     r.id,
 			"name":   r.name,
@@ -33,14 +35,13 @@ func roomlist() (roomlist []interface{}) {
 			"number": strconv.FormatInt(int64(r.playerCount), 10) + "/" + strconv.Itoa(len(r.players)),
 			"state":  r.state,
 		})
-		r.mutex.RUnlock()
 	}
-	h.roomMutex.RUnlock()
 	return
 }
 
 func sendRoomList() {
 	h.userMutex.RLock()
+	defer h.userMutex.RUnlock()
 	for _, users := range h.users {
 		for _, user := range users {
 			if user.msg == nil {
@@ -59,5 +60,4 @@ func sendRoomList() {
 			}
 		}
 	}
-	h.userMutex.RUnlock()
 }
