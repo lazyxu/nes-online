@@ -62,13 +62,9 @@ class Room extends React.Component {
     var userlist = []
     var button = this.props.loadingState == constant.LOADINGROOM ? '正在加载房间信息' : '正在下载地图...'
     if (this.props.loadingState == constant.LOADED) {
-      if (this.props.room.state == constant.ROOM_STATE_IN_GAME) {
-        location.href = '#/room/' + this.props.room.id + '/play'
-        return
-      }
       var existUnready = false
       for (var i = 0; i < this.props.room.players.length; i++) {
-        if (this.props.room.players[i]!=null) {
+        if (this.props.room.players[i] != null) {
           var playerName = this.props.room.players[i].name
           var playerAvatar = this.props.room.players[i].avatar
           var playerState = this.props.room.players[i].state_in_room
@@ -95,7 +91,9 @@ class Room extends React.Component {
         }
       }
       var id = this.props.id_in_room
-      if (id == this.props.room.host_id) {
+      if (this.props.room.state==constant.ROOM_STATE_IN_GAME) {
+        button = "游戏中"
+      } else if (id == this.props.room.host_id) {
         if (existUnready) {
           button = "等待准备"
         } else {
@@ -108,6 +106,9 @@ class Room extends React.Component {
             break;
           case constant.ROOM_PLAYER_STATE_READY:
             button = "取消准备"
+            break;
+          case constant.ROOM_PLAYER_STATE_READY:
+            button = "游戏中"
             break;
           default:
             button = "未知错误"

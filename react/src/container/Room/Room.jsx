@@ -12,9 +12,6 @@ class Room extends React.Component {
 
     constructor(props) {
         super(props);
-        constant.LOADINGROOM = 0
-        constant.LOADINGMAP = 1
-        constant.LOADED = 2
         this.state = {
             room: {
                 id: this.props.params.roomID,
@@ -27,24 +24,20 @@ class Room extends React.Component {
 
     componentWillMount() {
         ws.addOnmessage('id_in_room', data => {
-            this.setState({id_in_room: data.id_in_room})
+            this.setState({ id_in_room: data.id_in_room })
         })
         ws.addOnmessage('roomErrMsg', data => {
             alert(data.roomErrMsg)
             history.go(-1)
         })
         ws.addOnmessage('roomStateChange', data => {
+            this.setState({ room: data.room })
             if (this.state.loadingState == constant.LOADINGROOM) {
-                this.setState({
-                    room: data.room,
-                    loadingState: constant.LOADINGMAP,
-                })
+                this.setState({ loadingState: constant.LOADINGMAP })
                 gameApi.getRom(data.room.game).then(resp => {
                     this.setState({ loadingState: constant.LOADED })
                     window.nes.loadROM(resp)
                 })
-            } else {
-                this.setState({room: data.room})
             }
         })
         ws.send({
@@ -65,18 +58,20 @@ class Room extends React.Component {
                 <div className="LocationBar">
                     <a href="#/gameList">游戏大厅</a> | <a href="#/roomList/">房间列表</a>
                 </div>
-                {this.state.room.state == constant.ROOM_STATE_NORMAL ?
-                    <Normal
-                        room={this.state.room}
-                        id_in_room={this.state.id_in_room}
-                        loadingState={this.state.loadingState}
-                    /> :
-                    (this.state.room.state == constant.ROOM_STATE_IN_GAME ?
-                        <InGame
-                            room={this.state.room}
-                            id_in_room={this.state.id_in_room}
-                        /> :
-                        <div />)
+                {
+                    this.state.room == null ?
+                        <div /> :
+                        (this.state.room.state == constant.ROOM_STATE_IN_GAME &&
+                            this.state.room.players[this.state.id_in_room].state_in_room == constant.ROOM_PLAYER_STATE_IN_GAME) ?
+                            <InGame
+                                room={this.state.room}
+                                id_in_room={this.state.id_in_room}
+                            /> :
+                            <Normal
+                                room={this.state.room}
+                                id_in_room={this.state.id_in_room}
+                                loadingState={this.state.loadingState}
+                            />
                 }
             </div>
         )

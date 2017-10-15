@@ -111,16 +111,12 @@ class Emulator extends React.Component {
     document.getElementById('window').addEventListener("keyup", this.keyupListener.bind(this))
     document.getElementById('window').addEventListener("keydown", this.keydownListener.bind(this))
 
-    gameApi.getRom('冒险岛4').then(resp => {
-      window.nes.loadROM(resp)
-      setInterval(
-        () => {
-          window.nes.frame()
-        },
-        1000 / 60
-      )
-    })
-    console.log(this.refs)
+    setInterval(
+      () => {
+        window.nes.frame()
+      },
+      1000 / 60
+    )
   }
 
   render() {

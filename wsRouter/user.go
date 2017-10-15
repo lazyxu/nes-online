@@ -82,6 +82,8 @@ func (u *User) Reader() {
 			u.unready()
 		case "start":
 			u.start()
+		case "endGame":
+			u.endGame()
 		case "keyboard":
 			u.keyboard(m)
 		case "roomMsg":
@@ -107,7 +109,7 @@ func (u *User) out() {
 func (u *User) broadcast(m map[string]interface{}) {
 	m["from"] = u.Name
 	h.userMutex.RLock()
-	defer h.userMutex.Unlock()
+	defer h.userMutex.RUnlock()
 	for _, users := range h.users {
 		for _, user := range users {
 			if user.msg == nil {

@@ -10,13 +10,14 @@ import Emulator from './Emulator.jsx'
 import Timer from './Timer.jsx'
 import Chat from './Chat.jsx'
 import Players from './Players.jsx'
-// import Chat from './Chat.jsx'
-// import Menu from './Menu.jsx'
+import Menu from './Menu.jsx'
 // import keyboard from '../../api/user/keyboard.js'
 class Room extends React.Component {
 
   constructor(props) {
     super(props);
+    this.Menu = "Menu"
+    this.Players = "Players"
     this.state = {
       keyboard: constant.DEFAULT_KEYBOARD,
       tab: "",
@@ -30,23 +31,25 @@ class Room extends React.Component {
   }
 
   closeTab() {
-    this.setState({tab: ""})
+    this.refs.window.focus();
+    this.setState({ tab: "" })
   }
 
   render() {
     return (
       <div className='Room-InGame'>
-        {this.state.tab=="Players"?<Players closeTab={this.closeTab.bind(this)}  room={this.props.room}/>:
-          <div/>
+        {this.state.tab == this.Players ? <Players closeTab={this.closeTab.bind(this)} room={this.props.room} /> :
+          this.state.tab == this.Menu ? <Menu closeTab={this.closeTab.bind(this)} room={this.props.room} /> :
+            <div />
         }
         <div className='buttons'>
-        <button disabled>任务</button>
-          <button onClick={() => { this.setState({ chatHide: true }); this.props.gameTabSet("Menu"); }}>菜单</button>
+          <button disabled>任务</button>
+          <button onClick={() => { this.setState({ tab: this.Menu }); }}>菜单</button>
           <Timer />
-          <button onClick={() => { this.setState({tab: "Players"}) }}>玩家</button>
+          <button onClick={() => { this.setState({ tab: this.Players }) }}>玩家</button>
           <button disabled>聊天</button>
         </div>
-        <div className='window' id='window' tabIndex="0">
+        <div className='window' ref='window' id='window' tabIndex="0">
           <Emulator keyboard={this.state.keyboard} />
           <Chat />
         </div>

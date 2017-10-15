@@ -37,15 +37,15 @@ class Players extends React.Component {
           <table style={{ width: '100%' }}>
             <thead><tr>
               <td width='50px'></td>
-              <td width='auto'></td>
               <td width='50px'></td>
+              <td width='auto'></td>
               <td width='50px'></td>
             </tr></thead>
             {list}
           </table>
           <div className='exitButtons'>
-            <button onClick={() => { document.getElementById('window').focus(); this.props.closeTab() }}>确定</button>
-            <button onClick={() => { document.getElementById('window').focus(); this.props.closeTab() }}>取消</button>
+            <button onClick={() => { this.props.closeTab() }}>确定</button>
+            <button onClick={() => { this.props.closeTab() }}>取消</button>
           </div>
         </div>
       </div>

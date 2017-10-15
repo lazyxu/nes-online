@@ -2,7 +2,22 @@ package wsRouter
 
 import (
 	"github.com/MeteorKL/koala/logger"
+	"github.com/MeteorKL/nes-online/util/constant"
 )
+
+
+func updateRoomState(r *Room) {
+	existInGame := false
+	for _, user := range r.Players {
+		if user != nil && user.StateInRoom == constant.ROOM_PLAYER_STATE_IN_GAME {
+			existInGame = true
+		}
+	}
+	if !existInGame {
+		r.State = constant.ROOM_STATE_NORMAL
+	}
+}
+
 
 func sendRoomList() {
 	h.userMutex.RLock()
