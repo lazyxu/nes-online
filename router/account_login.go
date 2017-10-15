@@ -4,19 +4,16 @@ import (
 	"net/http"
 	"github.com/MeteorKL/koala"
 
-	"github.com/MeteorKL/koala/session"
 	"net/url"
 	"github.com/MeteorKL/koala/util"
 	"github.com/MeteorKL/nes-online/util/config"
 	"github.com/MeteorKL/nes-online/util/constant"
 	"github.com/MeteorKL/nes-online/util/dao/dao_user"
+	"github.com/MeteorKL/nes-online/util/session"
 	"github.com/MeteorKL/nes-online/router/thirdPartyLogin"
 	"github.com/MeteorKL/koala/logger"
+	"github.com/MeteorKL/nes-online/wsRouter"
 )
-
-var userNames = make(map[string]bool)
-
-var SessionStore = session.NewSessionStore(session.DEFAULT_EXPIRE_TIME)
 
 func login(k *koala.Params, w http.ResponseWriter, r *http.Request) {
 	account := k.ParamPost["account"][0]
@@ -30,7 +27,11 @@ func login(k *koala.Params, w http.ResponseWriter, r *http.Request) {
 		writeErrJSON(w, "邮箱尚未激活")
 		return
 	}
-	s := SessionStore.GetSession(r, w, CookieName)
+	if !wsRouter.Login(constant.USER_LOGIN, user["name"].(string)) {
+		writeErrJSON(w, "您已登录 不能重复登录")
+		return
+	}
+	s := session.Store.GetSession(r, w, CookieName)
 	user["type"] = constant.USER_LOGIN
 	s.Set("user", user)
 	logger.Debug(s.Get("user"))
@@ -38,7 +39,7 @@ func login(k *koala.Params, w http.ResponseWriter, r *http.Request) {
 }
 
 func checkLogin(k *koala.Params, w http.ResponseWriter, r *http.Request) {
-	s := SessionStore.PeekSession(r, CookieName)
+	s := session.Store.PeekSession(r, CookieName)
 	if s == nil {
 		writeErrJSON(w, "你还没登录啊")
 		return
@@ -59,7 +60,11 @@ func githubLogin(k *koala.Params, w http.ResponseWriter, r *http.Request) {
 		writeErrJSON(w, "登录失败")
 		return
 	}
-	s := SessionStore.GetSession(r, w, CookieName)
+	if !wsRouter.Login(constant.USER_LOGIN, user["name"].(string)) {
+		writeErrJSON(w, "您已登录 不能重复登录")
+		return
+	}
+	s := session.Store.GetSession(r, w, CookieName)
 	user["type"] = constant.USER_LOGIN
 	s.Set("user", user)
 	writeSuccessJSON(w, "登录成功", user)
@@ -67,14 +72,18 @@ func githubLogin(k *koala.Params, w http.ResponseWriter, r *http.Request) {
 
 func qqLogin(k *koala.Params, w http.ResponseWriter, r *http.Request) {
 	code := k.ParamGet["code"][0]
-	redirect_uri:=k.ParamGet["redirect_uri"][0]
-	user:=thirdPartyLogin.QQ(code, redirect_uri)
+	redirect_uri := k.ParamGet["redirect_uri"][0]
+	user := thirdPartyLogin.QQ(code, redirect_uri)
 	if user == nil {
 		writeErrJSON(w, "获取用户qq信息失败")
 		return
 	}
+	if !wsRouter.Login(constant.USER_LOGIN, user["name"].(string)) {
+		writeErrJSON(w, "您已登录 不能重复登录")
+		return
+	}
 	logger.Debug(user)
-	s := SessionStore.GetSession(r, w, CookieName)
+	s := session.Store.GetSession(r, w, CookieName)
 	user["type"] = constant.USER_LOGIN
 	s.Set("user", user)
 	writeSuccessJSON(w, "登录成功", user)
@@ -94,16 +103,16 @@ func qqLoginRedirect(k *koala.Params, w http.ResponseWriter, r *http.Request) {
 
 func visitorLogin(k *koala.Params, w http.ResponseWriter, r *http.Request) {
 	name := k.ParamPost["name"][0]
-	if _, exist := userNames[name]; exist {
+	if !wsRouter.Login(constant.USER_VISITOR, name) {
 		writeErrJSON(w, "该昵称已经被使用")
 		return
 	}
-	userNames[name] = true
-	s := SessionStore.GetSession(r, w, CookieName)
+	s := session.Store.GetSession(r, w, CookieName)
 	user := make(map[string]interface{})
+	user["type"] = constant.USER_VISITOR
 	user["name"] = name
 	user["avatar"] = constant.DEFAULT_AVATAR_URL
-	user["type"] = constant.USER_VISITOR
+	user["keyboard"] = constant.DEFAULT_KEYBOARD
 	s.Set("user", user)
 	writeSuccessJSON(w, "登录成功", user)
 }
@@ -116,6 +125,6 @@ func apiLogin() {
 	koala.Get("/api/qqLogin", qqLogin)
 	koala.Get("/api/qqLoginRedirect", qqLoginRedirect)
 	koala.Post("/api/logout", func(k *koala.Params, w http.ResponseWriter, r *http.Request) {
-		SessionStore.DelSession(r, w, CookieName)
+		session.Store.DelSession(r, w, CookieName)
 	})
 }

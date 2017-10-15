@@ -55,12 +55,15 @@ func UserHandler(ws *websocket.Conn, user map[string]interface{}) {
 // client send Msg to server
 func (u *User) Reader() {
 	for {
+		if !checkUser(u) {
+			continue
+		}
 		m := make(map[string]interface{})
 		err := u.ws.ReadJSON(&m)
 		if err != nil {
 			break
 		}
-		if m["type"] != "keyboard" {
+		if m["type"] != "getKeyboard" {
 			logger.Debug(m["type"])
 			logger.Debug(m)
 		}
@@ -84,8 +87,6 @@ func (u *User) Reader() {
 			u.start()
 		case "endGame":
 			u.endGame()
-		case "keyboard":
-			u.keyboard(m)
 		case "roomMsg":
 			u.sendRoomMsg(m, u.Name, true)
 		case "__offer":
@@ -100,6 +101,7 @@ func (u *User) Reader() {
 	}
 	u.ws.Close()
 }
+
 func (u *User) out() {
 	u.leaveRoom()
 	delUser(u)

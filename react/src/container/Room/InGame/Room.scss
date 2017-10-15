@@ -42,7 +42,7 @@
   right: 0;
   z-index: 1;
 }
-.GameTab { 
+.Room-InGame-Tab { 
   position: fixed;
   left: 0;
   top: 0;
@@ -55,8 +55,7 @@
   z-index: 100;
   font-family: arial;
 }
-
-.GameTab > .window {
+.Room-InGame-Tab > .window {
   width: auto;
   position: absolute;
   left: 20%;
@@ -69,4 +68,22 @@
   border: 2px solid #b09528;
   border-radius: 3px;
   opacity: 0.8;
+}
+.Room-InGame-Tab  > .window > .exitButtons {
+  position: absolute;
+  bottom: 31px;
+  left: 10%;
+  right: 10%;
+}
+.Room-InGame-Tab  > .window > .exitButtons > button {
+  background: #000;
+  border: 1px solid #a4821a;
+  color: gold;
+  border-radius: 3px;
+  width: 40%;
+  margin: 0 5%;
+  height: 28px;
+  font-size: 16px;
+  line-height: 22px;
+  outline: 0;
 }

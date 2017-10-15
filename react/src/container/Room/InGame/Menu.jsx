@@ -12,9 +12,7 @@ class Menu extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      isRunning: window.nes.isRunning,
       emulateSound: window.nes.opts.emulateSound,
-      page: "游戏菜单",
     }
   }
 
@@ -26,26 +24,26 @@ class Menu extends React.Component {
 
   render() {
     return (
-      <div className='GameTab'>
-        {this.state.page == "键位设置" ?
-          <KeyboardSetting /> :
-          (this.state.page == "游戏菜单" ?
-            <div className='menuWindow'>
-              <div style={{ textAlign: "center" }}>游戏菜单</div>
-              <div className='menuButtons'>
-                <button onClick={() => { window.nes.ui.stopOrStart(), this.setState({ isRunning: !this.state.isRunning }) }}>{this.state.isRunning ? '暂停游戏' : '继续游戏'}</button>
-                <button onClick={() => { window.nes.restart(), this.setState({ isRunning: true }) }} disabled>重新开始</button>
-                <button onClick={() => this.props.gameTabSet("")} disabled>保存游戏</button>
-                <button onClick={() => this.props.gameTabSet("")} disabled>装载游戏</button>
-                <button onClick={() => { window.nes.ui.emulateSoundChange(), this.setState({ emulateSound: !this.state.emulateSound }) }}>{this.state.emulateSound ? '关闭声音' : '打开声音'}</button>
-                <button onClick={() => this.setState({ page: "键位设置" })}>键位设置</button>
-                <button onClick={() => this.end()}>结束游戏</button>
-                <br />
-                <button onClick={() => { this.props.closeTab() }}>回到游戏</button>
-              </div>
-            </div> :
-            <div />)
-        }
+      <div className='Menu'>
+        <div className='window'>
+          <div style={{ textAlign: "center" }}>游戏菜单</div>
+          <div className='buttons'>
+            {this.props.isRunning ?
+              <button onClick={() => { this.props.updateIsRunning(false) }}>暂停游戏</button> :
+              <button onClick={() => { this.props.updateIsRunning(true) }}>继续游戏</button>
+            }
+            <button onClick={() => { this.props.restart() }} >重新开始</button>
+            <button onClick={() => this.props.gameTabSet("")} disabled>保存游戏</button>
+            <button onClick={() => this.props.gameTabSet("")} disabled>装载游戏</button>
+            {this.props.emulateSound ?
+              <button onClick={() => { this.props.updateEmulateSound(false) }}>关闭声音</button> :
+              <button onClick={() => { this.props.updateEmulateSound(true) }}>打开声音</button>
+            }
+            <button onClick={() => this.end()}>结束游戏</button>
+            <br />
+            <button onClick={() => { this.props.closeTab() }}>回到游戏</button>
+          </div>
+        </div>
       </div>
     )
   }

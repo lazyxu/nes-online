@@ -11,6 +11,7 @@ import (
 	"gopkg.in/mgo.v2/bson"
 	"github.com/MeteorKL/koala"
 	"github.com/MeteorKL/nes-online/util/mailer"
+	"github.com/MeteorKL/nes-online/util/session"
 	"github.com/MeteorKL/nes-online/util/dao/dao_user"
 )
 
@@ -70,7 +71,7 @@ func resetPassword(k *koala.Params, w http.ResponseWriter, r *http.Request) {
 }
 
 func changePassword(k *koala.Params, w http.ResponseWriter, r *http.Request) {
-	s := SessionStore.PeekSession(r, CookieName)
+	s := session.Store.PeekSession(r, CookieName)
 	if s == nil {
 		writeErrJSON(w, "你还没有登录")
 		return
@@ -101,7 +102,7 @@ func changePassword(k *koala.Params, w http.ResponseWriter, r *http.Request) {
 }
 
 func changeName(k *koala.Params, w http.ResponseWriter, r *http.Request) {
-	s := SessionStore.PeekSession(r, CookieName)
+	s := session.Store.PeekSession(r, CookieName)
 	if s == nil {
 		writeErrJSON(w, "你还没有登录")
 		return

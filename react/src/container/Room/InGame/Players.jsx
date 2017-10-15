@@ -31,7 +31,7 @@ class Players extends React.Component {
       }
     }
     return (
-      <div className='GameTab'>
+      <div className='Room-InGame-Tab Players'>
         <div className='window'>
           <div style={{ textAlign: "center" }}>玩家列表</div>
           <table style={{ width: '100%' }}>

@@ -26,5 +26,5 @@ func Insert(docs ...interface{}) bool {
 		docs,
 	)
 	logger.Warn(err)
-	return err != nil
+	return err == nil
 }

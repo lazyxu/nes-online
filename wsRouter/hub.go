@@ -70,11 +70,30 @@ func delRoom(id int) {
 func addUser(u *User) (*User, bool) {
 	h.userMutex.Lock()
 	defer h.userMutex.Unlock()
-	if user, exist := h.users[u.Typ][u.Name]; exist {
+	if user, exist := h.users[u.Typ][u.Name]; exist && user != nil {
 		return user, false
 	}
 	h.users[u.Typ][u.Name] = u
 	return nil, true
+}
+
+func Login(typ int, name string) bool {
+	h.userMutex.Lock()
+	defer h.userMutex.Unlock()
+	if _, exist := h.users[typ][name]; exist {
+		return false
+	}
+	h.users[typ][name] = nil
+	return true
+}
+
+func IsLogin(typ int, name string) bool {
+	h.userMutex.Lock()
+	defer h.userMutex.Unlock()
+	if _, exist := h.users[typ][name]; exist {
+		return true
+	}
+	return false
 }
 
 func checkUser(u *User) bool {

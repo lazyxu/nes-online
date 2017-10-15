@@ -103,9 +103,6 @@ func (u *User) createRoom(m map[string]interface{}) {
 }
 
 func (u *User) enterRoom(m map[string]interface{}) {
-	if !checkUser(u) {
-		return
-	}
 	if roomIDstr, ok := m["roomID"].(string); !ok {
 		logger.Warn(u.Name + ", expect roomID in enterRoom")
 	} else {
@@ -124,7 +121,7 @@ func (u *User) enterRoom(m map[string]interface{}) {
 					"type": "roomStateChange",
 					"room": r,
 				})
-				sendRoomMsg(u.room, map[string]interface{}{
+				enterRoomMsg(u.room, map[string]interface{}{
 					"type": "roomMsg",
 					"msg":  "玩家 " + u.Name + " 进入了房间",
 				})
@@ -138,7 +135,7 @@ func (u *User) enterRoom(m map[string]interface{}) {
 						"type": "roomStateChange",
 						"room": r,
 					})
-					sendRoomMsg(u.room, map[string]interface{}{
+					enterRoomMsg(u.room, map[string]interface{}{
 						"type": "roomMsg",
 						"msg":  "玩家 " + u.Name + " 进入了房间",
 					})
@@ -220,10 +217,6 @@ func (u *User) start() {
 	sendRoomList()
 }
 
-func (u *User) keyboard(m map[string]interface{}) {
-	u.sendRoomMsg(m, u.Name, false)
-}
-
 func (u *User) sendRoomMsg(m map[string]interface{}, from string, sendToSelf bool) {
 	m["from"] = from
 	if u.room == nil {
@@ -245,7 +238,26 @@ func (u *User) sendRoomMsg(m map[string]interface{}, from string, sendToSelf boo
 	}
 }
 
+
 func sendRoomMsg(r *Room, m map[string]interface{}) {
+	m["from"] = "系统"
+	if r == nil {
+		logger.Warn("该房间不存在")
+		return
+	}
+	for _, user := range r.Players {
+		if user == nil {
+			continue
+		}
+		select {
+		case user.msg <- m:
+		default:
+			user.out()
+		}
+	}
+}
+
+func enterRoomMsg(r *Room, m map[string]interface{}) {
 	m["from"] = "系统"
 	if r == nil {
 		logger.Warn("该房间不存在")

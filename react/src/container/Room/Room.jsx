@@ -3,10 +3,12 @@ import { connect } from 'react-redux'
 
 import userApi from '../../api/user.js'
 import gameApi from '../../api/game.js'
+import keyboardApi from '../../api/keyboard.js'
 import ws from '../../websocket/index.js'
 import constant from '../../constant.js'
 import Normal from './Normal/Room.jsx'
 import InGame from './InGame/Room.jsx'
+import jsnes from '../../jsnes/index.js'
 
 class Room extends React.Component {
 
@@ -19,16 +21,34 @@ class Room extends React.Component {
             },
             id_in_room: -1,
             loadingState: constant.LOADINGROOM,
+            keyboard: constant.DEFAULT_KEYBOARD,
         }
     }
 
+    updateKeyboard(keyboard) {
+        keyboardApi.update(keyboard).then(resp => {
+            if (resp.error) {
+                alert(resp.msg)
+            }
+            this.setState({ keyboard: resp.data })
+        })
+    }
+
     componentWillMount() {
+        window.nes = new jsnes.NES();
         ws.addOnmessage('id_in_room', data => {
             this.setState({ id_in_room: data.id_in_room })
         })
+        keyboardApi.get().then(resp => {
+            if (resp.error) {
+                alert(resp.msg)
+                return
+            }
+            this.setState({ keyboard: resp.data })
+        })
         ws.addOnmessage('roomErrMsg', data => {
             alert(data.roomErrMsg)
-            history.go(-1)
+            location.href = '#/roomList/'
         })
         ws.addOnmessage('roomStateChange', data => {
             this.setState({ room: data.room })
@@ -66,6 +86,8 @@ class Room extends React.Component {
                             <InGame
                                 room={this.state.room}
                                 id_in_room={this.state.id_in_room}
+                                keyboard={this.state.keyboard}
+                                updateKeyboard={this.updateKeyboard.bind(this)}
                             /> :
                             <Normal
                                 room={this.state.room}

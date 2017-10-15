@@ -4,11 +4,11 @@ var PPU = require("./ppu");
 var PAPU = require("./papu");
 var ROM = require("./rom");
 
-var NES = function(opts) {
+var NES = function (opts) {
   this.opts = {
-    onFrame: function() {},
+    onFrame: function () { },
     onAudioSample: null,
-    onStatusUpdate: function() {},
+    onStatusUpdate: function () { },
 
     // FIXME: not actually used except for in PAPU
     preferredFrameRate: 60,
@@ -26,6 +26,8 @@ var NES = function(opts) {
   }
 
   this.frameTime = 1000 / this.opts.preferredFrameRate;
+  this.frameIntervalFunction = null;
+  this.frameInterval = null;
 
   this.cpu = new CPU(this);
   this.ppu = new PPU(this);
@@ -51,7 +53,7 @@ NES.prototype = {
   romData: null,
 
   // Resets the system
-  reset: function() {
+  reset: function () {
     if (this.mmap !== null) {
       this.mmap.reset();
     }
@@ -64,14 +66,25 @@ NES.prototype = {
     this.fpsFrameCount = 0;
   },
 
-  frame: function() {
+  stop: function () {
+    clearInterval(this.frameInterval)
+  },
+
+  start: function () {
+    this.frameInterval = setInterval(
+      this.frameIntervalFunction,
+      this.frameTime
+    )
+  },
+
+  frame: function () {
     this.ppu.startFrame();
     var cycles = 0;
     var emulateSound = this.opts.emulateSound;
     var cpu = this.cpu;
     var ppu = this.ppu;
     var papu = this.papu;
-    FRAMELOOP: for (;;) {
+    FRAMELOOP: for (; ;) {
       if (cpu.cyclesToHalt === 0) {
         // Execute a CPU instruction
         cycles = cpu.emulate();
@@ -124,33 +137,33 @@ NES.prototype = {
     this.fpsFrameCount++;
   },
 
-  buttonDown: function(controller, button) {
+  buttonDown: function (controller, button) {
     console.log(controller, button)
     this.controllers[controller].buttonDown(button);
   },
 
-  buttonUp: function(controller, button) {
+  buttonUp: function (controller, button) {
     console.log(controller, button)
     this.controllers[controller].buttonUp(button);
   },
 
-  zapperMove: function(x, y) {
+  zapperMove: function (x, y) {
     if (!this.mmap) return;
     this.mmap.zapperX = x;
     this.mmap.zapperY = y;
   },
 
-  zapperFireDown: function() {
+  zapperFireDown: function () {
     if (!this.mmap) return;
     this.mmap.zapperFired = true;
   },
 
-  zapperFireUp: function() {
+  zapperFireUp: function () {
     if (!this.mmap) return;
     this.mmap.zapperFired = false;
   },
 
-  getFPS: function() {
+  getFPS: function () {
     var now = +new Date();
     var fps = null;
     if (this.lastFpsTime) {
@@ -161,7 +174,7 @@ NES.prototype = {
     return fps;
   },
 
-  reloadROM: function() {
+  reloadROM: function () {
     if (this.romData !== null) {
       this.loadROM(this.romData);
     }
@@ -169,7 +182,7 @@ NES.prototype = {
 
   // Loads a ROM file into the CPU and PPU.
   // The ROM file is validated first.
-  loadROM: function(data) {
+  loadROM: function (data) {
     // Load ROM file:
     this.rom = new ROM(this);
     this.rom.load(data);
@@ -181,13 +194,13 @@ NES.prototype = {
     this.romData = data;
   },
 
-  setFramerate: function(rate) {
+  setFramerate: function (rate) {
     this.opts.preferredFrameRate = rate;
     this.frameTime = 1000 / rate;
     this.papu.setSampleRate(this.opts.sampleRate, false);
   },
 
-  toJSON: function() {
+  toJSON: function () {
     return {
       romData: this.romData,
       cpu: this.cpu.toJSON(),
@@ -196,7 +209,7 @@ NES.prototype = {
     };
   },
 
-  fromJSON: function(s) {
+  fromJSON: function (s) {
     this.loadROM(s.romData);
     this.cpu.fromJSON(s.cpu);
     this.mmap.fromJSON(s.mmap);

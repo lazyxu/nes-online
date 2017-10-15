@@ -8,6 +8,7 @@ import (
 
 	"gopkg.in/mgo.v2/bson"
 	"github.com/MeteorKL/nes-online/util/dao/dao_user"
+	"github.com/MeteorKL/koala/logger"
 )
 
 func apiUser() {
@@ -23,14 +24,17 @@ func apiUser() {
 		}
 		keyboard := make(map[string]int)
 		json.Unmarshal([]byte(k.ParamPost["keyboard"][0]), &keyboard)
-		dao_user.Update(
+		if !dao_user.Update(
 			bson.M{
 				"name": oldName,
 			}, bson.M{
 				"name":     name,
 				"keyboard": keyboard,
 			}, nil,
-		)
+		) {
+			logger.Error("settingUpdate failed")
+			writeErrJSON(w, "修改失败！")
+		}
 		koala.WriteJSON(w, map[string]interface{}{
 			"state":    true,
 			"msg":      "修改成功",

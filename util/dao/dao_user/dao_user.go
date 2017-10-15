@@ -58,17 +58,22 @@ func Exist(query bson.M) bool {
 }
 
 func Update(selector bson.M, set bson.M, unset bson.M) bool {
-	session := mgo_session.Get()
-	defer session.Close()
-	err := session.DB(db).C(collection).Update(
-		selector,
-		bson.M{
+	var update bson.M
+	if unset != nil {
+		update = bson.M{
 			"$set":   set,
 			"$unset": unset,
-		},
-	)
+		}
+	} else {
+		update = bson.M{
+			"$set": set,
+		}
+	}
+	session := mgo_session.Get()
+	defer session.Close()
+	err := session.DB(db).C(collection).Update(selector, update)
 	logger.Warn(err)
-	return err != nil
+	return err == nil
 }
 
 func Insert(docs ...interface{}) bool {
@@ -78,7 +83,7 @@ func Insert(docs ...interface{}) bool {
 		docs,
 	)
 	logger.Warn(err)
-	return err != nil
+	return err == nil
 }
 
 func ThirdPartyLogin(thirdPartyType string, name string, avatarURL string) map[string]interface{} {
@@ -97,7 +102,7 @@ func ThirdPartyLogin(thirdPartyType string, name string, avatarURL string) map[s
 			"updated_at":   time.Now().Unix(),
 			"keyboard":     constant.DEFAULT_KEYBOARD,
 		}) {
-			logger.Warn(name+"@"+thirdPartyType+"注册失败")
+			logger.Warn(name + "@" + thirdPartyType + "注册失败")
 			return nil
 		}
 	} else {
@@ -110,16 +115,19 @@ func ThirdPartyLogin(thirdPartyType string, name string, avatarURL string) map[s
 			},
 			nil,
 		) {
-			logger.Warn(name+"@"+thirdPartyType+"更新信息失败")
+			logger.Warn(name + "@" + thirdPartyType + "更新信息失败")
 			return nil
 		}
 	}
 	return Get(
 		bson.M{
 			thirdPartyType: name,
-		},bson.M{
-			"_id":      0,
-			"password": 0,
+		}, bson.M{
+			"_id":         0,
+			"password":    0,
+			"verify_code": 0,
+			"updated_at":  0,
+			"created_at":  0,
 		},
 	)
 }

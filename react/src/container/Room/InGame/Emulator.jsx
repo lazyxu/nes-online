@@ -79,6 +79,23 @@ class Emulator extends React.Component {
     }
   }
 
+  resize() {
+    var height = this.refs.emulator.clientHeight;
+    var width = this.refs.emulator.clientWidth;
+    var landscape = (height / 240 * 256 > width) ? false : true;
+    if (!landscape) {
+      this.refs.screen.style.height = (width / 256 * 240) + 'px'
+      this.refs.screen.style.width = width + 'px'
+    } else {
+      this.refs.screen.style.height = height + 'px'
+      this.refs.screen.style.width = (height / 240 * 256) + 'px'
+    }
+  }
+
+  local() {
+    window.nes.frame()
+  }
+
   componentDidMount() {
     this.canvasContext = this.refs.screen.getContext('2d');
     this.canvasImageData = this.canvasContext.getImageData(0, 0, 256, 240);
@@ -108,15 +125,22 @@ class Emulator extends React.Component {
       this.canvasImageData.data.set(this.buf8);
       this.canvasContext.putImageData(this.canvasImageData, 0, 0);
     }
+    this.resize();
+    window.addEventListener("resize", this.resize.bind(this))
     document.getElementById('window').addEventListener("keyup", this.keyupListener.bind(this))
     document.getElementById('window').addEventListener("keydown", this.keydownListener.bind(this))
 
-    setInterval(
-      () => {
-        window.nes.frame()
-      },
-      1000 / 60
-    )
+    window.nes.reloadROM()
+    window.nes.frameIntervalFunction = this.local.bind(this)
+    window.nes.start()
+  }
+  
+  componentWillUnmount() {
+    window.nes.opts.onFrame = () => { }
+    clearInterval(window.nes.frameInterval)
+    window.removeEventListener("resize", this.resize.bind(this))
+    document.getElementById('window').removeEventListener("keyup", this.keyupListener.bind(this))
+    document.getElementById('window').removeEventListener("keydown", this.keydownListener.bind(this))
   }
 
   render() {
