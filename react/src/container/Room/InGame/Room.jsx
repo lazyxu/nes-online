@@ -26,9 +26,7 @@ class Room extends React.Component {
       tab: "",
       isRunning: true,
       emulateSound: this.props.nes.opts.emulateSound,
-      playMode: this.props.room.player_count > 1 ?
-        constant.PLAY_MODE_WEBSOCKET :
-        constant.PLAY_MODE_LOCAL,
+      playMode: constant.PLAY_MODE_WEBSOCKET
     }
   }
 
@@ -36,7 +34,31 @@ class Room extends React.Component {
   }
 
   componentDidMount() {
+    this.updatePlayMode()
     this.restart()
+  }
+
+  updatePlayMode() {
+    if (this.state.playMode==constant.PLAY_MODE_LOCAL ) {
+      return
+    }
+    if (this.props.room.player_count > 1) {
+      var inGameCount = 0
+      for (var i = 0; i < this.props.room.players.length; i++) {
+        var player = this.props.room.players[i]
+        if (player != null && player.state_in_room == constant.ROOM_PLAYER_STATE_IN_GAME) {
+          inGameCount++
+        }
+      }
+      if (inGameCount > 1) {
+        return
+      }
+    }
+    this.setState({ playMode: constant.PLAY_MODE_LOCAL })
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    this.updatePlayMode()
   }
 
   componentWillUnmount() {
@@ -93,7 +115,8 @@ class Room extends React.Component {
         </div>
         <div className='window' ref='window' id='window' tabIndex="0">
           <Emulator
-            id_in_room={this.state.id_in_room}
+            room={this.props.room}
+            id_in_room={this.props.id_in_room}
             emulateSound={this.state.emulateSound}
             keyboard={this.props.keyboard}
             isRunning={this.state.isRunning}

@@ -20,7 +20,7 @@ type Room struct {
 	PlayerCount int32   `json:"player_count"`
 	Players     []*User `json:"players"`
 	HostID      int     `json:"host_id"`
-	// keyboardsLog [][][]Keyboard // 玩家id，
+	operation   [][]int64 // 玩家id，
 }
 
 func enterRoom(u *User, r *Room, idInRoom int) {
@@ -237,7 +237,6 @@ func (u *User) sendRoomMsg(m map[string]interface{}, from string, sendToSelf boo
 		}
 	}
 }
-
 
 func sendRoomMsg(r *Room, m map[string]interface{}) {
 	m["from"] = "系统"

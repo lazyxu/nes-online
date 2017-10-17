@@ -3,6 +3,9 @@ package wsRouter
 import (
 	"github.com/gorilla/websocket"
 	"github.com/MeteorKL/koala/logger"
+	"io/ioutil"
+	"encoding/json"
+	"strconv"
 )
 
 type User struct {
@@ -86,8 +89,13 @@ func (u *User) Reader() {
 		case "start":
 			u.start()
 		case "endGame":
+			b, err := json.Marshal(u.room.operation)
+			logger.Error(err)
+			ioutil.WriteFile(strconv.Itoa(u.room.ID)+"-"+u.room.Game+".json", b, 0666)
 			u.endGame()
 		case "operation":
+			id :=int64(m["id"].(float64))
+			u.room.operation[id] = append(u.room.operation[id], int64( m["operation"].(float64)))
 			u.sendRoomMsg(m, u.Name, true)
 		case "roomMsg":
 			u.sendRoomMsg(m, u.Name, true)

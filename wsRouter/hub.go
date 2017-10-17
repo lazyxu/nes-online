@@ -53,6 +53,7 @@ func createRoom(u *User, game string) int {
 		PlayerCount: 1,
 		Players:     []*User{u, nil},
 		HostID:      u.IdInRoom,
+		operation:   [][]int64{{}, {}},
 	}
 	h.rooms[id] = r
 	u.room = r

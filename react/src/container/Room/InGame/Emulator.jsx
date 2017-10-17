@@ -54,14 +54,16 @@ class Emulator extends React.Component {
             /> :
             this.props.playMode == constant.PLAY_MODE_WEBSOCKET ?
               <WebSocketEmulator
-                id_in_room={this.state.id_in_room}
+                id_in_room={this.props.id_in_room}
+                room={this.props.room}
                 keyboard={this.props.keyboard}
                 isRunning={this.props.isRunning}
                 nes={this.props.nes}
               /> :
               this.props.playMode == constant.PLAY_MODE_PEER_CONNECTION ?
                 <PeerConnectionEmulator
-                  id_in_room={this.state.id_in_room}
+                  id_in_room={this.props.id_in_room}
+                  room={this.props.room}
                   keyboard={this.props.keyboard}
                   isRunning={this.props.isRunning}
                   nes={this.props.nes}

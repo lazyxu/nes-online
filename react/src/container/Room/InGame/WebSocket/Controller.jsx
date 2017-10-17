@@ -25,32 +25,28 @@ class Controller extends React.Component {
     var keyboard = this.props.keyboard
     switch (e.keyCode) {
       case keyboard.A:
-      this.props.setOperation(operation.COMMAND_BUTTON_A, operation.STATE_UNSET)
-        ws.send({
-          type: 'roomMsg',
-          operation: operationEncode(operation.COMMAND_BUTTON_A, operation.STATE_UNSET),
-        })
+        this.props.setOperation(operation.COMMAND_BUTTON_A, operation.STATE_UNSET)
         break;
       case keyboard.B:
-        nes.buttonUp(1, jsnes.Controller.BUTTON_B);
+      this.props.setOperation(operation.COMMAND_BUTTON_B, operation.STATE_UNSET)
         break;
       case keyboard.select:
-        nes.buttonUp(1, jsnes.Controller.BUTTON_SELECT);
+      this.props.setOperation(operation.COMMAND_BUTTON_SELECT, operation.STATE_UNSET)
         break;
       case keyboard.start:
-        nes.buttonUp(1, jsnes.Controller.BUTTON_START);
+      this.props.setOperation(operation.COMMAND_BUTTON_START, operation.STATE_UNSET)
         break;
       case keyboard.up:
-        nes.buttonUp(1, jsnes.Controller.BUTTON_UP);
+      this.props.setOperation(operation.COMMAND_BUTTON_UP, operation.STATE_UNSET)
         break;
       case keyboard.down:
-        nes.buttonUp(1, jsnes.Controller.BUTTON_DOWN);
+      this.props.setOperation(operation.COMMAND_BUTTON_DOWN, operation.STATE_UNSET)
         break;
       case keyboard.left:
-        nes.buttonUp(1, jsnes.Controller.BUTTON_LEFT);
+      this.props.setOperation(operation.COMMAND_BUTTON_LEFT, operation.STATE_UNSET)
         break;
       case keyboard.right:
-        nes.buttonUp(1, jsnes.Controller.BUTTON_RIGHT);
+      this.props.setOperation(operation.COMMAND_BUTTON_RIGHT, operation.STATE_UNSET)
         break;
       default:
         break;
@@ -62,28 +58,28 @@ class Controller extends React.Component {
     var keyboard = this.props.keyboard
     switch (e.keyCode) {
       case keyboard.A:
-        nes.buttonDown(1, jsnes.Controller.BUTTON_A);
+        this.props.setOperation(operation.COMMAND_BUTTON_A, operation.STATE_SET)
         break;
       case keyboard.B:
-        nes.buttonDown(1, jsnes.Controller.BUTTON_B);
+      this.props.setOperation(operation.COMMAND_BUTTON_B, operation.STATE_SET)
         break;
       case keyboard.select:
-        nes.buttonDown(1, jsnes.Controller.BUTTON_SELECT);
+      this.props.setOperation(operation.COMMAND_BUTTON_SELECT, operation.STATE_SET)
         break;
       case keyboard.start:
-        nes.buttonDown(1, jsnes.Controller.BUTTON_START);
+      this.props.setOperation(operation.COMMAND_BUTTON_START, operation.STATE_SET)
         break;
       case keyboard.up:
-        nes.buttonDown(1, jsnes.Controller.BUTTON_UP);
+      this.props.setOperation(operation.COMMAND_BUTTON_UP, operation.STATE_SET)
         break;
       case keyboard.down:
-        nes.buttonDown(1, jsnes.Controller.BUTTON_DOWN);
+      this.props.setOperation(operation.COMMAND_BUTTON_DOWN, operation.STATE_SET)
         break;
       case keyboard.left:
-        nes.buttonDown(1, jsnes.Controller.BUTTON_LEFT);
+      this.props.setOperation(operation.COMMAND_BUTTON_LEFT, operation.STATE_SET)
         break;
       case keyboard.right:
-        nes.buttonDown(1, jsnes.Controller.BUTTON_RIGHT);
+      this.props.setOperation(operation.COMMAND_BUTTON_RIGHT, operation.STATE_SET)
         break;
       default:
         break;
