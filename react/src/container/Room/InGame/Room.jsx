@@ -25,13 +25,14 @@ class Room extends React.Component {
     this.state = {
       tab: "",
       isRunning: true,
-      emulateSound: true,
-      playMode: constant.PLAY_MODE_LOCAL,
+      emulateSound: this.props.nes.opts.emulateSound,
+      playMode: this.props.room.player_count > 1 ?
+        constant.PLAY_MODE_WEBSOCKET :
+        constant.PLAY_MODE_LOCAL,
     }
   }
 
   componentWillMount() {
-    this.setState({ emulateSound: this.props.nes.opts.emulateSound })
   }
 
   componentDidMount() {
@@ -92,6 +93,7 @@ class Room extends React.Component {
         </div>
         <div className='window' ref='window' id='window' tabIndex="0">
           <Emulator
+            id_in_room={this.state.id_in_room}
             emulateSound={this.state.emulateSound}
             keyboard={this.props.keyboard}
             isRunning={this.state.isRunning}

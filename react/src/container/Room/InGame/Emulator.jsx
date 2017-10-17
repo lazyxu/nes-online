@@ -6,7 +6,6 @@ import ws from '../../../websocket/index.js'
 import constant from '../../../constant.js'
 import gameApi from '../../../api/game.js'
 import { roomSet, gameTabSet, msgAdd, msgSet, keyboardGet } from '../../../actions/actions'
-import Keyboard from './Local/Keyboard.jsx'
 import Screen from './Common/Screen.jsx'
 import Audio from './Common/Audio.jsx'
 import LocalEmulator from './Local/Emulator.jsx'
@@ -46,30 +45,25 @@ class Emulator extends React.Component {
           emulateSound={this.props.emulateSound}
           setOnAudioSample={this.setOnAudioSample.bind(this)}
         />
-        <Keyboard
-          keyboard={this.props.keyboard}
-          nes={this.props.nes}
-        />
         {
           this.props.playMode == constant.PLAY_MODE_LOCAL ?
             <LocalEmulator
               keyboard={this.props.keyboard}
               isRunning={this.props.isRunning}
-              playMode={this.props.playMode}
               nes={this.props.nes}
             /> :
             this.props.playMode == constant.PLAY_MODE_WEBSOCKET ?
               <WebSocketEmulator
+                id_in_room={this.state.id_in_room}
                 keyboard={this.props.keyboard}
                 isRunning={this.props.isRunning}
-                playMode={this.props.playMode}
                 nes={this.props.nes}
               /> :
               this.props.playMode == constant.PLAY_MODE_PEER_CONNECTION ?
                 <PeerConnectionEmulator
+                  id_in_room={this.state.id_in_room}
                   keyboard={this.props.keyboard}
                   isRunning={this.props.isRunning}
-                  playMode={this.props.playMode}
                   nes={this.props.nes}
                 /> :
                 <div />

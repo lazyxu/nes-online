@@ -60,7 +60,7 @@ class Screen extends React.Component {
 
   render() {
     return (
-      <canvas ref='screen' class="nes-screen" width="256" height="240"></canvas>
+      <canvas ref='screen' class="Screen" width="256" height="240"></canvas>
     )
   }
 }

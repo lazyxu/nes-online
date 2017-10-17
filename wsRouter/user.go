@@ -87,6 +87,8 @@ func (u *User) Reader() {
 			u.start()
 		case "endGame":
 			u.endGame()
+		case "operation":
+			u.sendRoomMsg(m, u.Name, true)
 		case "roomMsg":
 			u.sendRoomMsg(m, u.Name, true)
 		case "__offer":

@@ -2,6 +2,7 @@ import React from 'react'
 import { connect } from 'react-redux'
 
 import ws from '../../../../websocket/index.js'
+import Keyboard from './Keyboard.jsx'
 
 class Emulator extends React.Component {
 
@@ -24,7 +25,10 @@ class Emulator extends React.Component {
 
   render() {
     return (
-      <div/>
+      <Keyboard
+        keyboard={this.props.keyboard}
+        nes={this.props.nes}
+      />
     )
   }
 }
