@@ -6,49 +6,26 @@ import ws from '../../../websocket/index.js'
 import constant from '../../../constant.js'
 import gameApi from '../../../api/game.js'
 import { roomSet, gameTabSet, msgAdd, msgSet, keyboardGet } from '../../../actions/actions'
-// import Players from './Players.jsx'
-// import Chat from './Chat.jsx'
 import Keyboard from './Local/Keyboard.jsx'
 import Screen from './Common/Screen.jsx'
 import Audio from './Common/Audio.jsx'
-// import keyboard from '../../api/user/keyboard.js'
-// import nes from '../nes/nes.js'
+import LocalEmulator from './Local/Emulator.jsx'
+import WebSocketEmulator from './WebSocket/Emulator.jsx'
+import PeerConnectionEmulator from './PeerConnection/Emulator.jsx'
+
 class Emulator extends React.Component {
 
   constructor(props) {
     super(props);
-    this.interval = null
-  }
-
-  start() {
-    this.interval = setInterval(() => {
-      this.props.nes.frame()
-    }, 1000 / 60)
-  }
-
-  stop() {
-    clearInterval(this.interval)
   }
 
   componentDidMount() {
-    this.props.nes.reloadROM()
-    this.start()
   }
 
   componentDidUpdate(prevProps, prevState) {
-    if (prevProps.isRunning != this.props.isRunning) {
-      if (this.props.isRunning) {
-        this.interval = setInterval(() => {
-          this.props.nes.frame()
-        }, 1000 / 60)
-      } else {
-        this.stop()
-      }
-    }
   }
 
   componentWillUnmount() {
-    this.stop()
   }
 
   setOnFrame(func) {
@@ -73,6 +50,30 @@ class Emulator extends React.Component {
           keyboard={this.props.keyboard}
           nes={this.props.nes}
         />
+        {
+          this.props.playMode == constant.PLAY_MODE_LOCAL ?
+            <LocalEmulator
+              keyboard={this.props.keyboard}
+              isRunning={this.props.isRunning}
+              playMode={this.props.playMode}
+              nes={this.props.nes}
+            /> :
+            this.props.playMode == constant.PLAY_MODE_WEBSOCKET ?
+              <WebSocketEmulator
+                keyboard={this.props.keyboard}
+                isRunning={this.props.isRunning}
+                playMode={this.props.playMode}
+                nes={this.props.nes}
+              /> :
+              this.props.playMode == constant.PLAY_MODE_PEER_CONNECTION ?
+                <PeerConnectionEmulator
+                  keyboard={this.props.keyboard}
+                  isRunning={this.props.isRunning}
+                  playMode={this.props.playMode}
+                  nes={this.props.nes}
+                /> :
+                <div />
+        }
       </div>
     )
   }

@@ -26,7 +26,7 @@ class Room extends React.Component {
       tab: "",
       isRunning: true,
       emulateSound: true,
-      playMode: constant.LOCAL,
+      playMode: constant.PLAY_MODE_LOCAL,
     }
   }
 
@@ -35,6 +35,7 @@ class Room extends React.Component {
   }
 
   componentDidMount() {
+    this.restart()
   }
 
   componentWillUnmount() {
@@ -94,6 +95,7 @@ class Room extends React.Component {
             emulateSound={this.state.emulateSound}
             keyboard={this.props.keyboard}
             isRunning={this.state.isRunning}
+            playMode={this.state.playMode}
             nes={this.props.nes}
           />
           <Chat />

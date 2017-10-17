@@ -2,7 +2,7 @@ import React from 'react'
 import { connect } from 'react-redux'
 
 import jsnes from '../../../../jsnes/index.js'
-class Emulator extends React.Component {
+class Keyboard extends React.Component {
 
   constructor(props) {
     super(props);
@@ -91,4 +91,4 @@ class Emulator extends React.Component {
   }
 }
 
-export default Emulator;
+export default Keyboard;
