@@ -1,13 +1,13 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
-import './Keyboard.scss'
+import './KeyboardSetting.scss'
 import ws from '../../../websocket/index.js'
 import constant from '../../../constant.js'
 import keyboardApi from '../../../api/keyboard.js'
 import { roomSet, gameTabSet, tabSet, keyboardSet } from '../../../actions/actions'
 
-class Keyboard extends React.Component {
+class KeyboardSetting extends React.Component {
 
   constructor(props) {
     super(props);
@@ -100,4 +100,4 @@ function mapStateToProps(state) {
   }
 }
 
-export default connect(mapStateToProps, { roomSet, gameTabSet, tabSet, keyboardSet })(Keyboard);
+export default connect(mapStateToProps, { roomSet, gameTabSet, tabSet, keyboardSet })(KeyboardSetting);

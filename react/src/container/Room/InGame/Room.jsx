@@ -11,7 +11,7 @@ import Timer from './Timer.jsx'
 import Chat from './Chat.jsx'
 import Players from './Players.jsx'
 import Menu from './Menu.jsx'
-import Keyboard from './Keyboard.jsx'
+import KeyboardSetting from './KeyboardSetting.jsx'
 // import audio from '../nes/audio.js'
 // import nes from '../nes/nes.js'
 
@@ -21,14 +21,17 @@ class Room extends React.Component {
     super(props);
     this.Menu = "Menu"
     this.Players = "Players"
-    this.Keyboard = "Keyboard"
+    this.KeyboardSetting = "KeyboardSetting"
     this.state = {
       tab: "",
       isRunning: true,
+      emulateSound: true,
+      playMode: constant.LOCAL,
     }
   }
 
   componentWillMount() {
+    this.setState({ emulateSound: this.props.nes.opts.emulateSound })
   }
 
   componentDidMount() {
@@ -43,8 +46,17 @@ class Room extends React.Component {
   }
 
   updateIsRunning(isRunning) {
-    this.props.nes.updateIsRunning(isRunning)
     this.setState({ isRunning: isRunning })
+  }
+
+  updateEmulateSound(emulateSound) {
+    this.props.nes.emulateSound = emulateSound
+    this.setState({ emulateSound: emulateSound })
+  }
+
+  restart() {
+    this.updateIsRunning(true)
+    this.props.nes.reloadROM()
   }
 
   render() {
@@ -57,10 +69,13 @@ class Room extends React.Component {
               room={this.props.room}
               isRunning={this.state.isRunning}
               updateIsRunning={this.updateIsRunning.bind(this)}
+              restart={this.restart.bind(this)}
+              emulateSound={this.state.emulateSound}
+              updateEmulateSound={this.updateEmulateSound.bind(this)}
               nes={this.props.nes}
             /> :
-            this.state.tab == this.Keyboard ?
-              <Keyboard
+            this.state.tab == this.KeyboardSetting ?
+              <KeyboardSetting
                 closeTab={this.closeTab.bind(this)}
                 updateKeyboard={this.props.updateKeyboard}
                 keyboard={this.props.keyboard}
@@ -72,11 +87,13 @@ class Room extends React.Component {
           <button onClick={() => { this.setState({ tab: this.Menu }); }}>菜单</button>
           <Timer />
           <button onClick={() => { this.setState({ tab: this.Players }) }}>玩家</button>
-          <button onClick={() => { this.setState({ tab: this.Keyboard }) }}>按键设置</button>
+          <button onClick={() => { this.setState({ tab: this.KeyboardSetting }) }}>按键设置</button>
         </div>
         <div className='window' ref='window' id='window' tabIndex="0">
           <Emulator
+            emulateSound={this.state.emulateSound}
             keyboard={this.props.keyboard}
+            isRunning={this.state.isRunning}
             nes={this.props.nes}
           />
           <Chat />
