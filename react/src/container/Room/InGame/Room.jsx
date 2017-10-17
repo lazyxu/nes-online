@@ -12,6 +12,8 @@ import Chat from './Chat.jsx'
 import Players from './Players.jsx'
 import Menu from './Menu.jsx'
 import Keyboard from './Keyboard.jsx'
+// import audio from '../nes/audio.js'
+// import nes from '../nes/nes.js'
 
 class Room extends React.Component {
 
@@ -23,41 +25,13 @@ class Room extends React.Component {
     this.state = {
       tab: "",
       isRunning: true,
-      emulateSound: true,
-    }
-  }
-
-  audioInit() {
-    var audioCtx = new (window.AudioContext || window.webkitAudioContext)()
-    // 立体声
-    var channels = 2;
-    var sampleRate = window.nes.papu.sampleRate
-
-    // 创建一个 采样率与音频环境(AudioContext)相同的 的 音频片段。
-    var frameCount = 8192;
-
-    var audioBuffer = audioCtx.createBuffer(channels, frameCount, sampleRate);
-    var myFrameCount = 0
-    window.nes.opts.onAudioSample = (left, right) => {
-      if (myFrameCount == frameCount) {
-        myFrameCount = 0
-        var source = audioCtx.createBufferSource();
-        source.buffer = audioBuffer;
-        source.connect(audioCtx.destination);
-        source.start()
-      }
-      audioBuffer.getChannelData(0)[myFrameCount] = left
-      audioBuffer.getChannelData(1)[myFrameCount] = right
-      myFrameCount++
     }
   }
 
   componentWillMount() {
-    this.audioInit()
   }
 
   componentDidMount() {
-    this.setState({ emulateSound: window.nes.opts.emulateSound })
   }
 
   componentWillUnmount() {
@@ -69,21 +43,8 @@ class Room extends React.Component {
   }
 
   updateIsRunning(isRunning) {
-    if (isRunning) {
-      window.nes.start()
-    } else {
-      window.nes.stop()
-    }
+    this.props.nes.updateIsRunning(isRunning)
     this.setState({ isRunning: isRunning })
-  }
-
-  updateEmulateSound(emulateSound) {
-    window.nes.opts.emulateSound = emulateSound
-    this.setState({ emulateSound: emulateSound })
-  }
-
-  restart() {
-    window.nes.reloadROM()
   }
 
   render() {
@@ -94,11 +55,9 @@ class Room extends React.Component {
             <Menu
               closeTab={this.closeTab.bind(this)}
               room={this.props.room}
-              restart={this.restart.bind(this)}
               isRunning={this.state.isRunning}
               updateIsRunning={this.updateIsRunning.bind(this)}
-              emulateSound={this.state.emulateSound}
-              updateEmulateSound={this.updateEmulateSound.bind(this)}
+              nes={this.props.nes}
             /> :
             this.state.tab == this.Keyboard ?
               <Keyboard
@@ -118,6 +77,7 @@ class Room extends React.Component {
         <div className='window' ref='window' id='window' tabIndex="0">
           <Emulator
             keyboard={this.props.keyboard}
+            nes={this.props.nes}
           />
           <Chat />
         </div>

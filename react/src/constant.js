@@ -21,6 +21,11 @@ var host = document.location.host
 var redirect_uri = 'http://nes.meteorkl.com' + document.location.pathname + document.location.hash
 exports.wsServer = 'ws://' + host + '/ws'
 exports.qqRedirectURL = escape('http://' + host + '/api/loginQQ?redirect_uri=' + escape(redirect_uri))
+
+exports.LOCAL = 0
+exports.WEBSOCKET = 1
+exports.PEER_CONNECTION = 2
+
 exports.DEFAULT_KEYBOARD = {
 	"up": 87,
 	"down": 83,

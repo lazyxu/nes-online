@@ -2,7 +2,6 @@ import React from 'react'
 import { connect } from 'react-redux'
 
 import './Emulator.scss'
-import jsnes from '../../../jsnes/index.js'
 import ws from '../../../websocket/index.js'
 import constant from '../../../constant.js'
 import gameApi from '../../../api/game.js'
@@ -11,72 +10,11 @@ import { roomSet, gameTabSet, msgAdd, msgSet, keyboardGet } from '../../../actio
 // import Chat from './Chat.jsx'
 // import Menu from './Menu.jsx'
 // import keyboard from '../../api/user/keyboard.js'
+// import nes from '../nes/nes.js'
 class Emulator extends React.Component {
 
   constructor(props) {
     super(props);
-  }
-
-  keyupListener(e) {
-    switch (e.keyCode) {
-      case this.props.keyboard.A:
-        window.nes.buttonUp(1, jsnes.Controller.BUTTON_A);
-        break;
-      case this.props.keyboard.B:
-        window.nes.buttonUp(1, jsnes.Controller.BUTTON_B);
-        break;
-      case this.props.keyboard.select:
-        window.nes.buttonUp(1, jsnes.Controller.BUTTON_SELECT);
-        break;
-      case this.props.keyboard.start:
-        window.nes.buttonUp(1, jsnes.Controller.BUTTON_START);
-        break;
-      case this.props.keyboard.up:
-        window.nes.buttonUp(1, jsnes.Controller.BUTTON_UP);
-        break;
-      case this.props.keyboard.down:
-        window.nes.buttonUp(1, jsnes.Controller.BUTTON_DOWN);
-        break;
-      case this.props.keyboard.left:
-        window.nes.buttonUp(1, jsnes.Controller.BUTTON_LEFT);
-        break;
-      case this.props.keyboard.right:
-        window.nes.buttonUp(1, jsnes.Controller.BUTTON_RIGHT);
-        break;
-      default:
-        break;
-    }
-  }
-
-  keydownListener(e) {
-    switch (e.keyCode) {
-      case this.props.keyboard.A:
-        window.nes.buttonDown(1, jsnes.Controller.BUTTON_A);
-        break;
-      case this.props.keyboard.B:
-        window.nes.buttonDown(1, jsnes.Controller.BUTTON_B);
-        break;
-      case this.props.keyboard.select:
-        window.nes.buttonDown(1, jsnes.Controller.BUTTON_SELECT);
-        break;
-      case this.props.keyboard.start:
-        window.nes.buttonDown(1, jsnes.Controller.BUTTON_START);
-        break;
-      case this.props.keyboard.up:
-        window.nes.buttonDown(1, jsnes.Controller.BUTTON_UP);
-        break;
-      case this.props.keyboard.down:
-        window.nes.buttonDown(1, jsnes.Controller.BUTTON_DOWN);
-        break;
-      case this.props.keyboard.left:
-        window.nes.buttonDown(1, jsnes.Controller.BUTTON_LEFT);
-        break;
-      case this.props.keyboard.right:
-        window.nes.buttonDown(1, jsnes.Controller.BUTTON_RIGHT);
-        break;
-      default:
-        break;
-    }
   }
 
   resize() {
@@ -90,10 +28,6 @@ class Emulator extends React.Component {
       this.refs.screen.style.height = height + 'px'
       this.refs.screen.style.width = (height / 240 * 256) + 'px'
     }
-  }
-
-  local() {
-    window.nes.frame()
   }
 
   componentDidMount() {
@@ -113,7 +47,7 @@ class Emulator extends React.Component {
     for (var i = 0; i < this.buf32.length; ++i) {
       this.buf32[i] = 0xFF000000;
     }
-    window.nes.opts.onFrame = (buffer) => {
+    this.props.nes.emulator.opts.onFrame = (buffer) => {
       var i = 0;
       for (var y = 0; y < 240; ++y) {
         for (var x = 0; x < 256; ++x) {
@@ -127,20 +61,14 @@ class Emulator extends React.Component {
     }
     this.resize();
     window.addEventListener("resize", this.resize.bind(this))
-    document.getElementById('window').addEventListener("keyup", this.keyupListener.bind(this))
-    document.getElementById('window').addEventListener("keydown", this.keydownListener.bind(this))
 
-    window.nes.reloadROM()
-    window.nes.frameIntervalFunction = this.local.bind(this)
-    window.nes.start()
+    this.props.nes.restart()
   }
-  
+
   componentWillUnmount() {
-    window.nes.opts.onFrame = () => { }
-    clearInterval(window.nes.frameInterval)
+    this.props.nes.emulator.opts.onFrame = () => { }
+    this.props.nes.end()
     window.removeEventListener("resize", this.resize.bind(this))
-    document.getElementById('window').removeEventListener("keyup", this.keyupListener.bind(this))
-    document.getElementById('window').removeEventListener("keydown", this.keydownListener.bind(this))
   }
 
   render() {

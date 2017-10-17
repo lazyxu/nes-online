@@ -11,7 +11,7 @@ import Register from './Account/Register'
 import ForgetPassword from './Account/ForgetPassword'
 import { userSet, tabSet } from '../actions/actions'
 import ws from '../websocket/index.js'
-import jsnes from '../jsnes/index.js'
+// import jsnes from '../jsnes/index.js'
 
 class Index extends React.Component {
 

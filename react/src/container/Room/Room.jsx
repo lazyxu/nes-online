@@ -8,7 +8,7 @@ import ws from '../../websocket/index.js'
 import constant from '../../constant.js'
 import Normal from './Normal/Room.jsx'
 import InGame from './InGame/Room.jsx'
-import jsnes from '../../jsnes/index.js'
+import nes from '../../nes/index.js'
 
 class Room extends React.Component {
 
@@ -23,6 +23,7 @@ class Room extends React.Component {
             loadingState: constant.LOADINGROOM,
             keyboard: constant.DEFAULT_KEYBOARD,
         }
+        this.nes = null
     }
 
     updateKeyboard(keyboard) {
@@ -31,11 +32,15 @@ class Room extends React.Component {
                 alert(resp.msg)
             }
             this.setState({ keyboard: resp.data })
+            this.nes.keyboard.keyboard = resp.data
         })
     }
 
     componentWillMount() {
-        window.nes = new jsnes.NES();
+        this.nes = new nes.NESOL({
+            playMode: constant.LOCAL,
+            keyboardElemID: 'window',
+        })
         ws.addOnmessage('id_in_room', data => {
             this.setState({ id_in_room: data.id_in_room })
         })
@@ -45,6 +50,7 @@ class Room extends React.Component {
                 return
             }
             this.setState({ keyboard: resp.data })
+            this.nes.keyboard.keyboard = resp.data
         })
         ws.addOnmessage('roomErrMsg', data => {
             alert(data.roomErrMsg)
@@ -56,7 +62,7 @@ class Room extends React.Component {
                 this.setState({ loadingState: constant.LOADINGMAP })
                 gameApi.getRom(data.room.game).then(resp => {
                     this.setState({ loadingState: constant.LOADED })
-                    window.nes.loadROM(resp)
+                    this.nes.loadROM(resp)
                 })
             }
         })
@@ -88,6 +94,7 @@ class Room extends React.Component {
                                 id_in_room={this.state.id_in_room}
                                 keyboard={this.state.keyboard}
                                 updateKeyboard={this.updateKeyboard.bind(this)}
+                                nes={this.nes}
                             /> :
                             <Normal
                                 room={this.state.room}

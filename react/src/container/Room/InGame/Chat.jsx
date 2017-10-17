@@ -2,7 +2,6 @@ import React from 'react'
 import { connect } from 'react-redux'
 
 import './Chat.scss'
-import jsnes from '../../../jsnes/index.js'
 import ws from '../../../websocket/index.js'
 import constant from '../../../constant.js'
 import gameApi from '../../../api/game.js'
