@@ -2,7 +2,7 @@ import React from 'react'
 import { connect } from 'react-redux'
 
 import ws from '../../../../websocket/index.js'
-import Controller from './Controller.jsx'
+import Controller from '../Common/Controller.jsx'
 import operation from '../Common/operation.js'
 
 class Emulator extends React.Component {
@@ -70,20 +70,21 @@ class Emulator extends React.Component {
         console.log(command)
         console.log(state)
       }
-      receivedLog[data.id][data.frameCount] = data.operation
+      receivedLog[data.id][data.frameCount-this.state.frameCount] = data.operation
     })
 
     this.frameInterval = setInterval(() => {
       if (this.props.isRunning) {
         for (var i = 0; i < this.props.room.player_count; i++) {
-          if (typeof receivedLog[i][this.state.frameCount] === 'undefined') {
+          if (typeof receivedLog[i][0] === 'undefined') {
             console.log('waiting for user ' + i + '\'s command in frame ' + this.state.frameCount)
             return
           }
         }
 
         for (var i = 0; i < this.props.room.player_count; i++) {
-          this.action(receivedLog[i][this.state.frameCount])
+          this.action(receivedLog[i][0])
+          receivedLog[i].shift()
         }
 
         this.props.nes.frame()

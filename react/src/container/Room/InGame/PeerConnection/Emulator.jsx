@@ -2,7 +2,8 @@ import React from 'react'
 import { connect } from 'react-redux'
 
 import ws from '../../../../websocket/index.js'
-import Keyboard from './Keyboard.jsx'
+import Controller from '../Common/Controller.jsx'
+import operation from '../Common/operation.js'
 
 class Emulator extends React.Component {
 

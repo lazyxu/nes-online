@@ -4,7 +4,7 @@ import { connect } from 'react-redux'
 import jsnes from '../../../../jsnes/index.js'
 import ws from '../../../../websocket/index.js'
 import constant from '../../../../constant.js'
-import operation from '../Common/operation.js'
+import operation from './operation.js'
 
 class Controller extends React.Component {
 
