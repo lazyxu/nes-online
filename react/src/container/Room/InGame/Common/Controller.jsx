@@ -25,28 +25,28 @@ class Controller extends React.Component {
     var keyboard = this.props.keyboard
     switch (e.keyCode) {
       case keyboard.A:
-        this.props.setOperation(operation.COMMAND_BUTTON_A, operation.STATE_UNSET)
+        this.props.addOperation(operation.COMMAND_BUTTON_A, operation.STATE_UNSET)
         break;
       case keyboard.B:
-      this.props.setOperation(operation.COMMAND_BUTTON_B, operation.STATE_UNSET)
+      this.props.addOperation(operation.COMMAND_BUTTON_B, operation.STATE_UNSET)
         break;
       case keyboard.select:
-      this.props.setOperation(operation.COMMAND_BUTTON_SELECT, operation.STATE_UNSET)
+      this.props.addOperation(operation.COMMAND_BUTTON_SELECT, operation.STATE_UNSET)
         break;
       case keyboard.start:
-      this.props.setOperation(operation.COMMAND_BUTTON_START, operation.STATE_UNSET)
+      this.props.addOperation(operation.COMMAND_BUTTON_START, operation.STATE_UNSET)
         break;
       case keyboard.up:
-      this.props.setOperation(operation.COMMAND_BUTTON_UP, operation.STATE_UNSET)
+      this.props.addOperation(operation.COMMAND_BUTTON_UP, operation.STATE_UNSET)
         break;
       case keyboard.down:
-      this.props.setOperation(operation.COMMAND_BUTTON_DOWN, operation.STATE_UNSET)
+      this.props.addOperation(operation.COMMAND_BUTTON_DOWN, operation.STATE_UNSET)
         break;
       case keyboard.left:
-      this.props.setOperation(operation.COMMAND_BUTTON_LEFT, operation.STATE_UNSET)
+      this.props.addOperation(operation.COMMAND_BUTTON_LEFT, operation.STATE_UNSET)
         break;
       case keyboard.right:
-      this.props.setOperation(operation.COMMAND_BUTTON_RIGHT, operation.STATE_UNSET)
+      this.props.addOperation(operation.COMMAND_BUTTON_RIGHT, operation.STATE_UNSET)
         break;
       default:
         break;
@@ -58,28 +58,28 @@ class Controller extends React.Component {
     var keyboard = this.props.keyboard
     switch (e.keyCode) {
       case keyboard.A:
-        this.props.setOperation(operation.COMMAND_BUTTON_A, operation.STATE_SET)
+        this.props.addOperation(operation.COMMAND_BUTTON_A, operation.STATE_SET)
         break;
       case keyboard.B:
-      this.props.setOperation(operation.COMMAND_BUTTON_B, operation.STATE_SET)
+      this.props.addOperation(operation.COMMAND_BUTTON_B, operation.STATE_SET)
         break;
       case keyboard.select:
-      this.props.setOperation(operation.COMMAND_BUTTON_SELECT, operation.STATE_SET)
+      this.props.addOperation(operation.COMMAND_BUTTON_SELECT, operation.STATE_SET)
         break;
       case keyboard.start:
-      this.props.setOperation(operation.COMMAND_BUTTON_START, operation.STATE_SET)
+      this.props.addOperation(operation.COMMAND_BUTTON_START, operation.STATE_SET)
         break;
       case keyboard.up:
-      this.props.setOperation(operation.COMMAND_BUTTON_UP, operation.STATE_SET)
+      this.props.addOperation(operation.COMMAND_BUTTON_UP, operation.STATE_SET)
         break;
       case keyboard.down:
-      this.props.setOperation(operation.COMMAND_BUTTON_DOWN, operation.STATE_SET)
+      this.props.addOperation(operation.COMMAND_BUTTON_DOWN, operation.STATE_SET)
         break;
       case keyboard.left:
-      this.props.setOperation(operation.COMMAND_BUTTON_LEFT, operation.STATE_SET)
+      this.props.addOperation(operation.COMMAND_BUTTON_LEFT, operation.STATE_SET)
         break;
       case keyboard.right:
-      this.props.setOperation(operation.COMMAND_BUTTON_RIGHT, operation.STATE_SET)
+      this.props.addOperation(operation.COMMAND_BUTTON_RIGHT, operation.STATE_SET)
         break;
       default:
         break;

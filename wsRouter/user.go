@@ -4,8 +4,8 @@ import (
 	"github.com/gorilla/websocket"
 	"github.com/MeteorKL/koala/logger"
 	"io/ioutil"
-	"encoding/json"
 	"strconv"
+	"encoding/json"
 )
 
 type User struct {
@@ -44,7 +44,10 @@ func UserHandler(ws *websocket.Conn, user map[string]interface{}) {
 	// server send Msg to client
 	go func(u *User) {
 		for m := range u.msg {
-			logger.Debug(m)
+			if m["type"] != "operation" {
+				logger.Debug(m["type"])
+				logger.Debug(m)
+			}
 			err := u.ws.WriteJSON(m)
 			if err != nil {
 				break
@@ -66,7 +69,7 @@ func (u *User) Reader() {
 		if err != nil {
 			break
 		}
-		if m["type"] != "getKeyboard" {
+		if m["type"] != "operation" {
 			logger.Debug(m["type"])
 			logger.Debug(m)
 		}
@@ -88,15 +91,19 @@ func (u *User) Reader() {
 			u.unready()
 		case "start":
 			u.start()
-		case "endGame":
+		case "save":
 			b, err := json.Marshal(u.room.operation)
 			logger.Error(err)
-			ioutil.WriteFile(strconv.Itoa(u.room.ID)+"-"+u.room.Game+".json", b, 0666)
+			ioutil.WriteFile(u.Name+": "+strconv.Itoa(u.room.ID)+"-"+u.room.Game+".json", b, 0666)
+		case "endGame":
+			//b, err := json.Marshal(u.room.operation)
+			//logger.Error(err)
+			//ioutil.WriteFile(strconv.Itoa(u.room.ID)+"-"+u.room.Game+".json", b, 0666)
 			u.endGame()
 		case "operation":
-			id :=int64(m["id"].(float64))
-			u.room.operation[id] = append(u.room.operation[id], int64( m["operation"].(float64)))
-			u.sendRoomMsg(m, u.Name, true)
+			//id :=int64(m["id"].(float64))
+			//u.room.operation[id] = append(u.room.operation[id], int64( m["operation"].(float64)))
+			u.sendRoomMsg(m, u.Name, false)
 		case "roomMsg":
 			u.sendRoomMsg(m, u.Name, true)
 		case "__offer":

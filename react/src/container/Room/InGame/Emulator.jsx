@@ -18,6 +18,9 @@ class Emulator extends React.Component {
     super(props);
   }
 
+  componentWillMount() {
+  }
+
   componentDidMount() {
   }
 

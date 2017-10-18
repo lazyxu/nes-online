@@ -5,6 +5,8 @@ import ws from '../../../../websocket/index.js'
 import Controller from '../Common/Controller.jsx'
 import operation from '../Common/operation.js'
 
+import peerConnection from '../Common/peerConnection.js'
+
 class Emulator extends React.Component {
 
   constructor(props) {
@@ -14,20 +16,22 @@ class Emulator extends React.Component {
       frameCount: 0,
     }
     this.delay = 5
-    this.localLog = -1
+    this.localLog = []
+    this.send = null
+    this.receivedLog = new Array(this.props.room.player_count)
   }
 
-  setOperation(command, state) {
-    console.log('setOperation')
+  addOperation(command, state) {
+    console.log('addOperation')
     console.log(this.state.frameCount + this.delay)
     console.log(command)
     console.log(state)
-    this.localLog = operation.encode(
+    this.localLog.push(operation.encode(
       this.state.frameCount + this.delay,
       this.props.id_in_room,
       command,
       state
-    )
+    ))
   }
 
   action(op) {
@@ -46,60 +50,82 @@ class Emulator extends React.Component {
   }
 
   componentDidMount() {
-    console.log('try websocket')
+    console.log('try peerConnection')
     console.log(this.props.room.player_count)
-    var receivedLog = new Array(this.props.room.player_count)
-    window.receivedLog = receivedLog
+    window.receivedLog = this.receivedLog
     for (var i = 0; i < this.props.room.player_count; i++) {
-      receivedLog[i] = new Array(this.delay)
-      for(var j=0;j<this.delay;j++) {
-        receivedLog[i][j] = -1
+      this.receivedLog[i] = new Array(this.delay)
+      for (var j = 0; j < this.delay; j++) {
+        this.receivedLog[i][j] = new Array(0)
       }
     }
 
-    ws.addOnmessage('operation', data => {
-      if (data.operation!=-1) {
-        var op = data.operation
-        var frameCount = operation.frameCount(op)
-        var id = operation.id(op)
-        var command = operation.command(op)
-        var state = operation.state(op)
-        console.log('Onmessage')
-        console.log(frameCount)
-        console.log(id)
-        console.log(command)
-        console.log(state)
+    var pc = new peerConnection(this.props.id_in_room, data => {
+      console.log(data)
+      if (data.type == 'operation') {
+        this.receivedLog[data.id][data.frameCount - this.state.frameCount] = data.operation
       }
-      receivedLog[data.id][data.frameCount-this.state.frameCount] = data.operation
     })
+    window.pc = pc
+    var count = 0
+    var int = setInterval(
+      () => {
+        var state = pc.getState()
+        if (count < 10 && state == peerConnection.CONNECTING) {
+          count++
+          return
+        }
+        if (state == peerConnection.CONNECTED) {
+          alert("CONNECTED, using peerConnection")
+          this.send = function (data) {
+            pc.dataChannel.send(JSON.stringify(data))
+          }
+          this.start()
+          clearInterval(int)
+        } else {
+          alert("FAILED, using websocket")
+          ws.addOnmessage('operation', data => {
+            this.receivedLog[data.id][data.frameCount - this.state.frameCount] = data.operation
+          })
+          this.send = ws.send
+          this.start()
+          clearInterval(int)
+        }
+      },
+      500
+    )
+  }
 
+  start() {
     this.frameInterval = setInterval(() => {
       if (this.props.isRunning) {
         for (var i = 0; i < this.props.room.player_count; i++) {
-          if (typeof receivedLog[i][0] === 'undefined') {
+          if (typeof this.receivedLog[i][0] === 'undefined') {
             console.log('waiting for user ' + i + '\'s command in frame ' + this.state.frameCount)
             return
           }
         }
 
+        this.receivedLog[this.props.id_in_room][this.delay] = this.localLog
         for (var i = 0; i < this.props.room.player_count; i++) {
-          this.action(receivedLog[i][0])
-          receivedLog[i].shift()
+          for (var j = 0; j < this.receivedLog[i][0].length; j++) {
+            this.action(this.receivedLog[i][0][j])
+          }
+          this.receivedLog[i].shift()
         }
 
         this.props.nes.frame()
-        ws.send({
+        this.send({
           type: 'operation',
           id: this.props.id_in_room,
           frameCount: this.state.frameCount + this.delay,
           operation: this.localLog,
         })
-        this.localLog = -1
+        this.localLog = []
         this.setState({ frameCount: this.state.frameCount + 1 })
       }
     }, 1000 / 60)
   }
-
   componentWillUnmount() {
     ws.removeOnmessage('operaion')
     clearInterval(this.frameInterval)
@@ -112,7 +138,7 @@ class Emulator extends React.Component {
         controller={this.props.controller}
         nes={this.props.nes}
         keyboard={this.props.keyboard}
-        setOperation={this.setOperation.bind(this)}
+        addOperation={this.addOperation.bind(this)}
       />
     )
   }

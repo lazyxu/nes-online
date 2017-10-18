@@ -37,6 +37,7 @@ class Screen extends React.Component {
     for (var i = 0; i < buf32.length; ++i) {
       buf32[i] = 0xFF000000;
     }
+    var frameID = 0
     this.props.setOnFrame(buffer => {
       var i = 0;
       for (var y = 0; y < 240; ++y) {
@@ -48,6 +49,8 @@ class Screen extends React.Component {
       }
       canvasImageData.data.set(buf8);
       canvasContext.putImageData(canvasImageData, 0, 0);
+      frameID++
+      document.getElementById('frameID').innerHTML = frameID
     })
     this.resize();
     window.addEventListener("resize", this.resize.bind(this))
@@ -60,7 +63,10 @@ class Screen extends React.Component {
 
   render() {
     return (
+      <div>
+      <span id="frameID"></span>
       <canvas ref='screen' class="Screen" width="256" height="240"></canvas>
+      </div>
     )
   }
 }
