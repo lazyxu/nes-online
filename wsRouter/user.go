@@ -104,6 +104,8 @@ func (u *User) Reader() {
 			//id :=int64(m["id"].(float64))
 			//u.room.operation[id] = append(u.room.operation[id], int64( m["operation"].(float64)))
 			u.sendRoomMsg(m, u.Name, false)
+		case "protocolSwitch":
+			u.sendRoomMsg(m, u.Name, true)
 		case "roomMsg":
 			u.sendRoomMsg(m, u.Name, true)
 		case "__offer":

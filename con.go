@@ -15,6 +15,9 @@ var upgrader = &websocket.Upgrader{ReadBufferSize: 1024, WriteBufferSize: 1024}
 
 func wsHandler(w http.ResponseWriter, r *http.Request) {
 	s := session.Store.PeekSession(r, router.CookieName)
+	if s == nil {
+		return
+	}
 	if user, ok := s.Get("user").(map[string]interface{}); ok {
 		ws, err := upgrader.Upgrade(w, r, nil)
 		if err != nil {
