@@ -150,7 +150,7 @@ class Room extends React.Component {
           {this.state.msg.map((msg, index) => {
             return (
               <div className='list' key={index}>
-                <span style={{ color: 'green' }}>[{msg.from}]: </span>
+                <span style={{ color: msg.from == constant.MSG_FROM_SYSTEM ? 'red' : 'green' }}>[{msg.from}]: </span>
                 <span style={{ color: 'white' }}>{msg.msg}</span>
               </div>
             )

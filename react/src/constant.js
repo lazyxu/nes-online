@@ -22,9 +22,10 @@ var redirect_uri = 'http://nes.meteorkl.com' + document.location.pathname + docu
 exports.wsServer = 'ws://' + host + '/ws'
 exports.qqRedirectURL = escape('http://' + host + '/api/loginQQ?redirect_uri=' + escape(redirect_uri))
 
+exports.MSG_FROM_SYSTEM = '系统'
+
 exports.PLAY_MODE_LOCAL = 0
-exports.PLAY_MODE_WEBSOCKET = 1
-exports.PLAY_MODE_PEER_CONNECTION = 2
+exports.PLAY_MODE_ONLINE = 1
 
 exports.DEFAULT_KEYBOARD = {
 	"up": 87,

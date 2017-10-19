@@ -33,7 +33,6 @@ var peerConnection = function (idInRoom, onMessage) {
             console.log("dataChannel open");
         }
         this.dataChannel.onmessage = (event) => {
-            console.log(event.data)
             onMessage(JSON.parse(event.data));
         }
         this.dataChannel.onclose = (event) => {
@@ -63,7 +62,6 @@ var peerConnection = function (idInRoom, onMessage) {
                 console.log("receiveChannel start");
             }
             this.dataChannel.onmessage = (event) => {
-                console.log(event.data)
                 onMessage(JSON.parse(event.data));
             }
             this.dataChannel.onclose = (event) => {

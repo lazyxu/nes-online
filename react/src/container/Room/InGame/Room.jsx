@@ -26,20 +26,39 @@ class Room extends React.Component {
       tab: "",
       isRunning: true,
       emulateSound: this.props.nes.opts.emulateSound,
-      playMode: constant.PLAY_MODE_WEBSOCKET
+      playMode: constant.PLAY_MODE_ONLINE,
+      msg: [],
     }
+  }
+
+  addMsg(from, msg) {
+    var msg = {
+      from: from,
+      msg: msg,
+    }
+    this.state.msg.push(msg)
+    setTimeout(() => {
+      this.state.msg.shift();
+      this.setState({ msg: this.state.msg });
+    },
+      1000 * 15
+    );
+    this.setState({ msg: this.state.msg })
   }
 
   componentWillMount() {
   }
 
   componentDidMount() {
+    ws.addOnmessage('roomMsg', data =>
+      this.addMsg(data.from, data.msg)
+    )
     this.updatePlayMode()
     this.restart()
   }
 
   updatePlayMode() {
-    if (this.state.playMode==constant.PLAY_MODE_LOCAL ) {
+    if (this.state.playMode == constant.PLAY_MODE_LOCAL) {
       return
     }
     if (this.props.room.player_count > 1) {
@@ -62,6 +81,7 @@ class Room extends React.Component {
   }
 
   componentWillUnmount() {
+    ws.removeOnmessage("roomMsg")
   }
 
   closeTab() {
@@ -122,8 +142,11 @@ class Room extends React.Component {
             isRunning={this.state.isRunning}
             playMode={this.state.playMode}
             nes={this.props.nes}
+            addMsg={this.addMsg.bind(this)}
           />
-          <Chat />
+          <Chat
+            msg={this.state.msg}
+          />
         </div>
       </div>
     );

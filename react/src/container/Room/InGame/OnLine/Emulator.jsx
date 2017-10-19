@@ -1,11 +1,11 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
+import constant from '../../../../constant.js'
 import ws from '../../../../websocket/index.js'
-import Controller from '../Common/Controller.jsx'
-import operation from '../Common/operation.js'
-
-import peerConnection from '../Common/peerConnection.js'
+import Controller from './Controller.jsx'
+import operation from './operation.js'
+import peerConnection from './peerConnection.js'
 
 class Emulator extends React.Component {
 
@@ -22,10 +22,10 @@ class Emulator extends React.Component {
   }
 
   addOperation(command, state) {
-    console.log('addOperation')
-    console.log(this.state.frameCount + this.delay)
-    console.log(command)
-    console.log(state)
+    // console.log('addOperation')
+    // console.log(this.state.frameCount + this.delay)
+    // console.log(command)
+    // console.log(state)
     this.localLog.push(operation.encode(
       this.state.frameCount + this.delay,
       this.props.id_in_room,
@@ -38,7 +38,7 @@ class Emulator extends React.Component {
     if (op == -1) {
       return
     }
-    console.log(op.toString(2))
+    // console.log(op.toString(2))
     var frameCount = operation.frameCount(op)
     var id = operation.id(op)
     var command = operation.command(op)
@@ -50,8 +50,8 @@ class Emulator extends React.Component {
   }
 
   componentDidMount() {
-    console.log('try peerConnection')
-    console.log(this.props.room.player_count)
+    this.props.addMsg(constant.MSG_FROM_SYSTEM, '正在尝试p2p连接，请等待')
+    // console.log(this.props.room.player_count)
     window.receivedLog = this.receivedLog
     for (var i = 0; i < this.props.room.player_count; i++) {
       this.receivedLog[i] = new Array(this.delay)
@@ -61,7 +61,7 @@ class Emulator extends React.Component {
     }
 
     var pc = new peerConnection(this.props.id_in_room, data => {
-      console.log(data)
+      // console.log(data)
       if (data.type == 'operation') {
         this.receivedLog[data.id][data.frameCount - this.state.frameCount] = data.operation
       }
@@ -76,14 +76,14 @@ class Emulator extends React.Component {
           return
         }
         if (state == peerConnection.CONNECTED) {
-          alert("CONNECTED, using peerConnection")
+          this.props.addMsg(constant.MSG_FROM_SYSTEM, 'p2p连接成功')
           this.send = function (data) {
             pc.dataChannel.send(JSON.stringify(data))
           }
           this.start()
           clearInterval(int)
         } else {
-          alert("FAILED, using websocket")
+          this.props.addMsg(constant.MSG_FROM_SYSTEM, 'p2p连接失败, 自动调整为websocket模式')
           ws.addOnmessage('operation', data => {
             this.receivedLog[data.id][data.frameCount - this.state.frameCount] = data.operation
           })
@@ -97,15 +97,20 @@ class Emulator extends React.Component {
   }
 
   start() {
+    var waitingCount = 0
     this.frameInterval = setInterval(() => {
       if (this.props.isRunning) {
         for (var i = 0; i < this.props.room.player_count; i++) {
           if (typeof this.receivedLog[i][0] === 'undefined') {
-            console.log('waiting for user ' + i + '\'s command in frame ' + this.state.frameCount)
+            waitingCount++
+            if (waitingCount>=60) {
+              waitingCount-=60
+              this.props.addMsg(constant.MSG_FROM_SYSTEM, '正在等待玩家'+i+'的指令传输')
+            }
             return
           }
         }
-
+        waitingCount=0
         this.receivedLog[this.props.id_in_room][this.delay] = this.localLog
         for (var i = 0; i < this.props.room.player_count; i++) {
           for (var j = 0; j < this.receivedLog[i][0].length; j++) {

@@ -12,7 +12,6 @@ class Chat extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
-      msg: [],
       hide: true
     }
   }
@@ -27,25 +26,10 @@ class Chat extends React.Component {
   }
 
   componentDidMount() {
-    ws.addOnmessage('roomMsg', data => {
-      var msg = {
-        from: data.from,
-        msg: data.msg,
-      }
-      this.state.msg.push(msg)
-      setTimeout( () => {
-          this.state.msg.shift();
-          this.setState({msg: this.state.msg});
-        },
-        1000*15
-      );
-      this.setState({ msg: this.state.msg })
-    })
     document.addEventListener('keyup', this.chatBox.bind(this))
   }
 
   componentWillUnmount() {
-    ws.removeOnmessage("roomMsg")
     document.removeEventListener('keyup', this.chatBox.bind(this))
   }
 
@@ -68,10 +52,10 @@ class Chat extends React.Component {
     return (
       <div className="Chat">
         <div className='chatHistory'>
-          {this.state.msg.map((msg, index) => {
+          {this.props.msg.map((msg, index) => {
             return (
               <div className='list' key={index}>
-                <span style={{ color: 'green' }}>[{msg.from}]: </span>
+                <span style={{ color: msg.from == constant.MSG_FROM_SYSTEM ? 'red' : 'green' }}>[{msg.from}]: </span>
                 <span style={{ color: 'white' }}>{msg.msg}</span>
               </div>
             )

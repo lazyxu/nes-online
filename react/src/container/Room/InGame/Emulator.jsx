@@ -9,8 +9,7 @@ import { roomSet, gameTabSet, msgAdd, msgSet, keyboardGet } from '../../../actio
 import Screen from './Common/Screen.jsx'
 import Audio from './Common/Audio.jsx'
 import LocalEmulator from './Local/Emulator.jsx'
-import WebSocketEmulator from './WebSocket/Emulator.jsx'
-import PeerConnectionEmulator from './PeerConnection/Emulator.jsx'
+import OnLineEmulator from './OnLine/Emulator.jsx'
 
 class Emulator extends React.Component {
 
@@ -54,24 +53,18 @@ class Emulator extends React.Component {
               keyboard={this.props.keyboard}
               isRunning={this.props.isRunning}
               nes={this.props.nes}
+              addMsg={this.props.addMsg}
             /> :
-            this.props.playMode == constant.PLAY_MODE_WEBSOCKET ?
-              <WebSocketEmulator
+            this.props.playMode == constant.PLAY_MODE_ONLINE ?
+              <OnLineEmulator
                 id_in_room={this.props.id_in_room}
                 room={this.props.room}
                 keyboard={this.props.keyboard}
                 isRunning={this.props.isRunning}
                 nes={this.props.nes}
+                addMsg={this.props.addMsg}
               /> :
-              this.props.playMode == constant.PLAY_MODE_PEER_CONNECTION ?
-                <PeerConnectionEmulator
-                  id_in_room={this.props.id_in_room}
-                  room={this.props.room}
-                  keyboard={this.props.keyboard}
-                  isRunning={this.props.isRunning}
-                  nes={this.props.nes}
-                /> :
-                <div />
+              <div />
         }
       </div>
     )

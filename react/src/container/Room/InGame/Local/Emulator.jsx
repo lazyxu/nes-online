@@ -1,6 +1,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
+import constant from '../../../../constant.js'
 import ws from '../../../../websocket/index.js'
 import Controller from './Controller.jsx'
 
@@ -12,6 +13,7 @@ class Emulator extends React.Component {
   }
 
   componentDidMount() {
+    this.props.addMsg(constant.MSG_FROM_SYSTEM, '自动调整为单机模式')
     this.frameInterval = setInterval(() => {
       if (this.props.isRunning) {
         this.props.nes.frame()
