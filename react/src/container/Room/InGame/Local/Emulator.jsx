@@ -4,6 +4,7 @@ import { connect } from 'react-redux'
 import constant from '../../../../constant.js'
 import ws from '../../../../websocket/index.js'
 import Controller from './Controller.jsx'
+import Screen from './Screen.jsx'
 
 class Emulator extends React.Component {
 
@@ -20,17 +21,26 @@ class Emulator extends React.Component {
       }
     }, 1000 / 60)
   }
-  
+
   componentWillUnmount() {
     clearInterval(this.frameInterval)
   }
 
+  setOnFrame(func) {
+    this.props.nes.opts.onFrame = func
+  }
+
   render() {
     return (
-      <Controller
-        keyboard={this.props.keyboard}
-        nes={this.props.nes}
-      />
+      <div>
+        <Controller
+          keyboard={this.props.keyboard}
+          nes={this.props.nes}
+        />
+        <Screen
+          setOnFrame={this.setOnFrame.bind(this)}
+        />
+      </div>
     )
   }
 }

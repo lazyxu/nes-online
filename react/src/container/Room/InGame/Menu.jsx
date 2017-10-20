@@ -25,10 +25,10 @@ class Menu extends React.Component {
           <div style={{ textAlign: "center" }}>游戏菜单</div>
           <div className='buttons'>
             {this.props.isRunning ?
-              <button onClick={() => this.props.updateIsRunning(false)}>暂停游戏</button> :
-              <button onClick={() => this.props.updateIsRunning(true)}>继续游戏</button>
+              <button onClick={() => this.props.updateIsRunning(false)} disabled>暂停游戏</button> :
+              <button onClick={() => this.props.updateIsRunning(true)} disabled>继续游戏</button>
             }
-            <button onClick={() => this.props.restart()} >重新开始</button>
+            {<button disabled >重新开始</button>}
             <button disabled>保存游戏</button>
             <button disabled>装载游戏</button>
             {this.props.emulateSound ?

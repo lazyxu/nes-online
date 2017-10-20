@@ -5,6 +5,7 @@ import (
 	"sync"
 	"github.com/MeteorKL/koala/logger"
 	"github.com/MeteorKL/nes-online/util/constant"
+	"time"
 )
 
 type Room struct {
@@ -20,8 +21,15 @@ type Room struct {
 	PlayerCount int32   `json:"player_count"`
 	Players     []*User `json:"players"`
 	HostID      int     `json:"host_id"`
-	operation   [][]int64 // 玩家id，
+
+	operationMutex       sync.RWMutex
+	frameID     int64
+	timer       *time.Ticker
+	operations   [][][]Operation // frameID, idInRoom,
+	operationTemp [][]Operation
 }
+
+type Operation int32
 
 func enterRoom(u *User, r *Room, idInRoom int) {
 	r.mutex.Lock()
@@ -82,9 +90,51 @@ func start(u *User) {
 	}
 }
 
+func (r *Room) loop() {
+	r.operationMutex.Lock()
+	r.timer = time.NewTicker(time.Second / 25)
+	sendRoomMsg(r, map[string]interface{}{
+		"type":      "operation",
+		"frameID":   r.frameID,
+		"operation": r.operationTemp,
+	})
+	r.operationMutex.Unlock()
+	for {
+		select {
+		case <-r.timer.C:
+			r.operationMutex.Lock()
+			sendRoomMsg(r, map[string]interface{}{
+				"type":      "operation",
+				"frameID":   r.frameID,
+				"operation": r.operationTemp,
+			})
+			r.operations = append(r.operations, r.operationTemp)
+			r.operationTemp = [][]Operation{{}, {}}
+			r.frameID += 2
+			r.operationMutex.Unlock()
+		}
+	}
+}
+
+func (r *Room) wsHostStart() {
+	r.operationMutex.Lock()
+	if r.timer == nil {
+		r.frameID = 0
+		go r.loop()
+	}
+	r.operationMutex.Unlock()
+}
+
+func (r *Room) wsHostEnd() {
+	if r.timer != nil {
+		r.timer.Stop()
+	}
+}
+
 func endGame(u *User) {
 	u.room.mutex.Lock()
 	defer u.room.mutex.Unlock()
+	u.room.wsHostEnd()
 	u.StateInRoom = constant.ROOM_PLAYER_STATE_UNREADY
 	updateRoomState(u.room)
 }

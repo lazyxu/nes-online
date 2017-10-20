@@ -3,36 +3,26 @@ import { connect } from 'react-redux'
 
 import constant from '../../../../constant.js'
 import ws from '../../../../websocket/index.js'
-import Controller from './Controller.jsx'
 import operation from './operation.js'
 import peerConnection from './peerConnection.js'
+import P2PHost from './P2PHost.jsx'
+import P2PClient from './P2PClient.jsx'
+import WSClient from './WSClient.jsx'
+import Screen from './Screen.jsx'
 
 class Emulator extends React.Component {
 
   constructor(props) {
     super(props)
-    this.frameInterval = null
+    this.PEER_CONNECTION = 0
+    this.WEBSOCKET = 1
     this.state = {
-      frameCount: 0,
+      connectionType: this.PEER_CONNECTION,
+      chase: false,
     }
     this.delay = 5
     this.localLog = []
-    this.send = null
-    this.receivedLog = new Array(this.props.room.player_count)
-    this.checkPeerCoonInterval = null
-  }
-
-  addOperation(command, state) {
-    // console.log('addOperation')
-    // console.log(this.state.frameCount + this.delay)
-    // console.log(command)
-    // console.log(state)
-    this.localLog.push(operation.encode(
-      this.state.frameCount + this.delay,
-      this.props.id_in_room,
-      command,
-      state
-    ))
+    this.addOperation = null
   }
 
   action(op) {
@@ -52,119 +42,48 @@ class Emulator extends React.Component {
 
   componentWillMount() {
     ws.addOnmessage('protocolSwitch', data => {
-      this.props.addMsg(constant.MSG_FROM_SYSTEM, 'p2p连接失败, 自动调整为websocket模式')
-      if (this.checkPeerCoonInterval!=null) {
-        clearInterval(this.checkPeerCoonInterval)
-      }
-      ws.addOnmessage('operation', data => {
-        this.receivedLog[data.id][data.frameCount - this.state.frameCount] = data.operation
-      })
-      this.send = ws.send
-      this.start()
+      this.setState({ connectionType: this.WEBSOCKET })
     })
   }
 
   componentDidMount() {
-    this.props.addMsg(constant.MSG_FROM_SYSTEM, '正在尝试p2p连接，请等待')
-    // console.log(this.props.room.player_count)
-    window.receivedLog = this.receivedLog
-    for (var i = 0; i < this.props.room.player_count; i++) {
-      this.receivedLog[i] = new Array(this.delay)
-      for (var j = 0; j < this.delay; j++) {
-        this.receivedLog[i][j] = new Array(0)
-      }
-    }
-
-    try {
-      var pc = new peerConnection(this.props.id_in_room, data => {
-        // console.log(data)
-        if (data.type == 'operation') {
-          this.receivedLog[data.id][data.frameCount - this.state.frameCount] = data.operation
-        }
-      })
-      window.pc = pc
-      var count = 0
-      this.checkPeerCoonInterval = setInterval(
-        () => {
-          var state = pc.getState()
-          if (count < 10 && state == peerConnection.CONNECTING) {
-            count++
-            return
-          }
-          if (state == peerConnection.CONNECTED) {
-            this.props.addMsg(constant.MSG_FROM_SYSTEM, 'p2p连接成功')
-            this.send = function (data) {
-              pc.dataChannel.send(JSON.stringify(data))
-            }
-            this.start()
-            clearInterval(this.checkPeerCoonInterval)
-          } else {
-            ws.send({
-              type: 'protocolSwitch',
-              protocol: 'websocket'
-            })
-          }
-        },
-        500
-      )
-    } catch (err) {
-      ws.send({
-        type: 'protocolSwitch',
-        protocol: 'websocket'
-      })
-    }
+    ws.send({
+      type: 'protocolSwitch',
+      connectionType: this.WEBSOCKET,
+    })
   }
 
-  start() {
-    var waitingCount = 0
-    this.frameInterval = setInterval(() => {
-      if (this.props.isRunning) {
-        for (var i = 0; i < this.props.room.player_count; i++) {
-          if (typeof this.receivedLog[i][0] === 'undefined') {
-            waitingCount++
-            if (waitingCount >= 60) {
-              waitingCount -= 60
-              this.props.addMsg(constant.MSG_FROM_SYSTEM, '正在等待玩家' + (i+1) + '的指令传输')
-            }
-            return
-          }
-        }
-        waitingCount = 0
-        this.receivedLog[this.props.id_in_room][this.delay] = this.localLog
-        for (var i = 0; i < this.props.room.player_count; i++) {
-          for (var j = 0; j < this.receivedLog[i][0].length; j++) {
-            this.action(this.receivedLog[i][0][j])
-          }
-          this.receivedLog[i].shift()
-        }
-
-        this.props.nes.frame()
-        this.send({
-          type: 'operation',
-          id: this.props.id_in_room,
-          frameCount: this.state.frameCount + this.delay,
-          operation: this.localLog,
-        })
-        this.localLog = []
-        this.setState({ frameCount: this.state.frameCount + 1 })
-      }
-    }, 1000 / 60)
-  }
   componentWillUnmount() {
     ws.removeOnmessage('protocolSwitch')
-    ws.removeOnmessage('operaion')
-    clearInterval(this.frameInterval)
+  }
+
+  setOnFrame(func) {
+    this.props.nes.opts.onFrame = func
+  }
+
+  setChase(flag) {
+    this.setState({chase: flag})
   }
 
   render() {
     return (
-      <Controller
-        id_in_room={this.state.id_in_room}
-        controller={this.props.controller}
-        nes={this.props.nes}
-        keyboard={this.props.keyboard}
-        addOperation={this.addOperation.bind(this)}
-      />
+      <div>
+        <WSClient
+          room={this.props.room}
+          id_in_room={this.props.id_in_room}
+          controller={this.props.controller}
+          action={this.action.bind(this)}
+          nes={this.props.nes}
+          keyboard={this.props.keyboard}
+          addMsg={this.props.addMsg}
+          isRunning={this.props.isRunning}
+          setChase={this.setChase.bind(this)}
+        />
+        <Screen
+          setOnFrame={this.setOnFrame.bind(this)}
+          chase={this.state.chase}
+        />
+      </div>
     )
   }
 }

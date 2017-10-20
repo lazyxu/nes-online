@@ -18,7 +18,6 @@ func updateRoomState(r *Room) {
 	}
 }
 
-
 func sendRoomList() {
 	h.userMutex.RLock()
 	defer h.userMutex.RUnlock()

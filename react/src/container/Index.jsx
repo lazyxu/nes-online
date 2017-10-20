@@ -98,7 +98,7 @@ class Index extends React.Component {
         <div className="Footer">
           <p>
             <span> Copyright © 2017 </span>
-            <a href="http://MeteorKL.com/"> MeteorKL </a>
+            <a href="http://MeteorKL.com/about.html"> MeteorKL </a>
             <a href="http://www.miibeian.gov.cn/" rel="nofollow" target="_blank"> 浙ICP备 16025067号-1 </a></p>
         </div>
       </div >

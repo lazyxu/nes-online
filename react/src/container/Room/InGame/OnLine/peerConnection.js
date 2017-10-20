@@ -19,7 +19,7 @@ var peerConnection = function (idInRoom, onMessage) {
         }
     })
     if (idInRoom == 0) {
-        this.dataChannel = this.pc.createDataChannel("keyboard");
+        this.dataChannel = this.pc.createDataChannel("nes online");
         console.log("createDataChannel");
         this.pc.createOffer().then(offer => {
             return this.pc.setLocalDescription(offer);

@@ -1,12 +1,12 @@
 package constant
 
-
 const USER_UNLOGIN = -1
 const USER_VISITOR = 0
 const USER_LOGIN = 1
 const USER_MAX = 2
 
 const DEFAULT_AVATAR_URL = "/img/avatar/questionMark.jpg"
+
 var DEFAULT_KEYBOARD = map[string]interface{}{
 	"up":     87,
 	"down":   83,
@@ -30,6 +30,11 @@ const (
 	ROOM_PLAYER_STATE_UNREADY
 	ROOM_PLAYER_STATE_READY
 	ROOM_PLAYER_STATE_IN_GAME
+)
+
+const (
+	PEER_CONNECTION = iota
+	WEBSOCKET
 )
 
 const ROOM_AVATAR_TOPN = "/img/open.png"

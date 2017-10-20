@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"strconv"
 	"encoding/json"
+	"github.com/MeteorKL/nes-online/util/constant"
 )
 
 type User struct {
@@ -92,7 +93,7 @@ func (u *User) Reader() {
 		case "start":
 			u.start()
 		case "save":
-			b, err := json.Marshal(u.room.operation)
+			b, err := json.Marshal(u.room.operations)
 			logger.Error(err)
 			ioutil.WriteFile(u.Name+": "+strconv.Itoa(u.room.ID)+"-"+u.room.Game+".json", b, 0666)
 		case "endGame":
@@ -101,11 +102,18 @@ func (u *User) Reader() {
 			//ioutil.WriteFile(strconv.Itoa(u.room.ID)+"-"+u.room.Game+".json", b, 0666)
 			u.endGame()
 		case "operation":
+			u.room.operationMutex.Lock()
+			u.room.operationTemp[u.IdInRoom] = append(u.room.operationTemp[u.IdInRoom], Operation(m["operation"].(float64)))
+			u.room.operationMutex.Unlock()
 			//id :=int64(m["id"].(float64))
 			//u.room.operation[id] = append(u.room.operation[id], int64( m["operation"].(float64)))
 			u.sendRoomMsg(m, u.Name, false)
 		case "protocolSwitch":
-			u.sendRoomMsg(m, u.Name, true)
+			if m["connectionType"].(float64) == constant.WEBSOCKET {
+				u.room.wsHostStart()
+			} else {
+				u.room.wsHostEnd()
+			}
 		case "roomMsg":
 			u.sendRoomMsg(m, u.Name, true)
 		case "__offer":

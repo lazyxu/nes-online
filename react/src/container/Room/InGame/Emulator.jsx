@@ -6,7 +6,6 @@ import ws from '../../../websocket/index.js'
 import constant from '../../../constant.js'
 import gameApi from '../../../api/game.js'
 import { roomSet, gameTabSet, msgAdd, msgSet, keyboardGet } from '../../../actions/actions'
-import Screen from './Common/Screen.jsx'
 import Audio from './Common/Audio.jsx'
 import LocalEmulator from './Local/Emulator.jsx'
 import OnLineEmulator from './OnLine/Emulator.jsx'
@@ -29,10 +28,6 @@ class Emulator extends React.Component {
   componentWillUnmount() {
   }
 
-  setOnFrame(func) {
-    this.props.nes.opts.onFrame = func
-  }
-
   setOnAudioSample(func) {
     this.props.nes.opts.onAudioSample = func
   }
@@ -40,9 +35,6 @@ class Emulator extends React.Component {
   render() {
     return (
       <div ref='emulator' className='Emulator'>
-        <Screen
-          setOnFrame={this.setOnFrame.bind(this)}
-        />
         <Audio
           emulateSound={this.props.emulateSound}
           setOnAudioSample={this.setOnAudioSample.bind(this)}

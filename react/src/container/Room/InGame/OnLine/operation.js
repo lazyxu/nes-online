@@ -28,7 +28,6 @@ exports.STATE_UNSET = 0
 exports.encode = function (frameCount, id, command, state) {
     return (frameCount << 8) |(id << 5) |(command << 1) |state
 }
-
 exports.frameCount = function (log) {
     return log >> 8
 }

@@ -45,15 +45,17 @@ func createRoom(u *User, game string) int {
 	u.State = "房间中，" + game
 	u.IdInRoom = 0
 	r := &Room{
-		ID:          id,
-		Name:        u.Name,
-		Game:        game,
-		password:    "",
-		State:       constant.ROOM_STATE_NORMAL,
-		PlayerCount: 1,
-		Players:     []*User{u, nil},
-		HostID:      u.IdInRoom,
-		operation:   [][]int64{{}, {}},
+		ID:            id,
+		Name:          u.Name,
+		Game:          game,
+		password:      "",
+		State:         constant.ROOM_STATE_NORMAL,
+		PlayerCount:   1,
+		Players:       []*User{u, nil},
+		HostID:        u.IdInRoom,
+		frameID:       0,
+		operations:    [][][]Operation{},
+		operationTemp: [][]Operation{{}, {}},
 	}
 	h.rooms[id] = r
 	u.room = r
