@@ -1,6 +1,8 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
+import constant from '../../../../constant.js'
+
 class Screen extends React.Component {
 
   constructor(props) {
@@ -39,7 +41,7 @@ class Screen extends React.Component {
     }
     var frameID = 0
     this.props.setOnFrame(buffer => {
-      if (!this.props.chase || frameID%4==0) {
+      if (this.props.chaseFrame==0 || frameID%this.props.chaseFrame==0) {
         var i = 0;
         for (var y = 0; y < 240; ++y) {
           for (var x = 0; x < 256; ++x) {

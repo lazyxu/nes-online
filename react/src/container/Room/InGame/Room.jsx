@@ -47,13 +47,13 @@ class Room extends React.Component {
   }
 
   componentWillMount() {
+    this.updatePlayMode()
   }
 
   componentDidMount() {
     ws.addOnmessage('roomMsg', data =>
       this.addMsg(data.from, data.msg)
     )
-    this.updatePlayMode()
     this.restart()
   }
 

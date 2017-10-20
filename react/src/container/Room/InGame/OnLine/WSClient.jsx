@@ -55,11 +55,7 @@ class WSClient extends React.Component {
           this.setState({ frameID: this.state.frameID + 1 })
           this.receivedLog.shift()
         } else {
-          if (this.receivedLog.length>2) {
-            this.props.setChase(true)
-          } else {
-            this.props.setChase(false)
-          }
+          this.props.setChaseFrame(this.receivedLog.length / 4)
           if (typeof this.receivedLog[0] === 'undefined') {
             waitingCount++
             if (waitingCount >= 60) {

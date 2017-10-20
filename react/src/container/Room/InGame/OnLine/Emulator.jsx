@@ -18,7 +18,7 @@ class Emulator extends React.Component {
     this.WEBSOCKET = 1
     this.state = {
       connectionType: this.PEER_CONNECTION,
-      chase: false,
+      chaseFrame: 0,
     }
     this.delay = 5
     this.localLog = []
@@ -61,8 +61,8 @@ class Emulator extends React.Component {
     this.props.nes.opts.onFrame = func
   }
 
-  setChase(flag) {
-    this.setState({chase: flag})
+  setChaseFrame(frame) {
+    this.setState({chaseFrame: frame})
   }
 
   render() {
@@ -77,11 +77,11 @@ class Emulator extends React.Component {
           keyboard={this.props.keyboard}
           addMsg={this.props.addMsg}
           isRunning={this.props.isRunning}
-          setChase={this.setChase.bind(this)}
+          setChaseFrame={this.setChaseFrame.bind(this)}
         />
         <Screen
           setOnFrame={this.setOnFrame.bind(this)}
-          chase={this.state.chase}
+          chaseFrame={this.state.chaseFrame}
         />
       </div>
     )
