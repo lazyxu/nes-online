@@ -26,6 +26,9 @@ import userApi from './utils/api/user.js'
 //   }
 // }
 
+var App = document.createElement('div');
+document.body.appendChild(App);
+
 ReactDOM.render(
   <div>
     <Provider store={store}>
@@ -37,11 +40,11 @@ ReactDOM.render(
           <Route path="/roomList" component={RoomList} />
           <Route path="/active/:active_code" component={Active} />
           <Route path="/resetPassword/:verifyCode" component={ResetPassword} />
-          <Route path="/setting" component={Setting} />
+          <Route path="/settings" component={Setting} />
           <Route path="/room/:roomID" component={Room} />
         </Route>
       </Router>
     </Provider>
   </div>,
-  document.getElementById('App')
+  App
 );

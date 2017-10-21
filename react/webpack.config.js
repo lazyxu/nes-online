@@ -1,11 +1,12 @@
 var path = require('path');
 var webpack = require('webpack');
+var HtmlWebpackPlugin = require('html-webpack-plugin');
 
 var ROOT_PATH = path.resolve(__dirname);
 var APP_PATH = path.resolve(ROOT_PATH, 'src');
 var BUILD_PATH = path.resolve(ROOT_PATH, '../static/js/');
 
-module.exports= {
+module.exports = {
   entry: {
     bundle: './src/App.jsx',
     react: [
@@ -17,11 +18,11 @@ module.exports= {
   },
   output: {
     path: BUILD_PATH,
-    filename: '[name].js',
-    publicPath: '/static/'
+    filename: '[name].[chunkhash:8].js',
+    publicPath: '/js/'
   },
   resolve: {
-      extensions: ['', '.js', '.jsx']
+    extensions: ['', '.js', '.jsx']
   },
   module: {
     loaders: [
@@ -38,8 +39,13 @@ module.exports= {
   },
   // devtool: 'eval-source-map',
   plugins: [
+    new HtmlWebpackPlugin({
+      title: 'NES Online',
+      filename: '../index.html',
+      // template: 'index.html' // 模板路径
+    }),
     new webpack.optimize.CommonsChunkPlugin({
-      name: ["react"],
+      name: ["react", 'manifest'],
       minChunks: Infinity,
     }),
     // new webpack.HotModuleReplacementPlugin(),
@@ -53,10 +59,9 @@ module.exports= {
       }
     }),
     new webpack.DefinePlugin({
-        __DEBUG__: JSON.stringify(JSON.parse(process.env.DEBUG || 'false')),
-        "process.env": {
-          NODE_ENV: JSON.stringify("production")
-        }
+      "process.env": {
+        NODE_ENV: JSON.stringify("production")
+      }
     })
   ]
 }
