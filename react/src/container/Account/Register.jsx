@@ -53,8 +53,8 @@ class Register extends React.Component {
 
   checkName() {
     var name = this.refs.name.value
-    if (name == "") {
-      this.setState({ checkName: { color: 'red', value: '请填写你的昵称' }, buttonEnable: false })
+    if (name.trim() == "") {
+      this.setState({ checkName: { color: 'red', value: '昵称不能为空' }, buttonEnable: false })
     } else if (name.indexOf('@') > 0) {
       this.setState({ checkName: { color: 'red', value: '用户名中不允许包含@' }, buttonEnable: false })
     } else {

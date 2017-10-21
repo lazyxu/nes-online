@@ -21,6 +21,10 @@ class VisitorLogin extends React.Component {
 
   login() {
     var name = this.refs.name.value
+    if (name.trim() == '') {
+      this.setState({ login: { color: 'red', value: '昵称不能为空' } })
+      return
+    }
     userApi.visitorLogin(name).then(resp => {
       if (resp.error) {
         this.setState({ login: { color: 'red', value: resp.msg } })
@@ -38,12 +42,12 @@ class VisitorLogin extends React.Component {
     return (
       <div className="MaskLayer">
         <div className='Form'>
-          <span className="Close" onClick={()=>this.props.tabSet('')}>X</span>
+          <span className="Close" onClick={() => this.props.tabSet('')}>X</span>
           <h1>游客登录</h1>
-          <input type='text' placeholder='为自己取个昵称吧' ref='name' autoComplete="off" autoFocus onKeyUp={e => { if (e.keyCode == 13) this.login() }}/>
+          <input type='text' placeholder='为自己取个昵称吧' ref='name' autoComplete="off" autoFocus onKeyUp={e => { if (e.keyCode == 13) this.login() }} />
           <div className='link'>
-            <a onClick={()=>this.props.tabSet('Register')}  className='leftLink'>注册账号</a>
-            <a onClick={()=>this.props.tabSet('Login')}  className='rightLink'>已有账号,登录</a>
+            <a onClick={() => this.props.tabSet('Register')} className='leftLink'>注册账号</a>
+            <a onClick={() => this.props.tabSet('Login')} className='rightLink'>已有账号,登录</a>
           </div>
           <button type='button' className='enableButton' onClick={this.login.bind(this)}>游客登录</button>
           <div className='msg' style={{ "color": this.state.login.color }}>{this.state.login.value}</div>
