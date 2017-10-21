@@ -70,10 +70,10 @@ func (u *User) Reader() {
 		if err != nil {
 			break
 		}
-		//if m["type"] != "operation" {
+		if m["type"] != "operation" {
 			logger.Debug(m["type"])
 			logger.Debug(m)
-		//}
+		}
 		switch m["type"] {
 		case "getRoomList":
 			u.msg <- map[string]interface{}{

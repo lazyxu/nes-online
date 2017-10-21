@@ -1,6 +1,9 @@
 # NES Online
 <img src="logs/2.png" width="100%"/>
 
+## 已知bug
+* 房间状态
+
 ## TODO
 * 本地模式支持两个玩家的按键
 * 保存游戏，装载游戏

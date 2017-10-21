@@ -26,16 +26,16 @@
   text-align: center;
 }
 .Form > input:-moz-placeholder {
-    color: #b9b9b9;
+    color: #595959;
 }
 .Form > input::-moz-placeholder {
-    color: #b9b9b9;
+    color: #595959;
 }
 .Form > input:-ms-input-placeholder {
-    color: #b9b9b9;
+    color: #595959;
 }
 .Form > input::-webkit-input-placeholder {
-    color: #b9b9b9;
+    color: #595959;
 }
 .Form > input {
   position: relative;
@@ -74,7 +74,7 @@
 .link > .leftLink,
 .link > .rightLink {
   text-decoration: none;
-  color: #b9b9b9;
+  color: #595959;
   font-size: 15px;
   margin-bottom: 15px;
 }
@@ -104,7 +104,7 @@
   -webkit-border-radius: 6px;
 }
 .Form > .disableButton {
-  background: #b9b9b9;
+  background: #595959;
 }
 .Form > .enableButton {
   background: #1AD996;

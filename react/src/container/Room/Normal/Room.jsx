@@ -46,7 +46,7 @@ class Room extends React.Component {
 
   leaveRoom() {
     ws.send({ type: 'leaveRoom' })
-    history.go(-1)
+    location.href = '#/roomList/'
   }
   ready() {
     ws.send({ "type": "ready" });

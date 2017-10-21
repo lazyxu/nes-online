@@ -19,8 +19,8 @@ func updateRoomState(r *Room) {
 }
 
 func sendRoomList() {
-	h.userMutex.RLock()
-	defer h.userMutex.RUnlock()
+	h.roomMutex.RLock()
+	defer h.roomMutex.RUnlock()
 	for _, users := range h.users {
 		for _, user := range users {
 			if user.msg == nil {

@@ -31,24 +31,26 @@ class RoomList extends React.Component {
   }
 
   enter(id) {
-    location.href = '#/room/' + this.state.roomList[id].id
+    location.href = '#/room/' + id
   }
 
   render() {
     var roomList = []
+    var count = 0
     for (var i in this.state.roomList) {
       var room = this.state.roomList[i]
       roomList.push(
-        <tbody key={i} onClick={() => this.enter(i)}>
-          <tr className={i & 1 ? 'even' : 'odd'}>
-            <td>{room.id}</td>
-            <td>{room.players[room.host_id].name}</td>
-            <td>{room.game}</td>
-            <td>{room.player_count+'/'+room.players.length}</td>
-            <td>{constant.ROOM_STATE_TEXT[room.state]}</td>
+        <tbody key={room.id}>
+          <tr className={count & 1 ? 'even' : 'odd'}>
+            <td><a href={'#/room/'+room.id}>{room.id}</a></td>
+            <td><a href={'#/room/'+room.id}>{room.players[room.host_id].name}</a></td>
+            <td><a href={'#/room/'+room.id}>{room.game}</a></td>
+            <td><a href={'#/room/'+room.id}>{room.player_count+'/'+room.players.length}</a></td>
+            <td><a href={'#/room/'+room.id}>{constant.ROOM_STATE_TEXT[room.state]}</a></td>
           </tr>
         </tbody>
       )
+      count++
     }
 
     return (

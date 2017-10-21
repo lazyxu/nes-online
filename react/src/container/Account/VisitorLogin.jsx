@@ -39,7 +39,7 @@ class VisitorLogin extends React.Component {
       <div className="MaskLayer">
         <div className='Form'>
           <span className="Close" onClick={()=>this.props.tabSet('')}>X</span>
-          <h1>请先登录</h1>
+          <h1>游客登录</h1>
           <input type='text' placeholder='为自己取个昵称吧' ref='name' autoComplete="off" autoFocus onKeyUp={e => { if (e.keyCode == 13) this.login() }}/>
           <div className='link'>
             <a onClick={()=>this.props.tabSet('Register')}  className='leftLink'>注册账号</a>
