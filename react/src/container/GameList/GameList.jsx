@@ -2,9 +2,9 @@ import React from 'react'
 import { connect } from 'react-redux'
 
 import './GameList.scss'
-import gameApi from '../../api/game.js'
+import gameApi from '../../utils/api/game.js'
 import Scroll from '../../components/Scroll.jsx'
-import { gameSet, tabSet } from '../../actions/actions'
+import { gameSet, tabSet } from '../../utils/actions/index.js'
 
 class GameList extends React.Component {
 

@@ -2,10 +2,10 @@ import React from 'react'
 import { connect } from 'react-redux'
 
 import './RoomList.scss'
-import ws from '../../websocket/index.js'
-import constant from '../../constant.js'
+import ws from '../../utils/websocket/index.js'
+import constant from '../../utils/constant.js'
 import Scroll from '../../components/Scroll.jsx'
-import { roomListSet } from '../../actions/actions.js'
+import { roomListSet } from '../../utils/actions/index.js'
 
 class RoomList extends React.Component {
 

@@ -1,9 +1,9 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
-import constant from '../../../../constant.js'
-import ws from '../../../../websocket/index.js'
-import jsnes from '../../../../jsnes/index.js'
+import constant from '../../../../utils/constant.js'
+import ws from '../../../../utils/websocket/index.js'
+import jsnes from '../../../../utils/jsnes/index.js'
 import Screen from './Screen.jsx'
 import operation from './operation.js'
 

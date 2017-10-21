@@ -2,8 +2,7 @@ import React from 'react'
 import { Link } from 'react-router'
 
 import './Form.scss'
-import utils from './utils'
-import userApi from '../../api/user.js'
+import userApi from '../../utils/api/user.js'
 
 export default class ChangePassword extends React.Component {
   constructor(props) {

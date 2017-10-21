@@ -3,7 +3,7 @@ import { Link } from 'react-router'
 import { browserHistory } from 'react-router'
 
 import './Form.scss'
-import userApi from '../../api/user.js'
+import userApi from '../../utils/api/user.js'
 
 export default class Active extends React.Component {
   constructor(props) {

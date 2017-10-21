@@ -1,7 +1,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
-import constant from '../../../../constant.js'
+import constant from '../../../../utils/constant.js'
 
 class Screen extends React.Component {
 

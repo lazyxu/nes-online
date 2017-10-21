@@ -2,10 +2,10 @@ import React from 'react'
 import { connect } from 'react-redux'
 
 import './KeyboardSetting.scss'
-import ws from '../../../websocket/index.js'
-import constant from '../../../constant.js'
-import keyboardApi from '../../../api/keyboard.js'
-import { roomSet, gameTabSet, tabSet, keyboardSet } from '../../../actions/actions'
+import ws from '../../../utils/websocket/index.js'
+import constant from '../../../utils/constant.js'
+import keyboardApi from '../../../utils/api/keyboard.js'
+import { roomSet, gameTabSet, tabSet, keyboardSet } from '../../../utils/actions/index.js'
 
 class KeyboardSetting extends React.Component {
 

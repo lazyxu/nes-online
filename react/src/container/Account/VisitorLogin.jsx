@@ -5,11 +5,9 @@ import { connect } from 'react-redux'
 import { browserHistory } from 'react-router'
 
 import './Form.scss'
-
-import utils from './utils'
-import userApi from '../../api/user.js'
-import { userSet, tabSet } from '../../actions/actions'
-import ws from '../../websocket/index.js'
+import userApi from '../../utils/api/user.js'
+import { userSet, tabSet } from '../../utils/actions/index.js'
+import ws from '../../utils/websocket/index.js'
 
 class VisitorLogin extends React.Component {
   constructor(props) {

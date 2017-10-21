@@ -1,9 +1,9 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
-import jsnes from '../../../../jsnes/index.js'
-import ws from '../../../../websocket/index.js'
-import constant from '../../../../constant.js'
+import jsnes from '../../../../utils/jsnes/index.js'
+import ws from '../../../../utils/websocket/index.js'
+import constant from '../../../../utils/constant.js'
 import operation from './operation.js'
 
 class Controller extends React.Component {

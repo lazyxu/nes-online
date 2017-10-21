@@ -1,7 +1,7 @@
 import ajax from './ajax.js';
 import config from '../config';
 import store from '../../store.js'
-import actions from '../../actions/actions.js'
+import actions from '../../actions/index.js'
 
 exports.settingUpdate = (name, keyboard, callback) => {
   var url = config.apiServer+'/settingUpdate';

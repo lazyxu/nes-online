@@ -2,10 +2,10 @@ import React from 'react'
 import { connect } from 'react-redux'
 
 import './GameInfo.scss'
-import roomApi from '../../api/room.js'
-import userApi from '../../api/user.js'
-import ws from '../../websocket/index.js'
-import { roomSet, tabSet } from '../../actions/actions'
+import roomApi from '../../utils/api/room.js'
+import userApi from '../../utils/api/user.js'
+import ws from '../../utils/websocket/index.js'
+import { roomSet, tabSet } from '../../utils/actions/index.js'
 
 class GameInfo extends React.Component {
 

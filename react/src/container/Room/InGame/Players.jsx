@@ -2,9 +2,9 @@ import React from 'react'
 import { connect } from 'react-redux'
 
 import './Players.scss'
-import ws from '../../../websocket/index.js'
-import constant from '../../../constant.js'
-import { roomSet, gameTabSet } from '../../../actions/actions'
+import ws from '../../../utils/websocket/index.js'
+import constant from '../../../utils/constant.js'
+import { roomSet, gameTabSet } from '../../../utils/actions/index.js'
 
 class Players extends React.Component {
 

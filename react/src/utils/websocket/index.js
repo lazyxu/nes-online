@@ -1,7 +1,5 @@
-import user from './onmessage/user.js'
-import room from './onmessage/room.js'
 import store from '../store.js'
-import actions from '../actions/actions.js'
+import actions from '../actions/index.js'
 import constant from '../constant.js'
 
 var ws = null
@@ -16,8 +14,6 @@ exports.create = () => {
 
   ws.onopen = () => {
     console.log("WebSocket已经打开...")
-    user.handler(wsHandler)
-    room.handler(wsHandler)
   }
 
   ws.onmessage = (e) => {

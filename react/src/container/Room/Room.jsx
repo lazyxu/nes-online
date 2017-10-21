@@ -1,14 +1,14 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
-import userApi from '../../api/user.js'
-import gameApi from '../../api/game.js'
-import keyboardApi from '../../api/keyboard.js'
-import ws from '../../websocket/index.js'
-import constant from '../../constant.js'
+import userApi from '../../utils/api/user.js'
+import gameApi from '../../utils/api/game.js'
+import keyboardApi from '../../utils/api/keyboard.js'
+import ws from '../../utils/websocket/index.js'
+import constant from '../../utils/constant.js'
 import Normal from './Normal/Room.jsx'
 import InGame from './InGame/Room.jsx'
-import jsnes from '../../jsnes/index.js'
+import jsnes from '../../utils/jsnes/index.js'
 
 class Room extends React.Component {
 

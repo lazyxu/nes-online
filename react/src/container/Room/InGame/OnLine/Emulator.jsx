@@ -1,8 +1,8 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
-import constant from '../../../../constant.js'
-import ws from '../../../../websocket/index.js'
+import constant from '../../../../utils/constant.js'
+import ws from '../../../../utils/websocket/index.js'
 import P2PHost from './P2PHost.jsx'
 import P2PClient from './P2PClient.jsx'
 import WSClient from './WSClient.jsx'

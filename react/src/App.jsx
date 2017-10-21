@@ -4,7 +4,7 @@ import { Provider } from 'react-redux'
 import { Router, Route, IndexRoute, hashHistory } from 'react-router'
 import { connect } from 'react-redux'
 
-import './main.scss'
+import './App.scss'
 import Index from './container/Index.jsx'
 import GameInfo from './container/GameInfo/GameInfo'
 import GameList from './container/GameList/GameList'
@@ -12,14 +12,13 @@ import RoomList from './container/RoomList/RoomList'
 
 import Active from './container/Account/Active'
 import ResetPassword from './container/Account/ResetPassword'
-import SettingAccount from './container/Setting/Account'
+import Setting from './container/Setting/Setting'
 import Room from './container/Room/Room'
-import actions from './actions/actions'
-import store from './store.js'
+import actions from './utils/actions/index.js'
+import store from './utils/store.js'
 
-
-import constant from './constant.js'
-import userApi from './api/user.js'
+import constant from './utils/constant.js'
+import userApi from './utils/api/user.js'
 
 // const requireAuth = (nextState, replace) => {
 //   if (store.getState().user.type == constant.USER_UNLOGIN) {
@@ -38,7 +37,7 @@ ReactDOM.render(
           <Route path="/roomList" component={RoomList} />
           <Route path="/active/:active_code" component={Active} />
           <Route path="/resetPassword/:verifyCode" component={ResetPassword} />
-          <Route path="/settings/account" component={SettingAccount} />
+          <Route path="/setting" component={Setting} />
           <Route path="/room/:roomID" component={Room} />
         </Route>
       </Router>

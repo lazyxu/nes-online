@@ -2,9 +2,9 @@ import React from "react"
 import { connect } from "react-redux"
 
 import "./Form.scss"
-import userApi from "../../api/user.js"
-import constant from "../../constant.js"
-import { userSet } from "../../actions/actions"
+import userApi from "../../utils/api/user.js"
+import constant from "../../utils/constant.js"
+import { userSet } from "../../utils/actions/index.js"
 
 class Logout extends React.Component {
   constructor(props) {

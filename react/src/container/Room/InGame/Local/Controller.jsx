@@ -1,7 +1,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
-import jsnes from '../../../../jsnes/index.js'
+import jsnes from '../../../../utils/jsnes/index.js'
 class Controller extends React.Component {
 
   constructor(props) {

@@ -2,7 +2,7 @@ import React from 'react'
 import { connect } from 'react-redux'
 
 import './Menu.scss'
-import ws from '../../../websocket/index.js'
+import ws from '../../../utils/websocket/index.js'
 
 class Menu extends React.Component {
 

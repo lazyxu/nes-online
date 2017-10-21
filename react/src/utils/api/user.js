@@ -1,6 +1,6 @@
 import ajax from './ajax.js'
 import store from '../store.js'
-import actions from '../actions/actions.js'
+import actions from '../actions/index.js'
 import constant from '../constant.js'
 import ws from '../websocket/index.js'
 

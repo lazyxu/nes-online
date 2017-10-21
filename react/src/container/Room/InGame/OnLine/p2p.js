@@ -1,4 +1,4 @@
-import ws from '../../../../websocket/index.js'
+import ws from '../../../../utils/websocket/index.js'
 
 var P2P = function () {
   var PeerConnection = window.RTCPeerConnection || window.mozRTCPeerConnection || window.webkitRTCPeerConnection

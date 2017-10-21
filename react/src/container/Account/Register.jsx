@@ -3,9 +3,8 @@ import { Link } from 'react-router'
 import { connect } from 'react-redux'
 
 import './Form.scss'
-import utils from './utils'
-import userApi from '../../api/user.js'
-import {tabSet } from '../../actions/actions'
+import userApi from '../../utils/api/user.js'
+import {tabSet } from '../../utils/actions/index.js'
 
 class Register extends React.Component {
   constructor(props) {

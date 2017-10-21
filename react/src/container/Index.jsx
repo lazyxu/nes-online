@@ -3,15 +3,15 @@ import { connect } from 'react-redux'
 import { hashHistory } from 'react-router'
 
 import './Index.scss'
-import userApi from '../api/user.js'
-import constant from '../constant.js'
+import userApi from '../utils/api/user.js'
+import constant from '../utils/constant.js'
 import Login from './Account/Login'
 import VisitorLogin from './Account/VisitorLogin'
 import Register from './Account/Register'
 import ForgetPassword from './Account/ForgetPassword'
-import { userSet, tabSet } from '../actions/actions'
-import ws from '../websocket/index.js'
-// import jsnes from '../jsnes/index.js'
+import { userSet, tabSet } from '../utils/actions/index.js'
+import ws from '../utils/websocket/index.js'
+// import jsnes from '../utils/jsnes/index.js'
 
 class Index extends React.Component {
 
@@ -71,20 +71,19 @@ class Index extends React.Component {
           <a href="#/gameList">
             NES Online
           </a>
-          {userType == -1 ?
+          {userType == constant.USER_UNLOGIN ?
             <div className="Navbar">
               <a onClick={() => this.props.tabSet('VisitorLogin')}>游客登录</a><span> | </span>
               <a onClick={() => this.props.tabSet('Register')}>注册</a><span> | </span>
               <a className="CurrentLocation" onClick={() => this.props.tabSet('Login')}>登录</a>
             </div> :
-            (userType == 0 ?
+            (userType == constant.USER_VISITOR ?
               <div className="Navbar">
-                <a href="#/settings/account">设置</a><span> | </span>
                 <a onClick={() => this.logout()}>注销</a><span> | </span>
                 <span> {userName} </span>
               </div> :
               <div className="Navbar">
-                <a href="#/settings/account">设置</a><span> | </span>
+                <a href="#/setting">设置</a><span> | </span>
                 <a onClick={() => this.logout()}>注销</a><span> | </span>
                 <span>{userName}</span>
                 {/* <img src={userAvatar} /> */}

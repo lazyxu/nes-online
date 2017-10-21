@@ -7,8 +7,8 @@ import { browserHistory } from 'react-router'
 import './Form.scss'
 
 import utils from './utils'
-import userApi from '../../api/user.js'
-import { userSet } from '../../actions/actions'
+import userApi from '../../utils/api/user.js'
+import { userSet } from '../../utils/actions/index.js'
 import ws from '../../utils/websocket.js'
 
 class Login extends React.Component {
