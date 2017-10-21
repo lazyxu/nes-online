@@ -18,6 +18,7 @@ class Emulator extends React.Component {
     this.frameInterval = setInterval(() => {
       if (this.props.isRunning) {
         this.props.nes.frame()
+        this.props.addFrameID()
       }
     }, 1000 / 60)
   }

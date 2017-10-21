@@ -25,6 +25,7 @@ class Room extends React.Component {
     this.state = {
       tab: "",
       isRunning: true,
+      frameID: 0,
       emulateSound: this.props.nes.opts.emulateSound,
       playMode: constant.PLAY_MODE_ONLINE,
       msg: [],
@@ -103,6 +104,10 @@ class Room extends React.Component {
     this.props.nes.reloadROM()
   }
 
+  addFrameID() {
+    this.setState({frameID: this.state.frameID+1})
+  }
+
   render() {
     return (
       <div className='Room-InGame'>
@@ -127,11 +132,13 @@ class Room extends React.Component {
               <div />
         }
         <div className='buttons'>
-          <button disabled>任务</button>
-          <button onClick={() => { this.setState({ tab: this.Menu }); }}>菜单</button>
-          <Timer />
-          <button onClick={() => { this.setState({ tab: this.Players }) }}>玩家</button>
           <button onClick={() => { this.setState({ tab: this.KeyboardSetting }) }}>按键设置</button>
+          <button onClick={() => { this.setState({ tab: this.Menu }); }}>菜单</button>
+          <Timer 
+            frameID={this.state.frameID}
+          />
+          <button onClick={() => { this.setState({ tab: this.Players }) }}>玩家</button>
+          <input type='text' value={this.props.room.game} className="Timer" disabled />
         </div>
         <div className='window' ref='window' id='window' tabIndex="0">
           <Emulator
@@ -143,6 +150,8 @@ class Room extends React.Component {
             playMode={this.state.playMode}
             nes={this.props.nes}
             addMsg={this.addMsg.bind(this)}
+            frameID={this.state.frameID}
+            addFrameID={this.addFrameID.bind(this)}
           />
           <Chat
             msg={this.state.msg}

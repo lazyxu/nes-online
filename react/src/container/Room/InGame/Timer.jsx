@@ -6,29 +6,21 @@ class Timer extends React.Component {
 
   constructor(props) {
     super(props);
-    this.state = {
-      time: 0,
-    }
   }
 
   componentDidMount() {
-    this.interval = setInterval( () => {
-          this.setState({time: this.state.time+1});
-        },
-        1000
-    );
   }
 
   render() {
-    var second = parseInt(this.state.time%60);
+    var second = parseInt((this.props.frameID/60)%60);
     if(second < 10){
       second = "0" + second;
     }
-    var minutes = parseInt(this.state.time/60%60);
+    var minutes = parseInt((this.props.frameID/60)/60%60);
     if(minutes < 10){
       minutes = "0" + minutes;
     }
-    var hour = parseInt(this.state.time/3600);
+    var hour = parseInt((this.props.frameID/60)/3600);
     if(hour < 10){
       hour = "0" + hour;
     }

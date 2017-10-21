@@ -45,7 +45,7 @@ func UserHandler(ws *websocket.Conn, user map[string]interface{}) {
 	// server send Msg to client
 	go func(u *User) {
 		for m := range u.msg {
-			if m["type"] != "operation" {
+			if m["type"] != "operationTemp" {
 				logger.Debug(m["type"])
 				logger.Debug(m)
 			}
@@ -70,10 +70,10 @@ func (u *User) Reader() {
 		if err != nil {
 			break
 		}
-		if m["type"] != "operation" {
+		//if m["type"] != "operation" {
 			logger.Debug(m["type"])
 			logger.Debug(m)
-		}
+		//}
 		switch m["type"] {
 		case "getRoomList":
 			u.msg <- map[string]interface{}{
@@ -109,6 +109,7 @@ func (u *User) Reader() {
 			//u.room.operation[id] = append(u.room.operation[id], int64( m["operation"].(float64)))
 			u.sendRoomMsg(m, u.Name, false)
 		case "protocolSwitch":
+			u.sendRoomMsg(m, u.Name, true)
 			if m["connectionType"].(float64) == constant.WEBSOCKET {
 				u.room.wsHostStart()
 			} else {

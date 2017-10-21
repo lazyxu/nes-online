@@ -27,6 +27,9 @@ exports.MSG_FROM_SYSTEM = '系统'
 exports.PLAY_MODE_LOCAL = 0
 exports.PLAY_MODE_ONLINE = 1
 
+exports.CONNECTION_TYPE_PEER_CONNECTION = 0
+exports.CONNECTION_TYPE_WEB_SOCKET = 1
+
 exports.DEFAULT_KEYBOARD = {
 	"up": 87,
 	"down": 83,

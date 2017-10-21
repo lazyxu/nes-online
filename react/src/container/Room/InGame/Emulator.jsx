@@ -46,6 +46,7 @@ class Emulator extends React.Component {
               isRunning={this.props.isRunning}
               nes={this.props.nes}
               addMsg={this.props.addMsg}
+              addFrameID={this.props.addFrameID}
             /> :
             this.props.playMode == constant.PLAY_MODE_ONLINE ?
               <OnLineEmulator
@@ -55,6 +56,8 @@ class Emulator extends React.Component {
                 isRunning={this.props.isRunning}
                 nes={this.props.nes}
                 addMsg={this.props.addMsg}
+                frameID={this.props.frameID}
+                addFrameID={this.props.addFrameID}
               /> :
               <div />
         }

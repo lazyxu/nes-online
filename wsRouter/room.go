@@ -93,18 +93,13 @@ func start(u *User) {
 func (r *Room) loop() {
 	r.operationMutex.Lock()
 	r.timer = time.NewTicker(time.Second / 25)
-	sendRoomMsg(r, map[string]interface{}{
-		"type":      "operation",
-		"frameID":   r.frameID,
-		"operation": r.operationTemp,
-	})
 	r.operationMutex.Unlock()
 	for {
 		select {
 		case <-r.timer.C:
 			r.operationMutex.Lock()
 			sendRoomMsg(r, map[string]interface{}{
-				"type":      "operation",
+				"type":      "operationTemp",
 				"frameID":   r.frameID,
 				"operation": r.operationTemp,
 			})
