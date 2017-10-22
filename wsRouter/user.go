@@ -7,6 +7,7 @@ import (
 	"strconv"
 	"encoding/json"
 	"github.com/MeteorKL/nes-online/util/constant"
+	"runtime/debug"
 )
 
 type User struct {
@@ -38,20 +39,17 @@ func UserHandler(ws *websocket.Conn, user map[string]interface{}) {
 		}
 	}
 	defer func() {
-		if u != nil {
-			u.out()
+		u.out()
+		if err := recover(); err != nil {
+			logger.Warn("PANIC")
+			logger.Warn(err)
+			debug.PrintStack()
 		}
 	}()
 	// server send Msg to client
 	go func(u *User) {
-		defer func() {
-			if u != nil {
-				u.out()
-			}
-		}()
 		for m := range u.msg {
 			if m["type"] != "operationTemp" {
-				logger.Debug(m["type"])
 				logger.Debug(m)
 			}
 			err := u.ws.WriteJSON(m)
@@ -76,7 +74,6 @@ func (u *User) Reader() {
 			break
 		}
 		if m["type"] != "operation" {
-			logger.Debug(m["type"])
 			logger.Debug(m)
 		}
 		switch m["type"] {
@@ -138,7 +135,6 @@ func (u *User) Reader() {
 func (u *User) out() {
 	u.leaveRoom()
 	delUser(u)
-	close(u.msg)
 	logger.Debug("玩家 " + u.Name + " 离开了平台")
 }
 
@@ -149,13 +145,13 @@ func (u *User) broadcast(m map[string]interface{}) {
 	for _, users := range h.users {
 		for _, user := range users {
 			if user.msg == nil {
-				logger.Info(user.Name+" channel is nil")
-				user.out()
+				logger.Warn(user.Name+" channel is nil")
+				continue
 			}
 			select {
 			case user.msg <- m:
 			default:
-				logger.Warn("channel is full !")
+				logger.Warn(user.Name+" channel is full")
 			}
 		}
 	}

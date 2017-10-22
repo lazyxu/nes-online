@@ -47,13 +47,6 @@ class WSClient extends React.Component {
     ws.removeOnmessage('operationTemp')
   }
 
-  addOnmessage(type, handler) {
-  }
-
-  removeOnmessage(type) {
-    ws.removeOnmessage(type)
-  }
-
   render() {
     return (
       <div>
@@ -65,8 +58,6 @@ class WSClient extends React.Component {
         />
         <FrameInterval
           nes={this.props.nes}
-          addOnmessage={this.addOnmessage.bind(this)}
-          removeOnmessage={this.removeOnmessage.bind(this)}
           addMsg={this.props.addMsg}
           isRunning={this.props.isRunning}
           frameID={this.props.frameID}

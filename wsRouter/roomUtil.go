@@ -24,8 +24,8 @@ func sendRoomList() {
 	for _, users := range h.users {
 		for _, user := range users {
 			if user.msg == nil {
-				logger.Info("channel is nil")
-				user.out()
+				logger.Warn(user.Name+" channel is nil")
+				continue
 			}
 			if user.State == "在线" {
 				select {
@@ -34,7 +34,7 @@ func sendRoomList() {
 					"roomList": h.rooms,
 				}:
 				default:
-					logger.Warn("channel is full !")
+					logger.Warn(user.Name+" channel is full")
 				}
 			}
 		}

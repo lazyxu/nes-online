@@ -285,7 +285,7 @@ func (u *User) sendRoomMsg(m map[string]interface{}, from string, sendToSelf boo
 		}
 		if user.msg==nil {
 			logger.Debug(user.Name+" channel is nil")
-			user.out()
+			//user.out()
 		}
 		select {
 		case user.msg <- m:
@@ -305,14 +305,14 @@ func sendRoomMsg(r *Room, m map[string]interface{}) {
 		if user == nil {
 			continue
 		}
-		if user.msg==nil {
-			logger.Debug(user.Name+" channel is nil")
-			user.out()
+		if user.msg == nil {
+			logger.Warn(user.Name+" channel is nil")
+			continue
 		}
 		select {
 		case user.msg <- m:
 		default:
-			logger.Warn("channel is full !")
+			logger.Warn(user.Name+" channel is full")
 		}
 	}
 }
@@ -327,6 +327,10 @@ func enterRoomMsg(r *Room, m map[string]interface{}) {
 		if user == nil {
 			continue
 		}
+		if user.msg == nil {
+			logger.Warn(user.Name+" channel is nil")
+			continue
+		}
 		select {
 		case user.msg <- m:
 			user.msg <- map[string]interface{}{
@@ -334,7 +338,7 @@ func enterRoomMsg(r *Room, m map[string]interface{}) {
 				"id_in_room": user.IdInRoom,
 			}
 		default:
-			user.out()
+			logger.Warn(user.Name+" channel is full")
 		}
 	}
 }

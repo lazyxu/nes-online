@@ -104,14 +104,6 @@ class P2PHost extends React.Component {
     clearInterval(this.sendOperationsInterval)
   }
 
-  addOnmessage(type, handler) {
-    this.p2p.addOnmessage(type, handler)
-  }
-
-  removeOnmessage(type) {
-    this.p2p.removeOnmessage(type)
-  }
-
   render() {
     return (
       <div>
@@ -123,8 +115,6 @@ class P2PHost extends React.Component {
         />
         <FrameInterval
           nes={this.props.nes}
-          addOnmessage={this.addOnmessage.bind(this)}
-          removeOnmessage={this.removeOnmessage.bind(this)}
           addMsg={this.props.addMsg}
           isRunning={this.props.isRunning}
           frameID={this.props.frameID}

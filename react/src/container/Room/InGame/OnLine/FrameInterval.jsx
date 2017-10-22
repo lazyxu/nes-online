@@ -50,7 +50,6 @@ class FrameInterval extends React.Component {
 
   start() {
     var waitingCount = 0
-    this.props.addMsg(constant.MSG_FROM_SYSTEM, '游戏开始')
     this.frameInterval = setInterval(() => {
       if (this.props.isRunning) {
         if (this.props.frameID & 1) {
@@ -63,7 +62,6 @@ class FrameInterval extends React.Component {
             waitingCount++
             if (waitingCount >= 60) {
               waitingCount -= 60
-              this.props.addMsg(constant.MSG_FROM_SYSTEM, '还没收到第' + this.props.frameID + '帧的数据')
             }
             return
           }
