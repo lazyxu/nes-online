@@ -44,6 +44,11 @@ func UserHandler(ws *websocket.Conn, user map[string]interface{}) {
 	}()
 	// server send Msg to client
 	go func(u *User) {
+		defer func() {
+			if u != nil {
+				u.out()
+			}
+		}()
 		for m := range u.msg {
 			if m["type"] != "operationTemp" {
 				logger.Debug(m["type"])
@@ -134,6 +139,7 @@ func (u *User) out() {
 	u.leaveRoom()
 	delUser(u)
 	close(u.msg)
+	logger.Debug("玩家 " + u.Name + " 离开了平台")
 }
 
 func (u *User) broadcast(m map[string]interface{}) {
@@ -143,7 +149,7 @@ func (u *User) broadcast(m map[string]interface{}) {
 	for _, users := range h.users {
 		for _, user := range users {
 			if user.msg == nil {
-				logger.Info("channel is nil")
+				logger.Info(user.Name+" channel is nil")
 				user.out()
 			}
 			select {

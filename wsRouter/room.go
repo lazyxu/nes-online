@@ -144,6 +144,7 @@ func (u *User) createRoom(m map[string]interface{}) {
 			"room": u.room,
 		}
 	}
+	logger.Debug("玩家 " + u.Name + " 创建了房间")
 	sendRoomList()
 }
 
@@ -170,6 +171,7 @@ func (u *User) enterRoom(m map[string]interface{}) {
 					"type": "roomMsg",
 					"msg":  "玩家 " + u.Name + " 进入了房间",
 				})
+				logger.Debug("玩家 " + u.Name + " 进入了房间")
 				sendRoomList()
 				return
 			}
@@ -184,6 +186,7 @@ func (u *User) enterRoom(m map[string]interface{}) {
 						"type": "roomMsg",
 						"msg":  "玩家 " + u.Name + " 进入了房间",
 					})
+					logger.Debug("玩家 " + u.Name + " 进入了房间")
 					sendRoomList()
 					return
 				}
@@ -215,6 +218,7 @@ func (u *User) leaveRoom() {
 		"type": "roomMsg",
 		"msg":  "玩家 " + u.Name + " 离开了房间",
 	})
+	logger.Debug("玩家 " + u.Name + " 离开了房间")
 	sendRoomList()
 }
 
@@ -232,6 +236,7 @@ func (u *User) endGame() {
 		"type": "roomMsg",
 		"msg":  "玩家 " + u.Name + " 退出了游戏",
 	})
+	logger.Debug("玩家 " + u.Name + " 退出了游戏")
 	sendRoomList()
 }
 
@@ -241,6 +246,7 @@ func (u *User) ready() {
 		"type": "roomStateChange",
 		"room": u.room,
 	}, u.Name, true)
+	logger.Debug("玩家 " + u.Name + " 已准备")
 	sendRoomList()
 }
 
@@ -250,6 +256,7 @@ func (u *User) unready() {
 		"type": "roomStateChange",
 		"room": u.room,
 	}, u.Name, true)
+	logger.Debug("玩家 " + u.Name + " 取消准备")
 	sendRoomList()
 }
 
@@ -259,6 +266,7 @@ func (u *User) start() {
 		"type": "roomStateChange",
 		"room": u.room,
 	}, u.Name, true)
+	logger.Debug("房主 " + u.Name + " 开始游戏")
 	sendRoomList()
 }
 
@@ -275,10 +283,14 @@ func (u *User) sendRoomMsg(m map[string]interface{}, from string, sendToSelf boo
 		if user == u && !sendToSelf {
 			continue
 		}
+		if user.msg==nil {
+			logger.Debug(user.Name+" channel is nil")
+			user.out()
+		}
 		select {
 		case user.msg <- m:
 		default:
-			u.out()
+			logger.Warn("channel is full !")
 		}
 	}
 }
@@ -293,10 +305,14 @@ func sendRoomMsg(r *Room, m map[string]interface{}) {
 		if user == nil {
 			continue
 		}
+		if user.msg==nil {
+			logger.Debug(user.Name+" channel is nil")
+			user.out()
+		}
 		select {
 		case user.msg <- m:
 		default:
-			user.out()
+			logger.Warn("channel is full !")
 		}
 	}
 }
