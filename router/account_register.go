@@ -1,7 +1,6 @@
 package router
 
 import (
-	"net/http"
 	"time"
 
 	"github.com/MeteorKL/koala"
@@ -28,10 +27,10 @@ func existName(name string) bool {
 	)
 }
 
-func register(k *koala.Params, w http.ResponseWriter, r *http.Request) {
-	mail := k.ParamPost["mail"][0]
-	name := k.ParamPost["name"][0]
-	password := k.ParamPost["password"][0]
+func register(c *koala.Context) {
+	mail := c.GetBodyQueryString("mail")
+	name := c.GetBodyQueryString("name")
+	password := c.GetBodyQueryString("password")
 	activeCode := generateVerifyCode(mail)
 	now := time.Now().Unix()
 	if !dao_user.Insert(bson.M{
@@ -44,7 +43,7 @@ func register(k *koala.Params, w http.ResponseWriter, r *http.Request) {
 		"updated_at":  now,
 		"keyboard":    constant.DEFAULT_KEYBOARD,
 	}) {
-		writeErrJSON(w, "发生未知错误，请联系管理员")
+		writeErrJSON(c, "发生未知错误，请联系管理员")
 		return
 	}
 
@@ -55,28 +54,28 @@ func register(k *koala.Params, w http.ResponseWriter, r *http.Request) {
 	err := mailer.Send(mail, subject, content, "text/html")
 	if err != nil {
 		println(err.Error())
-		writeErrJSON(w, "发送邮件失败，请确认你的邮箱地址后重试")
+		writeErrJSON(c, "发送邮件失败，请确认你的邮箱地址后重试")
 		return
 	}
-	writeSuccessJSON(w, "注册邮件发送成功，请在1h内激活你的帐号", nil)
+	writeSuccessJSON(c, "注册邮件发送成功，请在1h内激活你的帐号", nil)
 }
 
 func apiRegister() {
-	koala.Get("/api/checkMail", func(k *koala.Params, w http.ResponseWriter, r *http.Request) {
-		exist := existMail(k.ParamGet["mail"][0])
+	app.Get("/api/checkMail", func(c *koala.Context) {
+		exist := existMail(c.GetQueryString("mail"))
 		if exist {
-			writeErrJSON(w, "该邮箱已经被注册")
+			writeErrJSON(c, "该邮箱已经被注册")
 			return
 		}
-		writeSuccessJSON(w, "该邮箱可用", nil)
+		writeSuccessJSON(c, "该邮箱可用", nil)
 	})
-	koala.Get("/api/checkName", func(k *koala.Params, w http.ResponseWriter, r *http.Request) {
-		exist := existName(k.ParamGet["name"][0])
+	app.Get("/api/checkName", func(c *koala.Context) {
+		exist := existName(c.GetQueryString("name"))
 		if exist {
-			writeErrJSON(w, "该昵称已被使用")
+			writeErrJSON(c, "该昵称已被使用")
 			return
 		}
-		writeSuccessJSON(w, "该昵称可用", nil)
+		writeSuccessJSON(c, "该昵称可用", nil)
 	})
-	koala.Post("/api/register", register)
+	app.Post("/api/register", register)
 }

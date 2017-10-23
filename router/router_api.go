@@ -1,22 +1,20 @@
 package router
 
 import (
-	"net/http"
-
 	"github.com/MeteorKL/koala"
 )
 
 const CookieName = "SessionID"
 
-func writeErrJSON(w http.ResponseWriter, msg string) {
-	koala.WriteJSON(w, map[string]interface{}{
+func writeErrJSON(c *koala.Context, msg string) {
+	c.WriteJSON(map[string]interface{}{
 		"error": true,
 		"msg":   msg,
 	})
 }
 
-func writeSuccessJSON(w http.ResponseWriter, msg string, data interface{}) {
-	koala.WriteJSON(w, map[string]interface{}{
+func writeSuccessJSON(c *koala.Context, msg string, data interface{}) {
+	c.WriteJSON(map[string]interface{}{
 		"error": false,
 		"msg":   msg,
 		"data":  data,
@@ -24,10 +22,8 @@ func writeSuccessJSON(w http.ResponseWriter, msg string, data interface{}) {
 }
 
 func api() {
-	koala.Get("/api/getGameList", getGameList)
-	koala.Post("/api/uploadROM", uploadROM)
-
-	apiUser()
+	apiGame()
+	apiRom()
 	apiRegister()
 	apiActive()
 	apiLogin()

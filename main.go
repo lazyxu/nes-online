@@ -12,11 +12,14 @@ import (
 
 func main() {
 	logger.SetLogLevel(config.Conf.LogLevel)
-	router.Init()
+	config.Load()
+	app := koala.NewApp()
+	router.Init(app)
 
+	// app.Handle()
 	http.HandleFunc("/ws", wsHandler)
 	wsRouter.NewHub()
 
 	// http
-	koala.Run("8081")
+	app.Run("8081")
 }

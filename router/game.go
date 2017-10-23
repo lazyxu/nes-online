@@ -2,7 +2,6 @@ package router
 
 import (
 	"io/ioutil"
-	"net/http"
 	"strings"
 	"sync"
 	"sync/atomic"
@@ -28,13 +27,13 @@ func updateGameList() {
 	atomic.AddInt32(&updateGameListCount, 1)
 }
 
-func getGameList(k *koala.Params, w http.ResponseWriter, r *http.Request) {
+func getGameList(c *koala.Context) {
 	if gameList == nil {
 		updateGameList()
 	} else {
 		go updateGameList()
 	}
-	writeSuccessJSON(w, "", gameList)
+	writeSuccessJSON(c, "", gameList)
 }
 
 func initGame(dirPth string) {
@@ -57,4 +56,8 @@ func initGame(dirPth string) {
 	if !dao_game.Insert(gameList) {
 		logger.Error("更新游戏列表失败")
 	}
+}
+
+func apiGame() {
+	app.Get("/api/getGameList", getGameList)
 }

@@ -1,7 +1,7 @@
 package thirdPartyLogin
 
 import (
-	"github.com/MeteorKL/koala"
+	"github.com/MeteorKL/koala/client"
 	"strings"
 	"github.com/MeteorKL/koala/logger"
 	"github.com/MeteorKL/nes-online/util/config"
@@ -20,7 +20,7 @@ func QQ(code string, redirect_uri string)map[string]interface{} {
 	logger.Debug(config.Conf.QQ.Appid)
 	logger.Debug(config.Conf.QQ.Appkey)
 	// 2. get user info
-	_, _res := koala.GetRequest(URL)
+	_, _res := client.GetRequest(URL)
 	res := string(_res)
 	logger.Debug(res)
 	if strings.Contains(res, "callback") {
@@ -29,7 +29,7 @@ func QQ(code string, redirect_uri string)map[string]interface{} {
 	}
 	param := strings.Split(res, "&")[0]
 	access_token := strings.Split(param, "=")[0]
-	_, _res = koala.GetRequest("https://graph.qq.com/oauth2.0/me?access_token=" + access_token)
+	_, _res = client.GetRequest("https://graph.qq.com/oauth2.0/me?access_token=" + access_token)
 	res = string(_res)
 	param = strings.Split(res, "&")[0]
 	openid := strings.Split(param, "=")[1]
@@ -37,7 +37,7 @@ func QQ(code string, redirect_uri string)map[string]interface{} {
 	URL += "&access_token=" + access_token
 	URL += "&oauth_consumer_key=" + config.Conf.QQ.Appid
 	URL += "&openid=" + openid
-	_, jsondata := koala.GetRequest(URL)
+	_, jsondata := client.GetRequest(URL)
 	user := make(map[string]interface{})
 	err := json.Unmarshal(jsondata, &user)
 	logger.Warn(err)

@@ -1,7 +1,7 @@
 package thirdPartyLogin
 
 import (
-	"github.com/MeteorKL/koala"
+	"github.com/MeteorKL/koala/client"
 	"strings"
 	"encoding/json"
 	"github.com/MeteorKL/nes-online/util/config"
@@ -10,7 +10,7 @@ import (
 
 func Github(code string) map[string]interface{} {
 	// 1. get access_token
-	_, res := koala.PostRequest("https://github.com/login/oauth/access_token", map[string]string{
+	_, res := client.PostRequest("https://github.com/login/oauth/access_token", map[string]string{
 		"client_id":     config.Conf.Github.Client_id,
 		"client_secret": config.Conf.Github.Client_secret,
 		"code":          code,
@@ -18,7 +18,7 @@ func Github(code string) map[string]interface{} {
 	tokenParam := strings.Split(string(res), "&")[0]
 	token := strings.Split(tokenParam, "=")[1]
 	// 2. get user info
-	_, jsondata := koala.GetRequest("https://api.github.com/user?access_token=" + token)
+	_, jsondata := client.GetRequest("https://api.github.com/user?access_token=" + token)
 	user := make(map[string]interface{})
 	err := json.Unmarshal(jsondata, &user)
 	logger.Warn(err)

@@ -4,20 +4,21 @@ import (
 	"net/http"
 
 	"github.com/MeteorKL/koala"
-	"github.com/MeteorKL/nes-online/util/config"
 )
 
-func Init() {
-	config.Load()
+var app *koala.App
+
+func Init(a *koala.App) {
+	app = a
 	http.Handle("/img/", http.FileServer(http.Dir("static")))
 	http.Handle("/roms/", http.FileServer(http.Dir("static")))
 	// http.Handle("/static/", http.FileServer(http.Dir("static")))
 	// http.Handle("/src/", http.StripPrefix("/src/", http.FileServer(http.Dir("../react/src"))))
 	http.Handle("/js/", http.FileServer(http.Dir("static")))
 
-	koala.RenderPath = "static/"
-	koala.Get("/", func(k *koala.Params, w http.ResponseWriter, r *http.Request) {
-		koala.Render(w, "index.html", nil)
+	app.SetRenderPath("static/")
+	app.Get("/", func(c *koala.Context) {
+		c.Render("index.html", nil)
 	})
 	api()
 }
