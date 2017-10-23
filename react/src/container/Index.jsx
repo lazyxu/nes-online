@@ -73,16 +73,19 @@ class Index extends React.Component {
           </a>
           {userType == constant.USER_UNLOGIN ?
             <div className="Navbar">
+              <a href="https://github.com/MeteorKL/nes-online/issues" target="_blank">bug反馈</a><span> | </span>
               <a onClick={() => this.props.tabSet('VisitorLogin')}>游客登录</a><span> | </span>
               <a onClick={() => this.props.tabSet('Register')}>注册</a><span> | </span>
               <a className="CurrentLocation" onClick={() => this.props.tabSet('Login')}>登录</a>
             </div> :
             (userType == constant.USER_VISITOR ?
               <div className="Navbar">
+                <a href="https://github.com/MeteorKL/nes-online/issues" target="_blank">bug反馈</a><span> | </span>
                 <a onClick={() => this.logout()}>注销</a><span> | </span>
                 <span> {userName} </span>
               </div> :
               <div className="Navbar">
+                <a href="https://github.com/MeteorKL/nes-online/issues" target="_blank">bug反馈</a><span> | </span>
                 <a href="#/setting">设置</a><span> | </span>
                 <a onClick={() => this.logout()}>注销</a><span> | </span>
                 <span>{userName}</span>

@@ -25,6 +25,7 @@ func writeSuccessJSON(w http.ResponseWriter, msg string, data interface{}) {
 
 func api() {
 	koala.Get("/api/getGameList", getGameList)
+	koala.Post("/api/uploadROM", uploadROM)
 
 	apiUser()
 	apiRegister()

@@ -7,19 +7,6 @@ class Screen extends React.Component {
     super(props);
   }
 
-  resize() {
-    var height = document.getElementById('window').clientHeight;
-    var width = document.getElementById('window').clientWidth;
-    var landscape = (height / 240 * 256 > width) ? false : true;
-    if (!landscape) {
-      this.refs.screen.style.height = (width / 256 * 240) + 'px'
-      this.refs.screen.style.width = width + 'px'
-    } else {
-      this.refs.screen.style.height = height + 'px'
-      this.refs.screen.style.width = (height / 240 * 256) + 'px'
-    }
-  }
-
   componentDidMount() {
     var canvasContext = this.refs.screen.getContext('2d');
     var canvasImageData = canvasContext.getImageData(0, 0, 256, 240);
@@ -50,20 +37,20 @@ class Screen extends React.Component {
       canvasImageData.data.set(buf8);
       canvasContext.putImageData(canvasImageData, 0, 0);
       frameID++
+      if (frameID == 120) {
+        this.props.setDataURL(this.refs.screen.toDataURL("image/jpeg"))
+      }
     })
-    this.resize();
-    window.addEventListener("resize", this.resize.bind(this))
   }
 
   componentWillUnmount() {
     this.props.setOnFrame(() => { })
-    window.removeEventListener("resize", this.resize.bind(this))
   }
 
   render() {
     return (
       <div>
-      <canvas ref='screen' class="Screen" width="256" height="240"></canvas>
+        <canvas ref='screen' class="Screen" width="256" height="240"></canvas>
       </div>
     )
   }

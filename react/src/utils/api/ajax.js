@@ -17,6 +17,7 @@ exports.Get = (url) => {
     });
   });
 }
+
 exports.GetBinary = (url) => {
   return new Promise(function(resolve, reject) {
     const xhr = new XMLHttpRequest();
@@ -37,6 +38,7 @@ exports.GetBinary = (url) => {
     });
   });
 }
+
 function postDataFormat(obj){
     if(typeof obj != "object" ) {
         alert("输入的参数必须是对象");

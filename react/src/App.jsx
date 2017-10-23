@@ -9,6 +9,7 @@ import Index from './container/Index.jsx'
 import GameInfo from './container/GameInfo/GameInfo'
 import GameList from './container/GameList/GameList'
 import RoomList from './container/RoomList/RoomList'
+import Upload from './container/Upload/Upload'
 
 import Active from './container/Account/Active'
 import ResetPassword from './container/Account/ResetPassword'
@@ -36,6 +37,7 @@ ReactDOM.render(
         <Route path="/" component={Index}>
           <IndexRoute component={GameList} />
           <Route path="/gameList" component={GameList} />
+          <Route path="/upload" component={Upload} />
           <Route path="/game/:gameName" component={GameInfo} />
           <Route path="/roomList" component={RoomList} />
           <Route path="/active/:active_code" component={Active} />
