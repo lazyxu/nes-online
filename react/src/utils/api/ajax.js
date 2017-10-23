@@ -84,3 +84,24 @@ exports.Post = (url, query) => {
     });
   });
 }
+
+exports.PostJson = (url, query) => {
+  return new Promise(function(resolve, reject) {
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', url, true);
+    xhr.setRequestHeader("Content-Type", "application/json; charset=UTF-8");
+    xhr.send(query);
+    xhr.addEventListener('readystatechange', function() {
+      if (xhr.readyState === 4 && xhr.status === 200) {
+        try {
+          resolve(xhr.responseText);
+        } catch (e) {
+          reject(e);
+        }
+      }
+    });
+    xhr.addEventListener('error', function(error) {
+      reject(error);
+    });
+  });
+}

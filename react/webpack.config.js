@@ -37,7 +37,7 @@ module.exports = {
       }
     ]
   },
-  // devtool: 'eval-source-map',
+  devtool: 'eval-source-map',
   plugins: [
     new HtmlWebpackPlugin({
       title: 'NES Online',

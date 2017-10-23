@@ -24,7 +24,6 @@ class Screen extends React.Component {
     for (var i = 0; i < buf32.length; ++i) {
       buf32[i] = 0xFF000000;
     }
-    var frameID = 0
     this.props.setOnFrame(buffer => {
       var i = 0;
       for (var y = 0; y < 240; ++y) {
@@ -36,8 +35,7 @@ class Screen extends React.Component {
       }
       canvasImageData.data.set(buf8);
       canvasContext.putImageData(canvasImageData, 0, 0);
-      frameID++
-      if (frameID == 120) {
+      if (this.props.frameID == 60*5) {
         this.props.setDataURL(this.refs.screen.toDataURL("image/jpeg"))
       }
     })
