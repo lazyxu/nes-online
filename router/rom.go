@@ -9,12 +9,22 @@ import (
 )
 
 const JPG_URL = "data:image/jpeg;base64,"
+const DEFAULT_FOLDER  = "未分类"
 
 func uploadROM(c *koala.Context) {
-	dir := "static/roms/upload/"
-	name, suffix, err := c.SavePostFile("rom", dir)
+	folder := c.GetBodyQueryString("folder")
+	if folder=="" {
+		folder = DEFAULT_FOLDER
+	}
+	dir := "static/roms/"+c.GetBodyQueryString("folder")+"/"
+	name, suffix, err := c.SavePostFile("rom", dir, []string{".nes",".NES"})
 	logger.Debug(name)
 	logger.Debug(suffix)
+	if err != nil {
+		logger.Warn(err)
+		writeErrJSON(c, err.Error())
+		return
+	}
 	name = strings.TrimSuffix(name, suffix)
 	screenShot := c.GetBodyQueryString("screenShot")
 	//logger.Debug(screenShot)
@@ -24,7 +34,11 @@ func uploadROM(c *koala.Context) {
 	}
 	screenShot = strings.TrimPrefix(screenShot, JPG_URL)
 	screenshot, err := base64.StdEncoding.DecodeString(screenShot)
-	logger.Warn(err)
+	if err != nil {
+		logger.Warn(err)
+		writeErrJSON(c, "图片解析失败")
+		return
+	}
 	ioutil.WriteFile(dir+name+".jpg", screenshot, 0666)
 	writeSuccessJSON(c, "上传成功", nil)
 }

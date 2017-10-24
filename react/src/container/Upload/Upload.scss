@@ -1,0 +1,25 @@
+.UploadFiles span{
+    font-size: 12px;
+}
+.UploadFiles .line{
+    height: 12px;
+    margin-bottom: 1px;
+}
+.UploadFiles .rect {
+    height: 12px;
+    width: 12px;
+    margin: 1px;
+    display: inline-flex;
+}
+.UploadFiles .waiting {
+    background: #ebedf0;
+}
+.UploadFiles .loading {
+    background: #030afb;
+}
+.UploadFiles .success {
+    background: #239a3b;
+}
+.UploadFiles .failed {
+    background: #f33a3b;
+}

@@ -121,7 +121,7 @@ class Room extends React.Component {
       <div className='Room-Normal'>
         <div className='game-info'>
           <div className='id'>房间号：{this.props.room.id}</div>
-          <img src={typeof (this.props.room.game) == 'undefined' ? '/roms/loading.gif' : '/roms/' + this.props.room.game + '.jpg'} /><br />
+          <img src={typeof (this.props.room.game) == 'undefined' ? '/img/loading.gif' : '/roms/' + this.props.room.game + '.jpg'} /><br />
           {/* <span>房间 </span><input type='text' className='name' defaultValue={this.props.room.name}/><br/> */}
           <span>游戏 </span><input type='text' className='name' value={this.props.room.game} disabled /><br />
           {/* <span>密码 </span><input type='text' className='name' defaultValue={this.props.room.password}/> */}
