@@ -1,5 +1,4 @@
 var utils = require("./utils");
-var INTERRUPT = require("./cpu/interrupt");
 
 var Mappers = {};
 
@@ -337,7 +336,7 @@ Mappers[0].prototype = {
 
     // Reset IRQ:
     //nes.getCpu().doResetInterrupt();
-    this.nes.cpu.requestIrq(INTERRUPT.RESET);
+    this.nes.cpu.irq.requestReset
   },
 
   loadPRGROM: function() {
@@ -400,7 +399,7 @@ Mappers[0].prototype = {
     utils.copyArrayElements(
       this.nes.rom.vrom[bank % this.nes.rom.vromCount],
       0,
-      this.nes.ppu.vramMem,
+      this.nes.ppu.vram.data,
       address,
       4096
     );
@@ -444,7 +443,7 @@ Mappers[0].prototype = {
     utils.copyArrayElements(
       this.nes.rom.vrom[bank4k],
       0,
-      this.nes.ppu.vramMem,
+      this.nes.ppu.vram.data,
       bankoffset,
       1024
     );
@@ -468,7 +467,7 @@ Mappers[0].prototype = {
     utils.copyArrayElements(
       this.nes.rom.vrom[bank4k],
       bankoffset,
-      this.nes.ppu.vramMem,
+      this.nes.ppu.vram.data,
       address,
       2048
     );
@@ -739,7 +738,7 @@ Mappers[1].prototype.loadROM = function() {
   this.loadBatteryRam();
 
   // Do Reset-Interrupt:
-  this.nes.cpu.requestIrq(INTERRUPT.RESET);
+  this.nes.cpu.irq.requestReset
 };
 
 Mappers[1].prototype.switchLowHighPrgRom = function(oldSetting) {
@@ -814,7 +813,7 @@ Mappers[2].prototype.loadROM = function() {
   this.loadCHRROM();
 
   // Do Reset-Interrupt:
-  this.nes.cpu.requestIrq(INTERRUPT.RESET);
+  this.nes.cpu.irq.requestReset
 };
 
 /**
@@ -1056,7 +1055,7 @@ Mappers[4].prototype.loadROM = function() {
   this.loadBatteryRam();
 
   // Do Reset-Interrupt:
-  this.nes.cpu.requestIrq(INTERRUPT.RESET);
+  this.nes.cpu.irq.requestReset
 };
 
 Mappers[4].prototype.clockIrqCounter = function() {
@@ -1065,7 +1064,7 @@ Mappers[4].prototype.clockIrqCounter = function() {
     if (this.irqCounter < 0) {
       // Trigger IRQ:
       //nes.getCpu().doIrq();
-      this.nes.cpu.requestIrq(INTERRUPT.NORMAL);
+      this.nes.cpu.irq.requestNormal();
       this.irqCounter = this.irqLatchValue;
     }
   }
@@ -1253,7 +1252,7 @@ Mappers[5].prototype.loadROM = function() {
   this.loadCHRROM();
 
   // Do Reset-Interrupt:
-  this.nes.cpu.requestIrq(INTERRUPT.RESET);
+  this.nes.cpu.irq.requestReset
 };
 
 /**
@@ -1294,7 +1293,7 @@ Mappers[7].prototype.loadROM = function() {
   this.loadCHRROM();
 
   // Do Reset-Interrupt:
-  this.nes.cpu.requestIrq(INTERRUPT.RESET);
+  this.nes.cpu.irq.requestReset
 };
 
 /**

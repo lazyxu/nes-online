@@ -1,8 +1,8 @@
 
-var REGISTER = function () {
+var Register = function () {
 }
 
-REGISTER.prototype = {
+Register.prototype = {
 
   reset() {
     // 6 registers
@@ -24,4 +24,4 @@ REGISTER.prototype = {
 
 }
 
-module.exports = REGISTER;
+module.exports = Register;

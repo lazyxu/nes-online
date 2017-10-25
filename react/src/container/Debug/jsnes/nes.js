@@ -1,6 +1,6 @@
 var CPU = require("./cpu/index");
 var Controller = require("./controller");
-var PPU = require("./ppu");
+var PPU = require("./ppu/index");
 var PAPU = require("./papu");
 var ROM = require("./rom");
 

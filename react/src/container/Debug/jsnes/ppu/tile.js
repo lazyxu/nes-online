@@ -1,4 +1,6 @@
-var Tile = function() {
+
+var Tile = function(ppu) {
+  this.ppu = ppu
   // Tile data:
   this.pix = new Array(64);
 
@@ -45,7 +47,6 @@ Tile.prototype = {
     dx,
     dy,
     palAdd,
-    palette,
     flipHorizontal,
     flipVertical,
     pri,
@@ -87,7 +88,7 @@ Tile.prototype = {
             this.tpri = priTable[this.fbIndex];
             if (this.palIndex !== 0 && pri <= (this.tpri & 0xff)) {
               //console.log("Rendering upright tile to buffer");
-              buffer[this.fbIndex] = palette[this.palIndex + palAdd];
+              buffer[this.fbIndex] = this.ppu.palette.loadSprit(this.palIndex + palAdd);
               this.tpri = (this.tpri & 0xf00) | pri;
               priTable[this.fbIndex] = this.tpri;
             }
@@ -112,7 +113,7 @@ Tile.prototype = {
             this.palIndex = this.pix[this.tIndex];
             this.tpri = priTable[this.fbIndex];
             if (this.palIndex !== 0 && pri <= (this.tpri & 0xff)) {
-              buffer[this.fbIndex] = palette[this.palIndex + palAdd];
+              buffer[this.fbIndex] = this.ppu.palette.loadSprit(this.palIndex + palAdd);
               this.tpri = (this.tpri & 0xf00) | pri;
               priTable[this.fbIndex] = this.tpri;
             }
@@ -138,7 +139,7 @@ Tile.prototype = {
             this.palIndex = this.pix[this.tIndex];
             this.tpri = priTable[this.fbIndex];
             if (this.palIndex !== 0 && pri <= (this.tpri & 0xff)) {
-              buffer[this.fbIndex] = palette[this.palIndex + palAdd];
+              buffer[this.fbIndex] = this.ppu.palette.loadSprit(this.palIndex + palAdd);
               this.tpri = (this.tpri & 0xf00) | pri;
               priTable[this.fbIndex] = this.tpri;
             }
@@ -164,7 +165,7 @@ Tile.prototype = {
             this.palIndex = this.pix[this.tIndex];
             this.tpri = priTable[this.fbIndex];
             if (this.palIndex !== 0 && pri <= (this.tpri & 0xff)) {
-              buffer[this.fbIndex] = palette[this.palIndex + palAdd];
+              buffer[this.fbIndex] = this.ppu.palette.loadSprit(this.palIndex + palAdd);
               this.tpri = (this.tpri & 0xf00) | pri;
               priTable[this.fbIndex] = this.tpri;
             }

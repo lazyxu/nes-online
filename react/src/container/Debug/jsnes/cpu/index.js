@@ -1,15 +1,15 @@
 var utils = require("../utils");
-var MEMORY = require("./memory");
-var REGISTER = require("./register");
-var INTERRUPT = require("./interrupt");
-var OPCODE = require("./opcode");
+var Memory = require("./memory");
+var Register = require("./register");
+var Interrput = require("./interrupt");
+var Opcode = require("./opcode");
 
 var CPU = function (nes) {
   this.nes = nes;
-  this.opcode = new OPCODE();
-  this.mem = new MEMORY();
-  this.reg = new REGISTER();
-  this.irq = new INTERRUPT();
+  this.opcode = new Opcode();
+  this.mem = new Memory();
+  this.reg = new Register();
+  this.irq = new Interrput();
   this.reset();
 };
 
@@ -551,17 +551,6 @@ CPU.prototype = {
     }
   },
 
-  requestIrq: function (type) {
-    if (this.irq.requested) {
-      if (type == INTERRUPT.NORMAL) {
-        return;
-      }
-      // console.log("too fast irqs. type="+type);
-    }
-    this.irq.requested = true;
-    this.irq.type = type;
-  },
-
   push: function (value) {
     this.nes.mmap.write(this.reg.SP, value);
     this.reg.SP--;
@@ -611,7 +600,7 @@ CPU.prototype = {
   JSON_PROPERTIES: [
     'mem', 'cyclesToHalt', 'irqRequested', 'irqType',
     // Registers
-    'REGISTER_ACC', 'REGISTER_X', 'REGISTER_Y', 'REGISTER_SP', 'REGISTER_PC',
+    'Register_ACC', 'Register_X', 'Register_Y', 'Register_SP', 'Register_PC',
     // Status
     'F_CARRY', 'F_ZERO', 'F_IRQDISABLE', 'F_DECIMAL',
     'F_BRK', 'F_OVERFLOW', 'F_SIGN', 'F_NOTUSED'

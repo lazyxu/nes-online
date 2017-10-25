@@ -26,6 +26,7 @@ class Debug extends React.Component {
 
   componentWillMount() {
     this.nes = new jsnes.NES({})
+    window.nes = this.nes
   }
 
   componentWillUnmount() {

@@ -1,5 +1,5 @@
 
-var OPCODE = function () {
+var Opcode = function () {
   this.table = new Uint32Array([ // 151个合法操作码 opcode
     // 0x000000ff instruction 指令  0xff 表示非法指令
     // 0x0000ff00 addressing mode 寻址方式 
@@ -40,11 +40,11 @@ var OPCODE = function () {
   ]);
 }
 
-OPCODE.prototype = {
+Opcode.prototype = {
 
   reset() {
   },
 
 }
 
-module.exports = OPCODE;
+module.exports = Opcode;
