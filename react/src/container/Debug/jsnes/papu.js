@@ -376,7 +376,7 @@ PAPU.prototype = {
 
     // Frame IRQ handling:
     if (this.frameIrqEnabled && this.frameIrqActive) {
-      this.nes.cpu.requestIrq(this.nes.cpu.IRQ_NORMAL);
+      this.nes.cpu.requestIrq(INTERRUPT.NORMAL);
     }
 
     // Clock frame counter at double CPU speed:

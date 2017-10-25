@@ -1,5 +1,6 @@
 var Tile = require('./tile');
 var utils = require('./utils');
+var INTERRUPT = require("./cpu/interrupt");
 
 var PPU = function(nes) {
   this.nes = nes;
@@ -302,7 +303,7 @@ PPU.prototype = {
 
   startVBlank: function() {
     // Do NMI:
-    this.nes.cpu.requestIrq(this.nes.cpu.IRQ_NMI);
+    this.nes.cpu.requestIrq(INTERRUPT.NMI);
 
     // Make sure everything is rendered:
     if (this.lastRenderedScanline < 239) {
@@ -1425,7 +1426,7 @@ PPU.prototype = {
     // Set VBlank flag:
     this.setStatusFlag(this.STATUS_VBLANK, true);
     //nes.getCpu().doNonMaskableInterrupt();
-    this.nes.cpu.requestIrq(this.nes.cpu.IRQ_NMI);
+    this.nes.cpu.requestIrq(INTERRUPT.NMI);
   },
 
   isPixelWhite: function(x, y) {

@@ -1,4 +1,5 @@
 var utils = require("./utils");
+var INTERRUPT = require("./cpu/interrupt");
 
 var Mappers = {};
 
@@ -336,7 +337,7 @@ Mappers[0].prototype = {
 
     // Reset IRQ:
     //nes.getCpu().doResetInterrupt();
-    this.nes.cpu.requestIrq(this.nes.cpu.IRQ_RESET);
+    this.nes.cpu.requestIrq(INTERRUPT.RESET);
   },
 
   loadPRGROM: function() {
@@ -738,7 +739,7 @@ Mappers[1].prototype.loadROM = function() {
   this.loadBatteryRam();
 
   // Do Reset-Interrupt:
-  this.nes.cpu.requestIrq(this.nes.cpu.IRQ_RESET);
+  this.nes.cpu.requestIrq(INTERRUPT.RESET);
 };
 
 Mappers[1].prototype.switchLowHighPrgRom = function(oldSetting) {
@@ -813,7 +814,7 @@ Mappers[2].prototype.loadROM = function() {
   this.loadCHRROM();
 
   // Do Reset-Interrupt:
-  this.nes.cpu.requestIrq(this.nes.cpu.IRQ_RESET);
+  this.nes.cpu.requestIrq(INTERRUPT.RESET);
 };
 
 /**
@@ -1055,7 +1056,7 @@ Mappers[4].prototype.loadROM = function() {
   this.loadBatteryRam();
 
   // Do Reset-Interrupt:
-  this.nes.cpu.requestIrq(this.nes.cpu.IRQ_RESET);
+  this.nes.cpu.requestIrq(INTERRUPT.RESET);
 };
 
 Mappers[4].prototype.clockIrqCounter = function() {
@@ -1064,7 +1065,7 @@ Mappers[4].prototype.clockIrqCounter = function() {
     if (this.irqCounter < 0) {
       // Trigger IRQ:
       //nes.getCpu().doIrq();
-      this.nes.cpu.requestIrq(this.nes.cpu.IRQ_NORMAL);
+      this.nes.cpu.requestIrq(INTERRUPT.NORMAL);
       this.irqCounter = this.irqLatchValue;
     }
   }
@@ -1252,7 +1253,7 @@ Mappers[5].prototype.loadROM = function() {
   this.loadCHRROM();
 
   // Do Reset-Interrupt:
-  this.nes.cpu.requestIrq(this.nes.cpu.IRQ_RESET);
+  this.nes.cpu.requestIrq(INTERRUPT.RESET);
 };
 
 /**
@@ -1293,7 +1294,7 @@ Mappers[7].prototype.loadROM = function() {
   this.loadCHRROM();
 
   // Do Reset-Interrupt:
-  this.nes.cpu.requestIrq(this.nes.cpu.IRQ_RESET);
+  this.nes.cpu.requestIrq(INTERRUPT.RESET);
 };
 
 /**

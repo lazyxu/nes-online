@@ -1,9 +1,9 @@
 
-var MEM = function () {
+var MEMORY = function () {
   this.data = new Uint8Array(new ArrayBuffer(0x10000)); // Main memory 64KB
 }
 
-MEM.prototype = {
+MEMORY.prototype = {
 
   reset() {
     for (var i = 0; i < 0x2000; i++) {
@@ -31,4 +31,4 @@ MEM.prototype = {
 
 }
 
-module.exports = MEM;
+module.exports = MEMORY;
