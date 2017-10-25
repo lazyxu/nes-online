@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>JSNES: A JavaScript NES emulator</title>
+    <link rel="stylesheet" href="style.css" type="text/css" />
+</head>
+
+<body>
+    <script src="lib/dynamicaudio-min.js" type="text/javascript" charset="utf-8"></script>
+    <script src="source/nes.js" type="text/javascript" charset="utf-8"></script>
+    <script src="source/utils.js" type="text/javascript" charset="utf-8"></script>
+    <script src="source/cpu.js" type="text/javascript" charset="utf-8"></script>
+    <script src="source/keyboard.js" type="text/javascript" charset="utf-8"></script>
+    <script src="source/mappers.js" type="text/javascript" charset="utf-8"></script>
+    <script src="source/papu.js" type="text/javascript" charset="utf-8"></script>
+    <script src="source/ppu.js" type="text/javascript" charset="utf-8"></script>
+    <script src="source/rom.js" type="text/javascript" charset="utf-8"></script>
+    <script src="source/ui.js" type="text/javascript" charset="utf-8"></script>
+
+    <div id="emulator">
+        <canvas class="nes-screen" id="nes-screen" width="256" height="240"></canvas>
+        <div id="status"></div>
+        <div id="nes-emphTable" style="float: left">
+            <div>emphTable:</div>
+        </div>
+        <div style="float: left">
+            <div id="nes-imgPalette">
+                <div>imgPalette:</div>
+            </div>
+            <div id="nes-sprPalette">
+                <div>sprPalette:</div>
+            </div>
+        </div>
+        <div style="clear: both;"></div>
+        <div id="nes-patternTable-1" style="float: left">
+            <div>patternTable1:</div>
+        </div>
+        <div id="nes-patternTable-2" style="float: left">
+            <div>patternTable2:</div>
+        </div>
+        <div style="clear: both;"></div>
+        <div>
+            <div>sprite:</div>
+            <div id="nes-sprite" style="float: left">
+            </div>
+            <div id="nes-sprite-combin" style="float: left">
+                <canvas width="256" height="256" id="nes-sprite-combin1" class="nes-sprite-combin"></canvas>
+            </div>
+        </div>
+        <div style="clear: both;"></div>
+        <div id="nes-nameTable-1">
+            <div>nameTable1 attributeTable1:</div>
+            <canvas width="256" height="256" id="nes-nameTable1" class="nes-nameTable"></canvas>
+            <canvas width="256" height="256" id="nes-attributeTable1" class="nes-attributeTable"></canvas>
+        </div>
+        <div id="nes-nameTable-2">
+            <div>nameTable2 attributeTable2:</div>
+            <canvas width="256" height="256" id="nes-nameTable2" class="nes-nameTable"></canvas>
+            <canvas width="256" height="256" id="nes-attributeTable2" class="nes-attributeTable"></canvas>
+        </div>
+        <div id="nes-nameTable-3">
+            <div>nameTable3 attributeTable3:</div>
+            <canvas width="256" height="256" id="nes-nameTable3" class="nes-nameTable"></canvas>
+            <canvas width="256" height="256" id="nes-attributeTable3" class="nes-attributeTable"></canvas>
+        </div>
+        <div id="nes-nameTable-4">
+            <div>nameTable4 attributeTable4:</div>
+            <canvas width="256" height="256" id="nes-nameTable4" class="nes-nameTable"></canvas>
+            <canvas width="256" height="256" id="nes-attributeTable4" class="nes-attributeTable"></canvas>
+        </div>
+    </div>
+
+    <script type="text/javascript" charset="utf-8">
+        var imgPalette = "";
+        var sprPalette = "";
+        for (var j = 0; j < 2; j++) {
+            imgPalette += '<div class="nes-Palette-line">';
+            sprPalette += '<div class="nes-Palette-line">';
+            for (var i = 0; i < 8; i++) {
+                imgPalette += '<div id="nes-imgPalette' + (j * 8 + i) + '" class="nes-Palette"></div>';
+                sprPalette += '<div id="nes-sprPalette' + (j * 8 + i) + '" class="nes-Palette"></div>';
+            }
+            imgPalette += '</div>';
+            sprPalette += '</div>';
+        }
+        document.getElementById('nes-imgPalette').innerHTML += imgPalette;
+        document.getElementById('nes-sprPalette').innerHTML += sprPalette;
+
+        var patternTable1 = "";
+        var patternTable2 = "";
+        for (var j = 0; j < 16; j++) {
+            patternTable1 += '<div class="nes-patternTable-line">';
+            patternTable2 += '<div class="nes-patternTable-line">';
+            for (var i = 0; i < 16; i++) {
+                patternTable1 += '<canvas width="8" height="8" id="nes-patternTable' + (j * 16 + i) + '" class="nes-patternTable"></canvas>';
+                patternTable2 += '<canvas width="8" height="8" id="nes-patternTable' + (j * 16 + i + 256) + '" class="nes-patternTable"></canvas>';
+            }
+            patternTable1 += '</div>';
+            patternTable2 += '</div>';
+        }
+        document.getElementById('nes-patternTable-1').innerHTML += patternTable1;
+        document.getElementById('nes-patternTable-2').innerHTML += patternTable2;
+
+        var sprite = "";
+        for (var j = 0; j < 8; j++) {
+            sprite += '<div class="nes-sprite-line">';
+            for (var i = 0; i < 8; i++) {
+                sprite += '<canvas width="8" height="8" id="nes-sprite' + (j * 8 + i) + '" class="nes-sprite"></canvas>';
+            }
+            sprite += '</div>';
+        }
+        document.getElementById('nes-sprite').innerHTML += sprite;
+
+        var nes = new JSNES({
+            canvas_id: 'nes-screen',
+            nes_url: "roms/1.nes", //"roms/b8.nes"
+            onEndFrame: function (nes) {
+                if (nes.frameCount % 60) {
+                    document.getElementById('status').innerHTML = `
+                    <br>nes.ui.status: `+ nes.ui.status + `
+                    <br>nes.ppu.regVT: `+ nes.ppu.regVT + `
+                    <br>nes.ppu.regFV: `+ nes.ppu.regFV + `
+                    <br>nes.ppu.regVT: `+ nes.ppu.regHT + `
+                    <br>nes.ppu.regFH: `+ nes.ppu.regFH + `
+
+                    <br>nes.ppu.cntFV: `+ nes.ppu.cntFV + `
+                    <br>nes.ppu.cntVT: `+ nes.ppu.cntVT + `
+                    <br>nes.ppu.cntV: `+ nes.ppu.cntV + `
+                    <br>nes.ppu.cntH: `+ nes.ppu.cntH + `
+                    <br>nes.ppu.cntHT: `+ nes.ppu.cntHT + `
+                    <br>nes.ppu.f_nameTableAddress: `+ nes.ppu.f_nameTableAddress + `
+                    `;
+                    for (var i = 0; i < 16; i++) {
+                        var color = nes.ppu.getColor(nes.ppu.getimgPalette(i));
+                        document.getElementById('nes-imgPalette' + i).style.backgroundColor = 'rgb(' + (color & 0xff) + ', ' + ((color >> 8) & 0xff) + ', ' + ((color >> 16) & 0xff) + ')';
+                        color = nes.ppu.getColor(nes.ppu.getsprPalette(i));
+                        document.getElementById('nes-sprPalette' + i).style.backgroundColor = 'rgb(' + (color & 0xff) + ', ' + ((color >> 8) & 0xff) + ', ' + ((color >> 16) & 0xff) + ')';
+                    }
+                }
+
+                if (nes.frameCount % 60 % 5) {
+                    for (var j = 0; j < 512; j++) {
+                        var canvasContext = document.getElementById('nes-patternTable' + j).getContext("2d");
+                        var canvasImageData = canvasContext.getImageData(0, 0, 8, 8);
+                        var buf = new ArrayBuffer(canvasImageData.data.length);
+                        var buf8 = new Uint8ClampedArray(buf);
+                        var buf32 = new Uint32Array(buf);
+                        for (var y = 0; y < 64; ++y) {
+                            buf32[y] = 0xff000000 | nes.ppu.getColor(nes.ppu.getimgPalette(
+                                nes.ppu.lower2bitColorIndexFromPatternTable(
+                                    j, y & 0b111,
+                                    y >> 3
+                                )));
+                        }
+                        canvasImageData.data.set(buf8);
+                        canvasContext.putImageData(canvasImageData, 0, 0);
+                    }
+
+                    var dst_canvasContext = document.getElementById('nes-sprite-combin1').getContext("2d");
+                    dst_canvasContext.fillStyle = "white";
+                    dst_canvasContext.fillRect(0, 0, 256, 256);
+                    var canvasImageData = canvasContext.getImageData(0, 0, 256, 256);
+                    var buf = new ArrayBuffer(canvasImageData.data.length);
+                    var buf8 = new Uint8ClampedArray(buf);
+                    var buf32 = new Uint32Array(buf);
+                    for (var j = 63; j >= 0; j--) {
+                        var sprIndex = j << 2;
+                        var sprY = nes.ppu.spriteMem[sprIndex];
+                        var sprX = nes.ppu.spriteMem[sprIndex + 3];
+                        var sprTileIndex = nes.ppu.spriteMem[sprIndex + 1] + (nes.ppu.f_spPatternTable == 0 ? 0 : 256);
+                        var higher2bit = nes.ppu.spriteMem[sprIndex + 2] & 0b00000011;
+                        var priority = (nes.ppu.spriteMem[sprIndex + 2] & 0b00100000) == 0;
+                        var flipHorizontal = (nes.ppu.spriteMem[sprIndex + 2] & 0b01000000) != 0;
+                        var flipVertical = (nes.ppu.spriteMem[sprIndex + 2] & 0b10000000) != 0;
+                        if (sprY >= 240) {
+                            continue;
+                        }
+                        var tileImageData = document.getElementById('nes-patternTable' + sprTileIndex).getContext("2d").getImageData(0, 0, 8, 8);
+                        document.getElementById('nes-sprite' + j).getContext("2d").putImageData(
+                            tileImageData,
+                            0,
+                            0
+                        );
+                        var tIndex = 0;
+                        if (!flipVertical && !flipHorizontal) {
+                            tIndex = 0;
+                        } else if (flipHorizontal && !flipVertical) {
+                            tIndex = 7;
+                        } else if (flipVertical && !flipHorizontal) {
+                            tIndex = 56;
+                        } else {
+                            tIndex = 63;
+                        }
+                        for (var y = 0; y < 8; y++) {
+                            for (var x = 0; x < 8; x++) {
+                                var index = tIndex + (flipHorizontal ? -x : x);
+                                var lower2bit = nes.ppu.lower2bitColorIndexFromPatternTable(
+                                    sprTileIndex, index & 0b111,
+                                    index >> 3
+                                );
+                                // console.log(nes.ppu.f_spriteSize == 0 ? nes.ppu.f_spPatternTable : sprTileIndex & 1
+                                //     , sprTileIndex, index & 0b111, index >> 3, lower2bit, sprX, sprY)
+                                if (lower2bit != 0) {
+                                    buf32[(sprY + y) * 256 + sprX + x] = 0xff000000 | nes.ppu.getColor(
+                                        nes.ppu.getsprPalette(
+                                            (higher2bit << 2) | lower2bit
+                                        ));
+                                    if (nes.ppu.f_spriteSize) {
+                                        lower2bit = nes.ppu.lower2bitColorIndexFromPatternTable(
+                                            sprTileIndex + (flipVertical ? -1 : 1), index & 0b111,
+                                            index >> 3
+                                        );
+                                        buf32[(sprY + 8 + y) * 256 + sprX + x] = 0xff000000 | nes.ppu.getColor(
+                                            nes.ppu.getsprPalette(
+                                                (higher2bit << 2) | lower2bit
+                                            ));
+                                    }
+                                }
+                            }
+                            tIndex += (flipVertical ? -8 : 8);
+                        }
+                    }
+                    canvasImageData.data.set(buf8);
+                    dst_canvasContext.putImageData(canvasImageData, 0, 0);
+
+                    var dst_canvasContext = document.getElementById('nes-nameTable1').getContext("2d");
+                    dst_canvasContext.fillStyle = "white";
+                    dst_canvasContext.fillRect(0, 0, 256, 256);
+                    for (var j = 0; j < 32; j++) {
+                        for (var i = 0; i < 32; i++) {
+                            var tIndex = nes.ppu.tileIndexFromNameTable(0, j * 32 + i) + (nes.ppu.f_bgPatternTable === 0 ? 0 : 256);
+                            var canvasImageData = document.getElementById('nes-patternTable' + (tIndex)).getContext("2d").getImageData(0, 0, 8, 8);
+                            dst_canvasContext.putImageData(canvasImageData, i * 8, j * 8);
+                            var buf = new ArrayBuffer(canvasImageData.data.length);
+                            var buf8 = new Uint8ClampedArray(buf);
+                            var buf32 = new Uint32Array(buf);
+                            var higher2bit = nes.ppu.higher2bitColorIndexFromAttributeTable(0, j * 32 + i);
+                            for (var y = 0; y < 64; ++y) {
+                                var lower2bit = nes.ppu.lower2bitColorIndexFromPatternTable(tIndex, y & 0b111, y >> 3);
+                                buf32[y] = 0xff000000 | nes.ppu.getColor(
+                                    nes.ppu.getimgPalette(
+                                        lower2bit != 0 ?
+                                            higher2bit | lower2bit
+                                            : lower2bit
+                                    ));
+                            }
+                            canvasImageData.data.set(buf8);
+                            document.getElementById('nes-attributeTable1').getContext("2d").putImageData(canvasImageData, i * 8, j * 8);
+                        }
+                    }
+
+                    // var dst_canvasContext = document.getElementById('nes-nameTable2').getContext("2d");
+                    // dst_canvasContext.fillStyle = "white";
+                    // dst_canvasContext.fillRect(0, 0, 256, 256);
+                    // for (var j = 0; j < 32; j++) {
+                    //     for (var i = 0; i < 32; i++) {
+                    //         var tIndex = nes.ppu.tileIndexFromNameTable(1, j * 32 + i) + (nes.ppu.f_bgPatternTable === 0 ? 0 : 256);
+                    //         var canvasImageData = document.getElementById('nes-patternTable' + (tIndex)).getContext("2d").getImageData(0, 0, 8, 8);
+                    //         dst_canvasContext.putImageData(canvasImageData, i * 8, j * 8);
+                    //         var buf = new ArrayBuffer(canvasImageData.data.length);
+                    //         var buf8 = new Uint8ClampedArray(buf);
+                    //         var buf32 = new Uint32Array(buf);
+                    //         var higher2bit = nes.ppu.higher2bitColorIndexFromAttributeTable(0, j * 32 + i);
+                    //         for (var y = 0; y < 64; ++y) {
+                    //             var lower2bit = nes.ppu.lower2bitColorIndexFromPatternTable(tIndex, y & 0b111, y >> 3);
+                    //             buf32[y] = 0xff000000 | nes.ppu.getColor(
+                    //                 nes.ppu.getimgPalette(
+                    //                     lower2bit != 0 ?
+                    //                         higher2bit | lower2bit
+                    //                         : lower2bit
+                    //                 ));
+                    //         }
+                    //         canvasImageData.data.set(buf8);
+                    //         document.getElementById('nes-attributeTable1').getContext("2d").putImageData(canvasImageData, i * 8, j * 8);
+                    //     }
+                    // }
+                    // var dst_canvasContext = document.getElementById('nes-nameTable3').getContext("2d");
+                    // dst_canvasContext.fillStyle = "white";
+                    // dst_canvasContext.fillRect(0, 0, 256, 256);
+                    // for (var j = 0; j < 32; j++) {
+                    //     for (var i = 0; i < 32; i++) {
+                    //         var tIndex = nes.ppu.tileIndexFromNameTable(2, j * 32 + i) + (nes.ppu.f_bgPatternTable === 0 ? 0 : 256);
+                    //         var canvasImageData = document.getElementById('nes-patternTable' + (tIndex)).getContext("2d").getImageData(0, 0, 8, 8);
+                    //         dst_canvasContext.putImageData(canvasImageData, i * 8, j * 8);
+                    //         var buf = new ArrayBuffer(canvasImageData.data.length);
+                    //         var buf8 = new Uint8ClampedArray(buf);
+                    //         var buf32 = new Uint32Array(buf);
+                    //         var higher2bit = nes.ppu.higher2bitColorIndexFromAttributeTable(0, j * 32 + i);
+                    //         for (var y = 0; y < 64; ++y) {
+                    //             var lower2bit = nes.ppu.lower2bitColorIndexFromPatternTable(tIndex, y & 0b111, y >> 3);
+                    //             buf32[y] = 0xff000000 | nes.ppu.getColor(
+                    //                 nes.ppu.getimgPalette(
+                    //                     lower2bit != 0 ?
+                    //                         higher2bit | lower2bit
+                    //                         : lower2bit
+                    //                 ));
+                    //         }
+                    //         canvasImageData.data.set(buf8);
+                    //         document.getElementById('nes-attributeTable1').getContext("2d").putImageData(canvasImageData, i * 8, j * 8);
+                    //     }
+                    // }
+                    // var dst_canvasContext = document.getElementById('nes-nameTable4').getContext("2d");
+                    // dst_canvasContext.fillStyle = "white";
+                    // dst_canvasContext.fillRect(0, 0, 256, 256);
+                    // for (var j = 0; j < 32; j++) {
+                    //     for (var i = 0; i < 32; i++) {
+                    //         var tIndex = nes.ppu.tileIndexFromNameTable(3, j * 32 + i) + (nes.ppu.f_bgPatternTable === 0 ? 0 : 256);
+                    //         var canvasImageData = document.getElementById('nes-patternTable' + (tIndex)).getContext("2d").getImageData(0, 0, 8, 8);
+                    //         dst_canvasContext.putImageData(canvasImageData, i * 8, j * 8);
+                    //         var buf = new ArrayBuffer(canvasImageData.data.length);
+                    //         var buf8 = new Uint8ClampedArray(buf);
+                    //         var buf32 = new Uint32Array(buf);
+                    //         var higher2bit = nes.ppu.higher2bitColorIndexFromAttributeTable(0, j * 32 + i);
+                    //         for (var y = 0; y < 64; ++y) {
+                    //             var lower2bit = nes.ppu.lower2bitColorIndexFromPatternTable(tIndex, y & 0b111, y >> 3);
+                    //             buf32[y] = 0xff000000 | nes.ppu.getColor(
+                    //                 nes.ppu.getimgPalette(
+                    //                     lower2bit != 0 ?
+                    //                         higher2bit | lower2bit
+                    //                         : lower2bit
+                    //                 ));
+                    //         }
+                    //         canvasImageData.data.set(buf8);
+                    //         document.getElementById('nes-attributeTable1').getContext("2d").putImageData(canvasImageData, i * 8, j * 8);
+                    //     }
+                    // }
+
+                }
+            }
+        });
+
+        var html = "";
+        for (var j = 0; j < 8; j++) {
+            html += '<div class="nes-Palette-line">';
+            for (var i = 0; i < 8; i++) {
+                var color = nes.ppu.emphTable[j * 8 + i][0];
+                html += '<div style="background:rgb(' + (color & 0xff) + ', ' + ((color >> 8) & 0xff) + ', ' + ((color >> 16) & 0xff) + ')' + '" class="nes-Palette"></div>';
+            }
+            html += '</div>';
+        }
+        document.getElementById('nes-emphTable').innerHTML += html;
+    </script>
+
+    <table id="controls">
+        <tr>
+            <th>Button</th>
+            <th>Player 1</th>
+            <th>Player 2</th>
+        </tr>
+        <tr>
+            <td>Left</td>
+            <td>Left</td>
+            <td>Num-4</td>
+            <tr>
+                <td>Right</td>
+                <td>Right</td>
+                <td>Num-6</td>
+            </tr>
+            <tr>
+                <td>Up</td>
+                <td>Up</td>
+                <td>Num-8</td>
+            </tr>
+            <tr>
+                <td>Down</td>
+                <td>Down</td>
+                <td>Num-2</td>
+            </tr>
+            <tr>
+                <td>A</td>
+                <td>X</td>
+                <td>Num-7</td>
+            </tr>
+            <tr>
+                <td>B</td>
+                <td>Z/Y</td>
+                <td>Num-9</td>
+            </tr>
+            <tr>
+                <td>Start</td>
+                <td>Enter</td>
+                <td>Num-1</td>
+            </tr>
+            <tr>
+                <td>Select</td>
+                <td>Ctrl</td>
+                <td>Num-3</td>
+            </tr>
+    </table>
+</body>
+
+</html>

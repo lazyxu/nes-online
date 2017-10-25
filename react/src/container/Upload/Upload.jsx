@@ -97,10 +97,6 @@ class Upload extends React.Component {
     return false
   }
 
-  setOnFrame(func) {
-    this.nes.opts.onFrame = func
-  }
-
   loadNext() {
     this.fileIndex++
     this.sameCount = 0
