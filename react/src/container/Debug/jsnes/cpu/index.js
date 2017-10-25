@@ -1,5 +1,5 @@
 var utils = require("../utils");
-var mem = require("./mem");
+var MEM = require("./mem");
 
 var CPU = function (nes) {
   this.nes = nes;
@@ -41,9 +41,7 @@ var CPU = function (nes) {
     0x02020105, 0x05020b2b, 0x000000ff, 0x000000ff, 0x000000ff, 0x0402062b, 0x06020618, 0x000000ff,
     0x0201022d, 0x0403092b, 0x000000ff, 0x000000ff, 0x000000ff, 0x0403082b, 0x07030818, 0x000000ff
   ]);
-  // this.mem = new CPU_MEM();
-  // mem.init.call(this);
-  this.mem = new Uint8Array(new ArrayBuffer(0x10000)); // Main memory 64KB
+  this.mem = new MEM();
   this.IRQ_NORMAL = 0; // IRQ Types
   this.IRQ_NMI = 1;
   this.IRQ_RESET = 2;
@@ -52,21 +50,7 @@ var CPU = function (nes) {
 
 CPU.prototype = {
   reset() {
-    // mem.reset.call(this);
-    for (var i = 0; i < 0x2000; i++) {
-      this.mem[i] = 0xFF;
-    }
-    for (var p = 0; p < 4; p++) {
-      var i = p * 0x800;
-      this.mem[i + 0x008] = 0xF7;
-      this.mem[i + 0x009] = 0xEF;
-      this.mem[i + 0x00A] = 0xDF;
-      this.mem[i + 0x00F] = 0xBF;
-    }
-    for (var i = 0x2001; i < this.mem.length; i++) {
-      this.mem[i] = 0;
-    }
-    
+    this.mem.reset();
     this.cyclesToHalt = 0;
     this.irqRequested = false; // Interrupt notification
     this.irqType = null;
@@ -198,7 +182,7 @@ CPU.prototype = {
       case 12: // Indirect Absolute mode. Find the 16-bit address contained at the given location.
         addr = this.load16bit(opaddr + 2);// Find op
         if (addr < 0x1FFF) {
-          addr = this.mem[addr] + (this.mem[(addr & 0xFF00) | (((addr & 0xFF) + 1) & 0xFF)] << 8);// Read from address given in op
+          addr = this.mem.load(addr) + (this.mem.load((addr & 0xFF00) | (((addr & 0xFF) + 1) & 0xFF)) << 8);// Read from address given in op
         } else {
           addr = this.nes.mmap.load(addr) + (this.nes.mmap.load((addr & 0xFF00) | (((addr & 0xFF) + 1) & 0xFF)) << 8);
         }
@@ -596,7 +580,7 @@ CPU.prototype = {
 
   load: function (addr) {
     if (addr < 0x2000) {
-      return this.mem[addr & 0x7FF];
+      return this.mem.load(addr & 0x7FF);
     } else {
       return this.nes.mmap.load(addr);
     }
@@ -604,7 +588,7 @@ CPU.prototype = {
 
   load16bit: function (addr) {
     if (addr < 0x1FFF) {
-      return this.mem[addr & 0x7FF] | (this.mem[(addr + 1) & 0x7FF] << 8);
+      return this.mem.load(addr & 0x7FF) | (this.mem.load((addr + 1) & 0x7FF) << 8);
     } else {
       return this.nes.mmap.load(addr) | (this.nes.mmap.load(addr + 1) << 8);
     }
@@ -612,7 +596,7 @@ CPU.prototype = {
 
   write: function (addr, val) {
     if (addr < 0x2000) {
-      this.mem[addr & 0x7FF] = val;
+      this.mem.write(addr & 0x7FF, val);
     } else {
       this.nes.mmap.write(addr, val);
     }

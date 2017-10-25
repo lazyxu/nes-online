@@ -20,9 +20,9 @@ Mappers[0].prototype = {
   write: function(address, value) {
     if (address < 0x2000) {
       // Mirroring of RAM:
-      this.nes.cpu.mem[address & 0x7ff] = value;
+      this.nes.cpu.mem.write(address & 0x7ff, value);
     } else if (address > 0x4017) {
-      this.nes.cpu.mem[address] = value;
+      this.nes.cpu.mem.write(address, value);
       if (address >= 0x6000 && address < 0x8000) {
         // Write to SaveRAM. Store in file:
         // TODO: not yet
@@ -39,9 +39,9 @@ Mappers[0].prototype = {
   writelow: function(address, value) {
     if (address < 0x2000) {
       // Mirroring of RAM:
-      this.nes.cpu.mem[address & 0x7ff] = value;
+      this.nes.cpu.mem.write(address & 0x7ff, value);
     } else if (address > 0x4017) {
-      this.nes.cpu.mem[address] = value;
+      this.nes.cpu.mem.write(address, value);
     } else if (address > 0x2007 && address < 0x4000) {
       this.regWrite(0x2000 + (address & 0x7), value);
     } else {
@@ -56,13 +56,13 @@ Mappers[0].prototype = {
     // Check address range:
     if (address > 0x4017) {
       // ROM:
-      return this.nes.cpu.mem[address];
+      return this.nes.cpu.mem.load(address);
     } else if (address >= 0x2000) {
       // I/O Ports.
       return this.regLoad(address);
     } else {
       // RAM (mirrored)
-      return this.nes.cpu.mem[address & 0x7ff];
+      return this.nes.cpu.mem.load(address & 0x7ff);
     }
   },
 
@@ -86,7 +86,7 @@ Mappers[0].prototype = {
             // in main memory and in the
             // PPU as flags):
             // (not in the real NES)
-            return this.nes.cpu.mem[0x2000];
+            return this.nes.cpu.mem.load(0x2000);
 
           case 0x1:
             // 0x2001:
@@ -95,7 +95,7 @@ Mappers[0].prototype = {
             // in main memory and in the
             // PPU as flags):
             // (not in the real NES)
-            return this.nes.cpu.mem[0x2001];
+            return this.nes.cpu.mem.load(0x2001);
 
           case 0x2:
             // 0x2002:
@@ -168,13 +168,13 @@ Mappers[0].prototype = {
     switch (address) {
       case 0x2000:
         // PPU Control register 1
-        this.nes.cpu.mem[address] = value;
+        this.nes.cpu.mem.write(address,value);
         this.nes.ppu.updateControlReg1(value);
         break;
 
       case 0x2001:
         // PPU Control register 2
-        this.nes.cpu.mem[address] = value;
+        this.nes.cpu.mem.write(address, value);
         this.nes.ppu.updateControlReg2(value);
         break;
 
@@ -371,7 +371,7 @@ Mappers[0].prototype = {
       var ram = this.nes.rom.batteryRam;
       if (ram !== null && ram.length === 0x2000) {
         // Load Battery RAM into memory:
-        utils.copyArrayElements(ram, 0, this.nes.cpu.mem, 0x6000, 0x2000);
+        utils.copyArrayElements(ram, 0, this.nes.cpu.mem.data, 0x6000, 0x2000);
       }
     }
   },
@@ -384,7 +384,7 @@ Mappers[0].prototype = {
     utils.copyArrayElements(
       this.nes.rom.rom[bank],
       0,
-      this.nes.cpu.mem,
+      this.nes.cpu.mem.data,
       address,
       16384
     );
@@ -488,7 +488,7 @@ Mappers[0].prototype = {
     utils.copyArrayElements(
       this.nes.rom.rom[bank16k],
       offset,
-      this.nes.cpu.mem,
+      this.nes.cpu.mem.data,
       address,
       8192
     );

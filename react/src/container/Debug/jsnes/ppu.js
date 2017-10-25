@@ -576,14 +576,14 @@ PPU.prototype = {
 
   setStatusFlag: function(flag, value) {
     var n = 1 << flag;
-    this.nes.cpu.mem[0x2002] =
-      (this.nes.cpu.mem[0x2002] & (255 - n)) | (value ? n : 0);
+    this.nes.cpu.mem.write(0x2002,
+      (this.nes.cpu.mem.load(0x2002) & (255 - n)) | (value ? n : 0));
   },
 
   // CPU Register $2002:
   // Read the Status Register.
   readStatusRegister: function() {
-    var tmp = this.nes.cpu.mem[0x2002];
+    var tmp = this.nes.cpu.mem.load(0x2002);
 
     // Reset scroll & VRAM Address toggle:
     this.firstWrite = true;
@@ -750,7 +750,7 @@ PPU.prototype = {
     var baseAddress = value * 0x100;
     var data;
     for (var i = this.sramAddress; i < 256; i++) {
-      data = this.nes.cpu.mem[baseAddress + i];
+      data = this.nes.cpu.mem.load(baseAddress + i);
       this.spriteMem[i] = data;
       this.spriteRamWriteUpdate(i, data);
     }
