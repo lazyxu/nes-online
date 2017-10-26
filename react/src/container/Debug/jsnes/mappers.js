@@ -110,6 +110,7 @@ Mappers[0].prototype = {
             return 0;
 
           case 0x4:
+          console.log("sramLoad")
             // 0x2004:
             // Sprite Memory read.
             return this.nes.ppu.sramLoad();
@@ -179,11 +180,13 @@ Mappers[0].prototype = {
         break;
 
       case 0x2003:
+          // console.log("writeSRAMAddress")
         // Set Sprite RAM address:
         this.nes.ppu.writeSRAMAddress(value);
         break;
 
       case 0x2004:
+          console.log("sramWrite")
         // Write to Sprite RAM:
         this.nes.ppu.sramWrite(value);
         break;

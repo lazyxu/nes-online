@@ -1,6 +1,6 @@
 
 var Interrput = function () {
-  
+
 }
 
 Interrput.NORMAL = 0; // IRQ Types
@@ -13,10 +13,10 @@ Interrput.prototype = {
     this.requested = false; // Interrupt notification
     this.type = null;
   },
-  
-    requestNMI: function () {
-      this.request(Interrput.NMI)
-    },
+
+  requestNMI: function () {
+    this.request(Interrput.NMI)
+  },
 
   requestNormal: function () {
     this.request(Interrput.NMI)

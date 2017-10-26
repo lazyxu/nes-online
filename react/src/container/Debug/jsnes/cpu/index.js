@@ -520,7 +520,8 @@ CPU.prototype = {
         this.reg.F_ZERO = this.reg.Y;
         break;
       default: // ???
-        this.nes.stop();
+        // this.nes.stop();
+        this.nes.opts.onStop();
         this.nes.crashMessage = "Game crashed, invalid opcode at address $" + opaddr.toString(16);
         break;
     }

@@ -1,0 +1,17 @@
+.Palette {
+    float: left;
+    width: 104px;
+    line-height: 11px;
+    font-size: 10px;
+}
+.Palette .line{
+    height: 12px;
+    margin-bottom: 1px;
+}
+.Palette .rect {    
+    float: left;
+    height: 12px;
+    width: 12px;
+    margin: 1px 1px 0 0;
+    display: inline-flex;
+}

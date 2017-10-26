@@ -1,0 +1,15 @@
+.PatternTable {
+    float: left;
+}
+.PatternTable .table {
+    width: 208px;
+    line-height: 11px;
+    font-size: 10px;
+}
+.PatternTable .rect {    
+    float: left;
+    height: 12px;
+    width: 12px;
+    margin: 1px 1px 0 0;
+    display: inline-flex;
+}

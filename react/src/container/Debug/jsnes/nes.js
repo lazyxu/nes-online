@@ -9,7 +9,7 @@ var NES = function (opts) {
     onFrame: function () { },
     onAudioSample: null,
     onStatusUpdate: function () { },
-
+    onStop: function() {},
     // FIXME: not actually used except for in PAPU
     preferredFrameRate: 60,
 
@@ -100,7 +100,7 @@ NES.prototype = {
       for (; cycles > 0; cycles--) {
         if (
           ppu.curX === ppu.spr0HitX &&
-          ppu.f_spVisibility === 1 &&
+          ppu.reg.f_spVisibility === 1 &&
           ppu.scanline - 21 === ppu.spr0HitY
         ) {
           // Set sprite 0 hit flag:
