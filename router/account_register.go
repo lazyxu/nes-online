@@ -5,10 +5,10 @@ import (
 
 	"github.com/MeteorKL/koala"
 
-	"gopkg.in/mgo.v2/bson"
-	"github.com/MeteorKL/nes-online/util/dao/dao_user"
 	"github.com/MeteorKL/nes-online/util/constant"
+	"github.com/MeteorKL/nes-online/util/dao/dao_user"
 	"github.com/MeteorKL/nes-online/util/mailer"
+	"go.mongodb.org/mongo-driver/bson"
 )
 
 func existMail(mail string) bool {

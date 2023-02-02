@@ -2,12 +2,13 @@ package router
 
 import (
 	"encoding/json"
+
 	"github.com/MeteorKL/koala"
 
-	"gopkg.in/mgo.v2/bson"
-	"github.com/MeteorKL/nes-online/util/dao/dao_user"
 	"github.com/MeteorKL/koala/logger"
+	"github.com/MeteorKL/nes-online/util/dao/dao_user"
 	"github.com/MeteorKL/nes-online/util/session"
+	"go.mongodb.org/mongo-driver/bson"
 )
 
 func getKeyboard(c *koala.Context) {
@@ -15,7 +16,7 @@ func getKeyboard(c *koala.Context) {
 		writeErrJSON(c, "请先登录")
 	} else {
 		if user, ok := s.Get("user").(map[string]interface{}); ok {
-			writeSuccessJSON(c, "获取按键设置成功",user["keyboard"])
+			writeSuccessJSON(c, "获取按键设置成功", user["keyboard"])
 		} else {
 			logger.Error("updateKeyboard in session failed")
 			writeErrJSON(c, "获取按键设置失败")

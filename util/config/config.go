@@ -31,6 +31,7 @@ type Config struct {
 		Source    string   `json:"source"`
 		Mechanism string   `json:"mechanism"`
 	}  `json:"mgo"`
+	MgoUrl string  `json:"mgo_url"`
 }
 
 var Conf Config

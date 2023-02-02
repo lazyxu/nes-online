@@ -4,13 +4,14 @@ import (
 	"net/http"
 
 	"github.com/MeteorKL/koala"
-	"github.com/MeteorKL/nes-online/router"
-	"github.com/MeteorKL/nes-online/wsRouter"
 	"github.com/MeteorKL/koala/logger"
+	"github.com/MeteorKL/nes-online/router"
 	"github.com/MeteorKL/nes-online/util/config"
+	"github.com/MeteorKL/nes-online/wsRouter"
 )
 
 func main() {
+	println("main")
 	logger.SetLogLevel(config.Conf.LogLevel)
 	config.Load()
 	app := koala.NewApp()

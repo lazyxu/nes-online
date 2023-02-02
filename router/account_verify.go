@@ -6,12 +6,12 @@ import (
 	"math/rand"
 	"strconv"
 
-	"github.com/MeteorKL/koala/util"
-	"gopkg.in/mgo.v2/bson"
 	"github.com/MeteorKL/koala"
+	"github.com/MeteorKL/koala/util"
+	"github.com/MeteorKL/nes-online/util/dao/dao_user"
 	"github.com/MeteorKL/nes-online/util/mailer"
 	"github.com/MeteorKL/nes-online/util/session"
-	"github.com/MeteorKL/nes-online/util/dao/dao_user"
+	"go.mongodb.org/mongo-driver/bson"
 )
 
 func generateVerifyCode(mail string) string {

@@ -1,20 +1,21 @@
 package dao_user
 
 import (
-	"time"
-	"gopkg.in/mgo.v2/bson"
-	"github.com/MeteorKL/nes-online/util/constant"
+	"context"
 	"regexp"
+	"time"
+
 	"github.com/MeteorKL/koala/logger"
-	"github.com/MeteorKL/nes-online/util/config"
+	"github.com/MeteorKL/nes-online/util/constant"
 	"github.com/MeteorKL/nes-online/util/mgo_session"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 type User struct {
 }
 
-var db = config.Conf.Mgo.Database
-
+const db = "nes"
 const collection = "user"
 
 func Login(account string, password string) map[string]interface{} {
@@ -38,23 +39,25 @@ func Login(account string, password string) map[string]interface{} {
 
 func Get(query bson.M, selector bson.M) map[string]interface{} {
 	user := make(map[string]interface{})
-	session := mgo_session.Get()
-	defer session.Close()
-	err := session.DB(db).C(collection).Find(
-		query,
-	).Select(
-		selector,
-	).One(&user)
+	client := mgo_session.Get()
+	defer client.Disconnect(context.TODO())
+	coll := client.Database(db).Collection(collection)
+	err := coll.FindOne(context.TODO(),
+		query, &options.FindOneOptions{
+			Projection: selector,
+		},
+	).Decode(&user)
 	logger.Warn(err)
 	return user
 }
 
 func Exist(query bson.M) bool {
-	session := mgo_session.Get()
-	defer session.Close()
-	n, err := session.DB(db).C(collection).Find(query).Count()
+	client := mgo_session.Get()
+	defer client.Disconnect(context.TODO())
+	coll := client.Database(db).Collection(collection)
+	err := coll.FindOne(context.TODO(), query).Err()
 	logger.Warn(err)
-	return n != 0
+	return err == nil
 }
 
 func Update(selector bson.M, set bson.M, unset bson.M) bool {
@@ -69,17 +72,19 @@ func Update(selector bson.M, set bson.M, unset bson.M) bool {
 			"$set": set,
 		}
 	}
-	session := mgo_session.Get()
-	defer session.Close()
-	err := session.DB(db).C(collection).Update(selector, update)
+	client := mgo_session.Get()
+	defer client.Disconnect(context.TODO())
+	coll := client.Database(db).Collection(collection)
+	_, err := coll.UpdateOne(context.TODO(), selector, update)
 	logger.Warn(err)
 	return err == nil
 }
 
 func Insert(docs ...interface{}) bool {
-	session := mgo_session.Get()
-	defer session.Close()
-	err := session.DB(db).C(collection).Insert(
+	client := mgo_session.Get()
+	defer client.Disconnect(context.TODO())
+	coll := client.Database(db).Collection(collection)
+	_, err := coll.InsertMany(context.TODO(),
 		docs,
 	)
 	logger.Warn(err)
@@ -87,13 +92,14 @@ func Insert(docs ...interface{}) bool {
 }
 
 func ThirdPartyLogin(thirdPartyType string, name string, avatarURL string) map[string]interface{} {
-	session := mgo_session.Get()
-	defer session.Close()
-	n, err := session.DB(db).C(collection).Find(map[string]interface{}{
+	client := mgo_session.Get()
+	defer client.Disconnect(context.TODO())
+	coll := client.Database(db).Collection(collection)
+	err := coll.FindOne(context.TODO(), map[string]interface{}{
 		thirdPartyType: name,
-	}).Count()
+	}).Err()
 	logger.Warn(err)
-	if n == 0 {
+	if err != nil {
 		if !Insert(bson.M{
 			thirdPartyType: name,
 			"name":         name + "@" + thirdPartyType,

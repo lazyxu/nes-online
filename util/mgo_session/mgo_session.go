@@ -1,33 +1,28 @@
 package mgo_session
 
 import (
-	"time"
+	"context"
+	"fmt"
 
-	"gopkg.in/mgo.v2"
-	"github.com/MeteorKL/nes-online/util/config"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
+	"go.mongodb.org/mongo-driver/mongo/readpref"
+
 	"github.com/MeteorKL/koala/logger"
+	"github.com/MeteorKL/nes-online/util/config"
 )
 
-var mgoSession *mgo.Session
-
-func Get() *mgo.Session {
+func Get() *mongo.Client {
 	logger.Debug("config.mgo:")
-	logger.Debug(config.Conf.Mgo)
-	if mgoSession == nil {
-		var err error
-		mongoDBDialInfo := &mgo.DialInfo{
-			Addrs:     config.Conf.Mgo.Addrs,
-			Username:  config.Conf.Mgo.Username,
-			Password:  config.Conf.Mgo.Password,
-			Database:  config.Conf.Mgo.Database,
-			Source:    config.Conf.Mgo.Source,
-			Mechanism: config.Conf.Mgo.Mechanism,
-			Timeout:   60 * time.Second,
-		}
-		mgoSession, err = mgo.DialWithInfo(mongoDBDialInfo) //连接数据库
-		if err != nil {
-			panic(err) // no, not really
-		}
+	logger.Debug(config.Conf.MgoUrl)
+	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(config.Conf.MgoUrl))
+	if err != nil {
+		panic(err)
 	}
-	return mgoSession.Clone()
+	// Ping the primary
+	if err := client.Ping(context.TODO(), readpref.Primary()); err != nil {
+		panic(err)
+	}
+	fmt.Println("Successfully connected and pinged.")
+	return client
 }

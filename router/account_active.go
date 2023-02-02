@@ -5,8 +5,8 @@ import (
 
 	"github.com/MeteorKL/koala"
 
-	"gopkg.in/mgo.v2/bson"
 	"github.com/MeteorKL/nes-online/util/dao/dao_user"
+	"go.mongodb.org/mongo-driver/bson"
 )
 
 func active(c *koala.Context) {
