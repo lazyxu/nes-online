@@ -110,10 +110,10 @@ Mappers[0].prototype = {
             return 0;
 
           case 0x4:
-          console.log("sramLoad")
+            console.log("sramLoad")
             // 0x2004:
             // Sprite Memory read.
-            return this.nes.ppu.sramLoad();
+            return this.nes.ppu.reg.loadSram();
           case 0x5:
             return 0;
 
@@ -166,29 +166,26 @@ Mappers[0].prototype = {
   },
 
   regWrite: function(address, value) {
+        this.nes.cpu.mem.write(address,value);
     switch (address) {
       case 0x2000:
         // PPU Control register 1
-        this.nes.cpu.mem.write(address,value);
-        this.nes.ppu.updateControlReg1(value);
         break;
 
       case 0x2001:
         // PPU Control register 2
-        this.nes.cpu.mem.write(address, value);
-        this.nes.ppu.updateControlReg2(value);
         break;
 
       case 0x2003:
           // console.log("writeSRAMAddress")
         // Set Sprite RAM address:
-        this.nes.ppu.writeSRAMAddress(value);
+        this.nes.ppu.reg.writeSramAddr(value);
         break;
 
       case 0x2004:
           console.log("sramWrite")
         // Write to Sprite RAM:
-        this.nes.ppu.sramWrite(value);
+        this.nes.ppu.reg.writeSram(value);
         break;
 
       case 0x2005:
@@ -208,7 +205,7 @@ Mappers[0].prototype = {
 
       case 0x4014:
         // Sprite Memory DMA Access
-        this.nes.ppu.sramDMA(value);
+        this.nes.ppu.reg.sramDMA(value);
         break;
 
       case 0x4015:

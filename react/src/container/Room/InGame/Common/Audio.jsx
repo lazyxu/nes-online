@@ -14,7 +14,9 @@ class Audio extends React.Component {
     var frameCount= 8192  // 创建一个 采样率与音频环境(AudioContext)相同的 的 音频片段。
     var audioBuffer = audioCtx.createBuffer(channels, frameCount, sampleRate)
     var myFrameCount = 0;
+    window.t = [];
     this.props.setOnAudioSample((left, right) => {
+      window.t.push({left, right});
       if (this.props.emulateSound) {
         if (myFrameCount == frameCount) {
           var source = audioCtx.createBufferSource()

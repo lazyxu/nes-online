@@ -11,3 +11,4 @@ roms/
 static/origin_roms/*
 static/js/*
 *.rdb
+config.json

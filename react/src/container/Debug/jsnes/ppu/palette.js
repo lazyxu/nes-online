@@ -6,7 +6,6 @@ var Palette = function (ppu) {
   for (var i = 0; i < 64; i++) {
     this.emphTable[i] = new Array(8);
   }
-  this.currentEmph = 0;
   var curTable = [
     0x525252, 0xB40000, 0xA00000, 0xB1003D, 0x740069, 0x00005B, 0x00005F, 0x001840,
     0x002F10, 0x084A08, 0x006700, 0x124200, 0x6D2800, 0x000000, 0x000000, 0x000000,
@@ -41,18 +40,20 @@ var Palette = function (ppu) {
 Palette.prototype = {
 
   getColor(yiq) {
-    return this.emphTable[yiq][this.currentEmph];
+    return this.emphTable[yiq][
+      this.ppu.reg.displayType()==0?this.ppu.reg.colour():0
+    ];
   },
 
   loadImage(index) {
     return this.getColor(
-      this.ppu.vram.load(0x3f00 + index) & (this.ppu.reg.f_dispType === 0 ? 63 : 32)
+      this.ppu.vram.load(0x3f00 + index) & (this.ppu.reg.displayType() === 0 ? 63 : 32)
     );
   },
 
   loadSprit(index) {
     return this.getColor(
-      this.ppu.vram.load(0x3f10 + index) & (this.ppu.reg.f_dispType === 0 ? 63 : 32)
+      this.ppu.vram.load(0x3f10 + index) & (this.ppu.reg.displayType() === 0 ? 63 : 32)
     );
   }
 }

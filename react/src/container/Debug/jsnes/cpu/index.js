@@ -19,11 +19,15 @@ CPU.prototype = {
     this.reg.reset();
     this.irq.reset();
     this.cyclesToHalt = 0;
+    this.crashed = false;
   },
 
   // Emulates a single CPU instruction, returns the number of cycles
   // 模拟一个CPU指令，返回运行的周期数 1.检查中断 2.设置寻址方式 3.执行指令
   emulate: function () {
+    if (this.crashed) {
+      return 1;
+    }
     var temp;
     var add;
 
@@ -520,8 +524,7 @@ CPU.prototype = {
         this.reg.F_ZERO = this.reg.Y;
         break;
       default: // ???
-        // this.nes.stop();
-        this.nes.opts.onStop();
+      this.crashed = true;
         this.nes.crashMessage = "Game crashed, invalid opcode at address $" + opaddr.toString(16);
         break;
     }

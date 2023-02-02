@@ -20,6 +20,7 @@ class GameList extends React.Component {
       if (resp.error) {
         return
       }
+      resp.data.push({name:"volumes"})
       this.setState({ gameList: resp.data })
     })
   }

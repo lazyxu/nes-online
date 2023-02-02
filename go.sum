@@ -1,0 +1,8 @@
+github.com/gorilla/websocket v1.5.0 h1:PPwGk2jz7EePpoHN/+ClbZu8SPxiqlu12wZP/3sWmnc=
+github.com/gorilla/websocket v1.5.0/go.mod h1:YR8l580nyteQvAITg2hZ9XVh4b55+EU/adAjf1fMHhE=
+gopkg.in/alexcesaro/quotedprintable.v2 v2.0.0-20150314193201-9b4a113f96b3 h1:oeB/ux+1n/XCMvII9SH7XL7WykayRzJPRVv2NNNfcbI=
+gopkg.in/alexcesaro/quotedprintable.v2 v2.0.0-20150314193201-9b4a113f96b3/go.mod h1:50qiz2hIdY0uy1WZBsLdZyDeYfsOzCji1lsl3dGpQHM=
+gopkg.in/gomail.v1 v1.0.0-20150320132819-11b919ab4933 h1:zZLjlY9WmDAdTNIndT9MFhQNZJ+9OkMz22q3Z9ZhMpk=
+gopkg.in/gomail.v1 v1.0.0-20150320132819-11b919ab4933/go.mod h1:mrkmGIvaT7iUJO0pgw8OzjwN1tHmFcMHYtBizddG/ZU=
+gopkg.in/mgo.v2 v2.0.0-20190816093944-a6b53ec6cb22 h1:VpOs+IwYnYBaFnrNAeB8UUWtL3vEUnzSCL1nVjPhqrw=
+gopkg.in/mgo.v2 v2.0.0-20190816093944-a6b53ec6cb22/go.mod h1:yeKp02qBN3iKW1OzL3MGk2IdtZzaj7SFntXj72NppTA=
