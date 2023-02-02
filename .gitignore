@@ -6,7 +6,7 @@
 nes
 .idea/
 *.log
-*.json
+config.json
 roms/
 static/origin_roms/*
 static/js/*

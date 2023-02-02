@@ -1,0 +1,8 @@
+{
+  "log_level": "debug",
+  "github": {
+    "client_id": "2443d910b04cd68c5a66",
+    "client_secret": "7612e0862cd87dc2f298aff7051d36561086b939"
+  },
+  "mgo_url": "mongodb://root:pwd@127.0.0.1:27017/nes?authSource=admin&maxPoolSize=20&w=majority"
+}
